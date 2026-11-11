@@ -1,0 +1,2315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Physical Fitness Progression Paths</title>
+<meta name="description" content="A training calculator that turns your sport, conditioning, injuries and body stats into progression paths, weekly plans, fueling, recovery and test gates, with IntervalTimer export.">
+<meta name="theme-color" content="#10202b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root {
+  --bg: #f4f6f8; --panel: #ffffff; --panel-2: #eef2f5; --line: #d6dde3; --text: #18222b; --muted: #5b6874;
+  --accent: #127f74; --accent-ink: #ffffff; --accent-soft: #d8f0ec;
+  --E: #2f7fd1; --S: #c4542b; --P: #b98a00; --R: #7c4dc4;
+  --E-soft: #e1eefb; --S-soft: #fbe6de; --P-soft: #f8efcc; --R-soft: #ece4f8;
+  --good: #1f8a4c; --good-soft: #dcf2e4; --warn: #b26b00; --warn-soft: #fbeed6; --bad: #c2393b; --bad-soft: #fbe1e1;
+  --shadow: 0 1px 2px rgba(16,32,43,.06), 0 2px 8px rgba(16,32,43,.05);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d151b; --panel: #15212a; --panel-2: #1b2933; --line: #2a3a46; --text: #e3eaf0; --muted: #94a3b0;
+    --accent: #3cc3b2; --accent-ink: #062320; --accent-soft: #143a36;
+    --E: #6aaef5; --S: #f08a62; --P: #e3bb3c; --R: #b391f0;
+    --E-soft: #173049; --S-soft: #45261b; --P-soft: #3d3313; --R-soft: #2d2445;
+    --good: #4fd08a; --good-soft: #163a27; --warn: #f0b350; --warn-soft: #3d2f15; --bad: #f07a7c; --bad-soft: #452022;
+    --shadow: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d151b; --panel: #15212a; --panel-2: #1b2933; --line: #2a3a46; --text: #e3eaf0; --muted: #94a3b0;
+  --accent: #3cc3b2; --accent-ink: #062320; --accent-soft: #143a36;
+  --E: #6aaef5; --S: #f08a62; --P: #e3bb3c; --R: #b391f0;
+  --E-soft: #173049; --S-soft: #45261b; --P-soft: #3d3313; --R-soft: #2d2445;
+  --good: #4fd08a; --good-soft: #163a27; --warn: #f0b350; --warn-soft: #3d2f15; --bad: #f07a7c; --bad-soft: #452022;
+  --shadow: none; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--accent); }
+h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 8px; }
+h2 { font-size: 19px; } h3 { font-size: 16px; } h4 { font-size: 14px; }
+p { margin: 0 0 10px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+header.top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+header.top img { width: 30px; height: 30px; }
+header.top h1 { font-size: 17px; margin: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iconbtn { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+nav.tabs { position: sticky; top: 47px; z-index: 19; display: flex; gap: 4px; overflow-x: auto; padding: 6px 16px; background: var(--bg); border-bottom: 1px solid var(--line); scrollbar-width: thin; }
+nav.tabs button { flex: none; border: 0; background: transparent; color: var(--muted); padding: 7px 12px; border-radius: 999px; font: inherit; font-weight: 600; cursor: pointer; }
+nav.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.layout { max-width: 1320px; margin: 0 auto; padding: 14px 16px 60px; display: grid; gap: 16px; }
+@media (min-width: 1000px) {
+  .layout { grid-template-columns: 380px minmax(0, 1fr); align-items: start; }
+  #you { position: sticky; top: 104px; max-height: calc(100vh - 116px); overflow-y: auto; display: block !important; }
+  nav.tabs button[data-tab="you"] { display: none; }
+}
+.panel { display: none; }
+.panel.on { display: block; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 14px; box-shadow: var(--shadow); }
+.card > h2:first-child, .card > h3:first-child { margin-top: 0; }
+details.sec { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; box-shadow: var(--shadow); }
+details.sec > summary { cursor: pointer; padding: 11px 14px; font-weight: 700; list-style: none; display: flex; align-items: center; gap: 8px; }
+details.sec > summary::-webkit-details-marker { display: none; }
+details.sec > summary::after { content: "▸"; margin-left: auto; color: var(--muted); transition: transform .15s; }
+details.sec[open] > summary::after { transform: rotate(90deg); }
+details.sec .body { padding: 0 14px 14px; }
+label.f { display: block; margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+label.f > span.l { display: block; margin-bottom: 3px; }
+input, select, textarea { font: inherit; color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; width: 100%; min-width: 0; }
+input[type="checkbox"], input[type="radio"] { width: auto; accent-color: var(--accent); }
+input[type="range"] { padding: 0; accent-color: var(--accent); background: transparent; border: 0; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 10px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.btn { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 8px; padding: 7px 12px; font: inherit; font-weight: 600; cursor: pointer; }
+.btn.pri { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.sm { padding: 4px 9px; font-size: 13px; }
+.btn:disabled { opacity: .5; cursor: default; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
+.q-E { color: var(--E); } .q-S { color: var(--S); } .q-P { color: var(--P); } .q-R { color: var(--R); }
+.chip.E { background: var(--E-soft); color: var(--E); border-color: transparent; }
+.chip.S { background: var(--S-soft); color: var(--S); border-color: transparent; }
+.chip.P { background: var(--P-soft); color: var(--P); border-color: transparent; }
+.chip.R { background: var(--R-soft); color: var(--R); border-color: transparent; }
+.chip.good { background: var(--good-soft); color: var(--good); border-color: transparent; }
+.chip.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.chip.bad { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+.days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.days label { display: flex; flex-direction: column; align-items: center; font-size: 12px; padding: 4px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); cursor: pointer; }
+.days label:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); }
+.emph { display: grid; grid-template-columns: 92px 1fr 40px; gap: 4px 8px; align-items: center; font-size: 13px; }
+.emph output { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--panel-2); }
+.bar > i { display: block; height: 100%; }
+.test-row { display: grid; grid-template-columns: 1fr 104px; gap: 6px; align-items: center; margin-bottom: 6px; font-size: 13px; }
+.test-row .tl small { display: block; color: var(--muted); font-size: 12px; }
+.inj { display: grid; grid-template-columns: 1fr 128px; gap: 6px; align-items: center; margin-bottom: 6px; font-size: 13px; }
+.inj .ph { grid-column: 1 / -1; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; }
+.week { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+.day { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; box-shadow: var(--shadow); }
+.day.today { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.day.rest { background: var(--panel-2); }
+.day h3 { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.day h3 .mins { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 600; }
+.sess { border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }
+.blk { margin: 6px 0; padding-left: 9px; border-left: 3px solid var(--line); }
+.blk.E { border-color: var(--E); } .blk.S { border-color: var(--S); } .blk.P { border-color: var(--P); } .blk.R { border-color: var(--R); } .blk.X { border-color: var(--bad); }
+.blk h4 { font-size: 13px; margin: 0 0 2px; display: flex; gap: 6px; align-items: baseline; }
+.blk h4 small { color: var(--muted); font-weight: 500; }
+.blk ul { margin: 0; padding-left: 0; list-style: none; font-size: 13px; }
+.blk summary { cursor: pointer; }
+.blk details > div { padding: 2px 0 4px 14px; }
+.blk li { margin: 1px 0; }
+.blk li .dose { color: var(--muted); }
+.blk li .alt { color: var(--muted); font-size: 12px; }
+.ex { cursor: help; text-decoration: underline dotted var(--muted); text-underline-offset: 3px; }
+.ladder { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.ladder .st { flex: 1 1 120px; border: 1px solid var(--line); border-radius: 10px; padding: 8px; background: var(--panel-2); font-size: 12px; position: relative; }
+.ladder .st b { display: block; font-size: 13px; }
+.ladder .st.done { opacity: .7; }
+.ladder .st.cur { background: var(--panel); border-width: 2px; }
+.ladder .st.cur.E { border-color: var(--E); } .ladder .st.cur.S { border-color: var(--S); } .ladder .st.cur.P { border-color: var(--P); } .ladder .st.cur.R { border-color: var(--R); }
+.loops { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.loop { text-align: center; font-size: 13px; }
+.loop svg { width: 100%; max-width: 150px; height: auto; display: block; margin: 0 auto 4px; }
+.status { padding: 10px 12px; border-radius: 10px; font-weight: 600; margin-bottom: 10px; }
+.status.good { background: var(--good-soft); color: var(--good); }
+.status.warn { background: var(--warn-soft); color: var(--warn); }
+.status.bad { background: var(--bad-soft); color: var(--bad); }
+.note { background: var(--panel-2); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin: 8px 0; }
+.note.warn { background: var(--warn-soft); }
+.note.bad { background: var(--bad-soft); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 10px; }
+.kpi { background: var(--panel-2); border-radius: 10px; padding: 8px 10px; }
+.kpi b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+.kpi span { font-size: 12px; color: var(--muted); }
+.heat td.c { text-align: center; font-variant-numeric: tabular-nums; border-radius: 4px; }
+.pill-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+.pill-tabs button { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+.pill-tabs button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.disclaimer { font-size: 12px; color: var(--muted); }
+dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); max-width: min(560px, calc(100vw - 32px)); padding: 18px; }
+dialog::backdrop { background: rgba(0,0,0,.45); }
+.about-log { list-style: none; padding: 0; margin: 0; font-size: 13px; max-height: 40vh; overflow-y: auto; }
+.about-log li { margin: 0 0 5px; }
+.about-log time { color: var(--muted); margin-right: 8px; font-variant-numeric: tabular-nums; }
+.dlg-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 10px; font-size: 14px; z-index: 50; }
+.update-bar { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 40; display: flex; gap: 10px; align-items: center; justify-content: space-between; background: var(--panel); border: 1px solid var(--accent); border-radius: 12px; padding: 10px 14px; }
+.foot { text-align: center; padding: 10px 16px 30px; }
+.foot button { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+.exp-list label { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.exp-list label small { display: block; color: var(--muted); }
+@media (max-width: 560px) {
+  .grid3 { grid-template-columns: 1fr 1fr; }
+  .test-row { grid-template-columns: 1fr 92px; }
+}
+@media print { header.top, nav.tabs, #you, .foot, .noprint { display: none !important; } .panel { display: block !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <img src="icon.svg" alt="">
+  <h1>Fitness Progression Paths</h1>
+  <button class="iconbtn" id="themeBtn" title="Switch light or dark theme">Theme</button>
+</header>
+<nav class="tabs" role="tablist" id="tabs">
+  <button data-tab="you" role="tab">You</button>
+  <button data-tab="paths" role="tab">Paths</button>
+  <button data-tab="week" role="tab">Week</button>
+  <button data-tab="today" role="tab">Today</button>
+  <button data-tab="fuel" role="tab">Fuel</button>
+  <button data-tab="recover" role="tab">Recover</button>
+  <button data-tab="gates" role="tab">Gates</button>
+  <button data-tab="export" role="tab">Export</button>
+</nav>
+<div class="layout">
+  <aside id="you" class="panel"></aside>
+  <main>
+    <section id="paths" class="panel"></section>
+    <section id="week" class="panel"></section>
+    <section id="today" class="panel"></section>
+    <section id="fuel" class="panel"></section>
+    <section id="recover" class="panel"></section>
+    <section id="gates" class="panel"></section>
+    <section id="export" class="panel"></section>
+  </main>
+</div>
+<div class="foot"><button id="aboutBtn">About</button></div>
+
+<dialog id="aboutDlg" aria-labelledby="aboutTitle">
+  <h2 id="aboutTitle">About Fitness Progression Paths</h2>
+  <p>A training calculator for building endurance, strength and power toward an elite level without carrying mass you don't need. Everything you enter stays in this browser.</p>
+  <p class="small">It is an educational planner, not medical advice. Get a professional assessment for pain, a recent injury, or a health condition before you train hard.</p>
+  <p><a href="https://github.com/sonusario/physical_fitness_progression_paths" target="_blank" rel="noopener">Source on GitHub</a> · <a href="https://sonusario.github.io/">More projects</a> · <a href="https://sonusario.github.io/IntervalTimer/" target="_blank" rel="noopener">IntervalTimer</a> · Build <span id="buildNo"></span></p>
+  <h3>Changes</h3>
+  <ul class="about-log" id="aboutLog"><li class="muted">Loading changes…</li></ul>
+  <div class="dlg-row"><button class="btn" id="aboutClose">Close</button></div>
+</dialog>
+<input type="file" id="filePick" accept="application/json,.json" hidden>
+<script>
+'use strict';
+const APP_BUILD = '1.0 (2026.11.10)';
+const REPO = 'sonusario/physical_fitness_progression_paths';
+
+// =============================================================================
+// Muscle groups and exercises
+// =============================================================================
+const GROUPS = [
+  ['quad', 'Quads'], ['ham', 'Hamstrings'], ['glute', 'Glutes'], ['add', 'Adductors'], ['hipf', 'Hip flexors'],
+  ['calf', 'Calves'], ['shin', 'Shins and feet'], ['core', 'Abs and obliques'], ['lowb', 'Lower back'],
+  ['chest', 'Chest'], ['uback', 'Upper back'], ['lats', 'Lats'], ['delt', 'Shoulders'], ['rc', 'Rotator cuff'],
+  ['bi', 'Biceps'], ['tri', 'Triceps'], ['fore', 'Forearms and grip'], ['neck', 'Neck'],
+];
+const GROUP_NAME = Object.fromEntries(GROUPS);
+
+// id | name | muscle groups (primary = 1, or name:share) | stress tags | how to do it
+// Stress tags let injuries swap exercises out: knee, spine, shoulder, overhead,
+// impact, ankle, ham, groin, grip, wrist, elbow, neck.
+const EX_LIST = `
+bw_box_squat|Box squat (bodyweight)|quad glute:.6|knee|Sit back to a knee-height box, touch lightly, stand tall without rocking.
+split_squat|Split squat|quad glute:.6 add:.3|knee|Long stance, back knee to just above the floor, front shin close to vertical.
+rfess|Rear-foot-elevated split squat|quad glute add:.3|knee|Back foot on a bench, drop straight down for 3 seconds, drive up.
+skater|Skater squat|quad glute|knee|One leg, back knee lowers to a pad behind you, arms reach forward to balance.
+pistol_box|Pistol squat to a low box|quad glute core:.3|knee|One leg, sit to a low box with control, stand without a swing.
+pistol|Pistol squat (hold a weight once 3×8 is easy)|quad glute core:.3|knee|Full single-leg squat, heel down, knee tracking over the toes.
+goblet|Goblet squat|quad glute core:.3|knee|Hold a weight at the chest, sit between the heels, elbows inside the knees.
+db_rfess|Dumbbell rear-foot-elevated split squat|quad glute add:.3|knee|Dumbbells at the sides, back foot on a bench, 3 seconds down.
+back_squat|Back squat|quad glute lowb:.4 add:.3|knee spine|Bar on the upper back, brace, sit to at least parallel, drive up fast.
+front_squat|Front squat|quad glute core:.5 uback:.3|knee|Bar on the front of the shoulders, elbows high, upright torso.
+glute_bridge|Glute bridge|glute ham:.5|none|Feet flat, ribs down, squeeze the glutes to lift the hips, 2 second hold.
+sl_bridge|Single-leg glute bridge|glute ham:.6|none|One foot down, other knee to the chest, lift without arching the back.
+sl_rdl_bw|Single-leg Romanian deadlift (bodyweight)|ham glute lowb:.3|ham|Hinge on one leg, back leg long, hips square, feel the hamstring.
+slider_curl|Slider leg curl|ham glute:.5|ham|Bridge up on sliders or socks, slide the heels out slowly and pull back in.
+sl_hip_thrust|Single-leg hip thrust|glute ham:.5|none|Shoulders on a bench, one foot down, full hip lockout each rep.
+kb_deadlift|Kettlebell deadlift|glute ham lowb:.5 fore:.3|spine|Bell between the feet, hips back, flat back, stand by pushing the floor.
+db_rdl|Dumbbell Romanian deadlift|ham glute lowb:.4 fore:.3|spine ham|Soft knees, push the hips back, weights close to the legs, stop at mid-shin.
+sl_db_rdl|Single-leg dumbbell Romanian deadlift|ham glute lowb:.3|ham|One leg, weight in the opposite hand, slow lower, hips square.
+trapbar_dl|Trap-bar deadlift|glute ham quad:.5 lowb:.5 fore:.4 uback:.3|spine|Stand in the bar, brace, push the floor away; less low-back strain than a straight bar.
+rdl|Barbell Romanian deadlift|ham glute lowb:.5 fore:.3|spine ham|From standing, hinge with a flat back until the hamstrings stop you.
+reverse_lunge|Reverse lunge|quad glute add:.3|knee|Step back, back knee to just above the floor, push through the front heel.
+step_up|Step-up (knee-height box)|quad glute|knee|Whole foot on the box, stand up without pushing off the back leg.
+lateral_lunge|Lateral lunge|add glute quad:.5|groin knee|Step wide, sit into one hip with the other leg straight, push back.
+db_lunge|Dumbbell reverse lunge|quad glute add:.3|knee|Dumbbells at the sides, step back, keep the torso tall.
+db_step_up|Dumbbell step-up|quad glute|knee|Dumbbells at the sides, drive through the top foot, control the way down.
+db_lat_lunge|Goblet lateral lunge|add glute quad:.5|groin knee|Weight at the chest, sit into the hip, keep the other foot flat.
+incline_pushup|Incline push-up|chest tri:.6 delt:.4|wrist shoulder|Hands on a bench or wall, body in one line, chest to the edge.
+pushup|Push-up|chest tri:.6 delt:.4 core:.3|wrist shoulder|Hands under the shoulders, elbows at about 45°, chest to a fist's height.
+tempo_pushup|Tempo push-up (3 s down, 1 s pause)|chest tri:.6 delt:.4 core:.3|wrist shoulder|Slow on the way down, pause just above the floor, press fast.
+feet_pushup|Feet-elevated push-up|chest delt:.6 tri:.6 core:.3|wrist shoulder|Feet on a bench, body straight, full range.
+archer_pushup|Archer push-up|chest tri delt:.5 core:.3|wrist shoulder|Wide hands, lower toward one hand while the other arm stays long.
+db_floor_press|Dumbbell floor press|chest tri:.7 delt:.4|shoulder|Lie on the floor, press until the elbows lock, pause the elbows on the floor.
+db_bench|Dumbbell bench press|chest tri:.6 delt:.4|shoulder|Shoulder blades pinned back, lower to the chest line, press up and slightly in.
+bench|Bench press|chest tri:.7 delt:.4|shoulder|Feet planted, shoulder blades back, touch the lower chest, press up.
+band_row|Band row|uback lats:.5 bi:.4 rc:.3|none|Anchor the band at chest height, pull elbows back, squeeze the shoulder blades.
+inv_row|Inverted row (rings, low bar or sturdy table)|uback lats:.6 bi:.5 core:.3|grip|Body straight, pull the chest to the bar, lower slowly.
+feet_inv_row|Feet-elevated inverted row|uback lats:.6 bi:.5 core:.3|grip|Feet on a box so the body is level, pause at the top.
+db_row|One-arm dumbbell row|uback lats bi:.5 fore:.3|grip|Hand and knee on a bench, pull the elbow to the hip, no twisting.
+chest_row|Chest-supported row|uback lats bi:.5|grip|Chest on an incline bench, pull both elbows back; spares the low back.
+pike_pushup|Pike push-up|delt tri:.6 chest:.3|overhead shoulder wrist|Hips high, lower the head between the hands, press back up.
+elev_pike|Feet-elevated pike push-up|delt tri:.6|overhead shoulder wrist|Feet on a box, hips over the shoulders, head to the floor.
+wall_hspu|Wall handstand push-up (negatives first)|delt tri:.7 core:.3|overhead shoulder wrist|Face the wall, lower slowly to the floor, press or step down.
+kneel_press|Half-kneeling dumbbell press|delt tri:.6 core:.4|overhead shoulder|One knee down, ribs down, press up and slightly forward.
+landmine|Landmine press|delt chest:.5 tri:.5 core:.3|shoulder|Bar end in a corner, press up and forward along an arc; shoulder-friendly.
+ohp|Standing overhead press|delt tri:.7 core:.4 uback:.3|overhead shoulder spine|Squeeze the glutes, bar from the collarbones to overhead, head through.
+band_pulldown|Band pulldown|lats uback:.5 bi:.4|none|Anchor high, pull the elbows down to the ribs, shoulders away from the ears.
+pullup_neg|Pull-up negatives (5 s down)|lats bi:.6 uback:.5 fore:.4|grip shoulder|Jump or step to the top, lower for 5 seconds to a dead hang.
+pullup|Pull-up|lats bi:.6 uback:.5 fore:.4 core:.3|grip shoulder|From a dead hang, chest to the bar, no kipping.
+w_pullup|Weighted pull-up|lats bi:.6 uback:.5 fore:.5 core:.3|grip shoulder|Add weight with a belt or vest; strict reps only.
+calf_raise|Calf raise (both legs)|calf|ankle|Full range, 2 seconds up and 2 down, pause at the top.
+sl_calf|Single-leg calf raise|calf shin:.3|ankle|One foot, full height, slow lower, keep the ankle straight.
+sl_calf_step|Single-leg calf raise off a step (add weight when 3×15 is easy)|calf shin:.3|ankle|Heel drops below the step, rise to full height, 3 seconds down.
+seated_calf|Seated calf raise (bent knee, heavy)|calf|ankle|Weight on the knees, bent knee targets the soleus, the main running calf muscle.
+dead_bug|Dead bug|core hipf:.3|none|Low back pressed down, reach opposite arm and leg away slowly.
+plank|Plank|core delt:.3|wrist|Elbows under the shoulders, squeeze glutes and quads, breathe.
+ll_plank|Long-lever plank|core delt:.4|wrist|Elbows ahead of the shoulders, pull the elbows toward the toes.
+hollow|Hollow hold|core hipf:.4|none|Low back flat on the floor, arms and legs long and just off the ground.
+ab_roll|Ab-wheel or stability-ball rollout|core lats:.4 delt:.3|spine|Brace, roll out only as far as the low back stays flat.
+side_plank_k|Side plank from the knees|core glute:.3|none|Elbow under the shoulder, straight line from knees to head.
+side_plank|Side plank|core glute:.4 add:.3|none|Feet stacked, hips high, push the floor away.
+pallof|Pallof press|core|none|Band to the side at chest height, press it straight out and resist the twist.
+sa_carry|One-arm suitcase carry|core fore uback:.4|grip|Heavy weight in one hand, walk tall without leaning.
+farmer|Farmer carry|fore uback core:.5 glute:.3|grip|Heavy weights in both hands, short quick steps, shoulders down.
+dead_hang|Dead hang|fore lats:.3 rc:.3|grip shoulder|Hang from a bar with active shoulders; builds grip and shoulder tolerance.
+bag_carry|Backpack carry (loaded bag held in front)|core fore uback:.5|grip|Bear-hug a heavy bag or backpack and walk tall.
+`;
+const EX = {};
+for (const line of EX_LIST.trim().split('\n')) {
+  const [id, name, g, tags, cue] = line.split('|');
+  const groups = {};
+  for (const part of g.split(' ')) { const [k, v] = part.split(':'); groups[k] = v ? Number(v) : 1; }
+  EX[id] = { id, name, groups, tags: tags === 'none' ? [] : tags.split(' '), cue };
+}
+function addEx(id, name, g, tags, cue) {
+  const groups = {};
+  for (const part of g.split(' ')) { const [k, v] = part.split(':'); groups[k] = v ? Number(v) : 1; }
+  EX[id] = { id, name, groups, tags: tags ? tags.split(' ') : [], cue };
+}
+
+// Power, resilience and rehab exercises.
+const EX_MORE = `
+snap_down|Snap-downs into a stick landing|quad glute calf:.3|impact knee|Rise on the toes, snap down into an athletic stance and freeze.
+squat_jump|Squat jump with a stick landing|quad glute calf:.5|impact knee|Jump as high as you can, land quietly, freeze for 2 seconds.
+cmj|Countermovement jump|quad glute calf:.5|impact knee|Quick dip and jump, reset between reps; every rep at full effort.
+box_jump|Box jump (step down)|quad glute calf:.5|impact knee|Jump onto a box you can land on softly, step down; never jump down.
+hurdle_jump|Continuous hurdle or line jumps|quad glute calf:.6|impact knee ankle|Short ground contact, hips tall, rebound off the floor.
+depth_jump|Depth jump (30–45 cm box)|quad glute calf:.6|impact knee ankle|Step off, land and jump at once; quality ends the set.
+pogo|Pogo hops|calf shin:.4|impact ankle|Stiff ankles, bounce on the balls of the feet, quiet and quick.
+lat_pogo|Lateral line hops|calf add:.3 shin:.4|impact ankle|Side to side over a line, ankles stiff, short contacts.
+sl_pogo|Single-leg pogo hops|calf shin:.4|impact ankle|One leg, small quick hops; stop when contacts get loud.
+sl_hurdle|Single-leg hurdle hops|calf quad:.5 glute:.5|impact ankle knee|Hop over low hurdles on one leg, stick the last one.
+broad_stick|Broad jump with a stick landing|glute quad ham:.5|impact knee|Swing the arms, jump forward, land and hold.
+broad_triple|Triple broad jumps|glute quad ham:.5 calf:.4|impact knee ankle|Three jumps in a row with quick contacts.
+bound|Alternate-leg bounding|glute ham quad:.5 calf:.5 hipf:.4|impact ankle ham|Exaggerated running strides, drive the knee, land under the hips.
+sl_bound|Single-leg bounds|glute ham quad:.5 calf:.5|impact ankle knee ham|Hop forward on one leg with a full arm swing.
+inc_plyo_push|Incline plyo push-up|chest tri:.5 delt:.4|wrist shoulder|Hands on a bench, push hard so the hands leave it, land softly.
+plyo_push|Plyo push-up|chest tri:.5 delt:.4|wrist shoulder|Explode off the floor, land with soft elbows.
+mb_chest|Medicine-ball chest pass against a wall|chest tri:.5 delt:.4|shoulder|Step and throw as hard as you can; catch and reset.
+mb_rot|Medicine-ball rotational throw|core glute:.5 delt:.3|spine|Side-on to a wall, load the back hip, rotate and throw.
+mb_slam|Medicine-ball overhead slam|lats core delt:.3|overhead|Reach tall, slam hard, catch the bounce.
+mb_ohthrow|Medicine-ball overhead backward throw|glute ham:.6 delt:.4 lowb:.3|spine overhead|Dip, then extend hard and throw the ball up and behind you.
+kb_swing|Kettlebell swing|glute ham lowb:.4 fore:.3|spine|Hike the bell back, snap the hips; the arms only guide.
+jump_shrug|Jump shrug|glute quad calf:.4 uback:.5|spine|From the hang, jump and shrug hard with straight arms.
+hang_clean|Hang power clean|glute quad uback lowb:.4 fore:.3|spine wrist|From above the knees, jump and pull under, catch high.
+trapbar_jump|Trap-bar jump (20–30% of deadlift)|glute quad calf:.4|impact knee spine|Light load, jump as high as you can, land softly.
+strides|Strides (build-ups to 85–90% speed)|ham glute hipf:.4 calf:.4|impact ham|Build over 60–80 m, stay relaxed at the top, walk back.
+accel|Acceleration sprints|glute ham quad:.5 hipf:.5 calf:.4|impact ham|Lean from the ankles, powerful pushes; full rest between reps.
+flying|Flying sprints (build 20 m, then sprint)|ham glute hipf:.5 calf:.4|impact ham|Build into it, hold top speed through the zone, relax.
+hill_sprint|Short hill sprints (8–10 s)|glute ham quad:.5 calf:.5|ham|Steep hill, maximal effort, walk down; gentler on the hamstrings than flat sprints.
+bike_sprint|Bike sprints (seated, high resistance)|quad glute|knee|8–10 s all-out from a rolling start, easy spin between.
+swim_sprint|Swim sprints (12.5–25 m)|lats delt:.5 tri:.4 core:.3|shoulder|All-out from a push, easy swim back.
+row_sprint|Rowing power strokes|glute quad lats:.6 uback:.5|spine|8–10 maximal strokes from a rolling start.
+nordic|Nordic hamstring curl|ham|ham|Kneel with the ankles anchored, lower as slowly as you can, push back up.
+copen_s|Copenhagen plank (short lever, knee on the bench)|add core:.5|groin|Side plank with the top knee on a bench, lift the bottom leg to it.
+copen|Copenhagen plank (long lever, foot on the bench)|add core:.6|groin|Side plank with the top foot on a bench, hold or do slow lifts.
+add_squeeze|Adductor squeeze (ball between the knees)|add|groin|Lie with the knees bent, squeeze a ball hard for 5–10 s.
+tib_raise|Tibialis raise|shin|ankle|Back against a wall, heels forward, lift the toes high, slow down.
+soleus|Bent-knee calf raise (soleus)|calf|ankle|Knees bent about 45°, rise slowly; holding a weight makes it harder.
+calf_iso|Isometric calf hold|calf|none|Rise halfway on one leg against a wall and hold; pain should stay at 3/10 or lower.
+hsr_calf|Heavy slow calf raise|calf|ankle|3 seconds up and 3 down, heavy enough to reach 15, then 12, 10, 8 and 6 reps.
+towel_calf|High-load calf raise with a rolled towel under the toes|calf shin:.5|ankle|Towel under the toes lifts the arch, 3 s up, 2 s hold, 3 s down.
+short_foot|Short-foot exercise|shin|none|Draw the ball of the foot toward the heel without curling the toes.
+er_iso|Isometric shoulder external rotation|rc|none|Elbow at the side, push the back of the hand into a wall, 30–45 s.
+band_er|Band external rotation|rc uback:.3|shoulder|Towel under the elbow, rotate the hand out, slow return.
+side_er|Side-lying external rotation|rc|shoulder|Lie on the side, light weight, rotate up without lifting the elbow.
+ytw|Prone Y-T-W raises|uback rc:.6 delt:.4|shoulder|Face down on a bench or the floor, thumbs up, lift into Y, T and W.
+pull_apart|Band pull-apart|uback rc:.5 delt:.3|none|Arms straight, pull the band to the chest, squeeze the shoulder blades.
+face_pull|Face pull|uback rc delt:.5|shoulder|Rope at face height, pull toward the eyes with the elbows high.
+scap_push|Scapular push-up|uback chest:.3|wrist|In a plank, let the shoulder blades meet and then push them apart.
+curl_up|McGill curl-up|core|none|One knee bent, hands under the low back, lift the head and shoulders a little.
+bird_dog|Bird dog|lowb glute:.5 core:.5|none|On all fours, reach the opposite arm and leg long, hold 8–10 s.
+neck_iso|Neck isometrics (4 directions)|neck|neck|Hand on the head, push gently forward, back and to each side, 10 s each.
+chin_tuck|Chin tucks|neck|none|Slide the head straight back to make a double chin, hold 5 s.
+wrist_ext|Eccentric wrist extension (Tyler twist or dumbbell)|fore|elbow wrist|Lower the back of the wrist for 4 seconds, use the other hand to lift.
+wrist_iso|Isometric wrist extension|fore|none|Forearm on the thigh, hold a light weight with the wrist level for 30–45 s.
+wrist_curl|Wrist curls and reverse curls|fore|wrist|Light weight, full range, slow.
+fist_push|Push-up on fists or handles|chest tri:.6 delt:.4|shoulder|Neutral wrists take the bend out of the joint.
+finger_hang|Hangboard (two-arm, 20 mm edge, 10 s)|fore|grip elbow|Open-hand grip, active shoulders, stop well before failure.
+sl_balance|Single-leg balance (eyes closed when easy)|shin calf:.4 glute:.4|none|Stand on one leg for 30–60 s; close the eyes or stand on a cushion to progress.
+star_excursion|Star excursion reach|glute quad:.4 shin:.4|knee|Stand on one leg, reach the other foot forward, side and back.
+spanish_iso|Spanish squat hold (band behind the knees)|quad|none|Band anchored behind both knees, sit back to 60–70° knee bend, hold 45 s.
+decline_squat|Decline single-leg squat|quad|knee|Stand on a slant board, squat slowly to 60° on one leg.
+wall_sit|Wall sit|quad glute:.4|knee|Back on the wall, knees at about 60–90°, hold.
+clam|Banded clamshell|glute|none|Lie on the side, knees bent, open the top knee against the band.
+side_hip|Side-lying hip abduction|glute|none|Top leg straight and slightly behind you, lift with the heel leading.
+bridge_iso|Isometric bridge hold (heels far out)|ham glute:.5|none|Feet far from the hips, lift and hold; the hamstrings do the work.
+ll_bridge|Long-lever bridge march|ham glute:.5 core:.3|ham|Heels far out, bridge up and march slowly.
+askling|Askling L-protocol (Extender, Diver, Glider)|ham glute:.3|ham|Three lengthening drills for hamstrings; slow and pain-free.
+psoas_march|Banded psoas march|hipf core:.4|none|Lying with a band round the feet, drive one knee up while the other leg stays long.
+hip_9090|90/90 hip switches|glute add:.3|none|Sit with both knees at 90°, rotate the knees to the other side, tall chest.
+tspine|Open-book thoracic rotations|uback|none|Lie on the side, knees stacked, rotate the top arm open and breathe out.
+ankle_kw|Knee-to-wall ankle mobility|calf shin:.3|none|Front foot a few cm from a wall, drive the knee to the wall without the heel lifting.
+couch|Couch stretch|hipf quad:.5|knee|Back knee on the floor against a wall, squeeze the glute, tall torso.
+wgs|World's greatest stretch|hipf ham:.4 uback:.3|none|Lunge, elbow to the instep, rotate the arm up, then straighten the front leg.
+`;
+for (const line of EX_MORE.trim().split('\n')) {
+  const [id, name, g, tags, cue] = line.split('|');
+  addEx(id, name, g, tags === 'none' ? '' : tags, cue);
+}
+
+// Strength ladders: pattern -> equipment tier (0 bodyweight and band, 1 home with
+// dumbbells or kettlebells, 2 gym) -> exercise for stages 1..6.
+const LAD = {
+  squat: [
+    ['bw_box_squat', 'split_squat', 'rfess', 'skater', 'pistol_box', 'pistol'],
+    ['goblet', 'goblet', 'db_rfess', 'db_rfess', 'pistol_box', 'pistol'],
+    ['goblet', 'back_squat', 'back_squat', 'back_squat', 'back_squat', 'back_squat'],
+  ],
+  hinge: [
+    ['glute_bridge', 'sl_bridge', 'sl_rdl_bw', 'slider_curl', 'sl_hip_thrust', 'sl_hip_thrust'],
+    ['kb_deadlift', 'kb_deadlift', 'db_rdl', 'db_rdl', 'sl_db_rdl', 'sl_db_rdl'],
+    ['kb_deadlift', 'trapbar_dl', 'trapbar_dl', 'trapbar_dl', 'trapbar_dl', 'trapbar_dl'],
+  ],
+  hinge2: [
+    ['sl_bridge', 'sl_rdl_bw', 'slider_curl', 'slider_curl', 'sl_hip_thrust', 'sl_hip_thrust'],
+    ['db_rdl', 'db_rdl', 'sl_db_rdl', 'sl_db_rdl', 'sl_db_rdl', 'sl_db_rdl'],
+    ['db_rdl', 'rdl', 'rdl', 'rdl', 'rdl', 'rdl'],
+  ],
+  single: [
+    ['reverse_lunge', 'step_up', 'step_up', 'lateral_lunge', 'rfess', 'skater'],
+    ['db_lunge', 'db_step_up', 'db_step_up', 'db_lat_lunge', 'db_rfess', 'db_rfess'],
+    ['db_lunge', 'db_step_up', 'db_rfess', 'db_rfess', 'db_rfess', 'db_rfess'],
+  ],
+  hpush: [
+    ['incline_pushup', 'pushup', 'tempo_pushup', 'feet_pushup', 'archer_pushup', 'archer_pushup'],
+    ['pushup', 'db_floor_press', 'db_floor_press', 'feet_pushup', 'archer_pushup', 'archer_pushup'],
+    ['pushup', 'db_bench', 'bench', 'bench', 'bench', 'bench'],
+  ],
+  hpull: [
+    ['band_row', 'inv_row', 'inv_row', 'feet_inv_row', 'feet_inv_row', 'feet_inv_row'],
+    ['db_row', 'db_row', 'db_row', 'db_row', 'feet_inv_row', 'feet_inv_row'],
+    ['db_row', 'chest_row', 'chest_row', 'chest_row', 'chest_row', 'chest_row'],
+  ],
+  vpush: [
+    ['pike_pushup', 'pike_pushup', 'elev_pike', 'elev_pike', 'wall_hspu', 'wall_hspu'],
+    ['kneel_press', 'kneel_press', 'kneel_press', 'elev_pike', 'wall_hspu', 'wall_hspu'],
+    ['landmine', 'kneel_press', 'ohp', 'ohp', 'ohp', 'ohp'],
+  ],
+  vpull: [
+    ['band_pulldown', 'pullup_neg', 'pullup_neg', 'pullup', 'pullup', 'w_pullup'],
+    ['band_pulldown', 'pullup_neg', 'pullup', 'pullup', 'w_pullup', 'w_pullup'],
+    ['band_pulldown', 'pullup_neg', 'pullup', 'pullup', 'w_pullup', 'w_pullup'],
+  ],
+  calf: [
+    ['calf_raise', 'sl_calf', 'sl_calf_step', 'sl_calf_step', 'sl_calf_step', 'sl_calf_step'],
+    ['calf_raise', 'sl_calf', 'sl_calf_step', 'sl_calf_step', 'seated_calf', 'seated_calf'],
+    ['sl_calf', 'sl_calf_step', 'seated_calf', 'seated_calf', 'seated_calf', 'seated_calf'],
+  ],
+  core_ae: [['dead_bug', 'plank', 'll_plank', 'hollow', 'hollow', 'll_plank'], null, ['dead_bug', 'plank', 'll_plank', 'ab_roll', 'ab_roll', 'ab_roll']],
+  core_ar: [['side_plank_k', 'side_plank', 'pallof', 'pallof', 'side_plank', 'pallof'], null, null],
+  carry: [['bag_carry', 'bag_carry', 'bag_carry', 'bag_carry', 'bag_carry', 'bag_carry'], ['sa_carry', 'sa_carry', 'farmer', 'farmer', 'farmer', 'farmer'], null],
+};
+// Movement patterns that need a pull-up bar fall back to these.
+const NO_BAR = { pullup_neg: 'band_pulldown', pullup: 'band_pulldown', w_pullup: 'band_pulldown', dead_hang: 'bag_carry', finger_hang: 'wrist_iso' };
+// When an injury rules out an exercise, try these in order.
+const SAFE_ALT = {
+  squat: ['spanish_iso', 'wall_sit', 'glute_bridge'], hinge: ['bridge_iso', 'glute_bridge', 'bird_dog'], hinge2: ['bridge_iso', 'glute_bridge'],
+  single: ['glute_bridge', 'side_hip'], hpush: ['fist_push', 'db_floor_press', 'scap_push'], hpull: ['band_row', 'chest_row'],
+  vpush: ['landmine', 'scap_push', 'pull_apart'], vpull: ['band_pulldown', 'band_row'], calf: ['calf_iso', 'seated_calf'],
+  core_ae: ['dead_bug', 'curl_up'], core_ar: ['pallof', 'side_plank_k'], carry: ['pallof'],
+};
+const PAT_NAME = {
+  squat: 'Squat', hinge: 'Hinge', hinge2: 'Hinge (hamstring bias)', single: 'Single leg', hpush: 'Horizontal push', hpull: 'Horizontal pull',
+  vpush: 'Vertical push', vpull: 'Vertical pull', calf: 'Calves', core_ae: 'Trunk: anti-extension', core_ar: 'Trunk: anti-rotation', carry: 'Carry and grip',
+};
+// The patterns behind each strength day. Together they reach every major group.
+const STRENGTH_DAYS = {
+  A: ['squat', 'vpull', 'hpush', 'calf', 'core_ae', 'carry'],
+  B: ['hinge', 'single', 'hpull', 'vpush', 'core_ar', 'calf'],
+  C: ['single', 'hinge2', 'hpush', 'hpull', 'core_ae', 'carry'],
+};
+
+// Power ladders by stage 1..6. Tier 1+ adds medicine balls, tier 2 adds Olympic-style lifts.
+const POW = {
+  jump: ['snap_down', 'squat_jump', 'cmj', 'box_jump', 'hurdle_jump', 'depth_jump'],
+  hop: ['pogo', 'pogo', 'lat_pogo', 'sl_pogo', 'sl_pogo', 'sl_hurdle'],
+  bound: ['broad_stick', 'broad_stick', 'broad_triple', 'bound', 'bound', 'sl_bound'],
+  upper: [['inc_plyo_push', 'inc_plyo_push', 'plyo_push', 'plyo_push', 'plyo_push', 'plyo_push'], ['mb_chest', 'mb_chest', 'mb_rot', 'mb_rot', 'mb_ohthrow', 'mb_ohthrow']],
+  throw: [['inc_plyo_push', 'plyo_push', 'plyo_push', 'plyo_push', 'plyo_push', 'plyo_push'], ['mb_slam', 'mb_rot', 'mb_rot', 'mb_ohthrow', 'mb_ohthrow', 'mb_ohthrow']],
+  lift: [null, ['kb_swing', 'kb_swing', 'kb_swing', 'kb_swing', 'kb_swing', 'kb_swing'], ['kb_swing', 'kb_swing', 'jump_shrug', 'trapbar_jump', 'hang_clean', 'hang_clean']],
+  sprint: { run: ['strides', 'strides', 'accel', 'accel', 'flying', 'flying'], hill: ['strides', 'hill_sprint', 'hill_sprint', 'hill_sprint', 'accel', 'flying'],
+    bike: ['bike_sprint', 'bike_sprint', 'bike_sprint', 'bike_sprint', 'bike_sprint', 'bike_sprint'], swim: ['swim_sprint', 'swim_sprint', 'swim_sprint', 'swim_sprint', 'swim_sprint', 'swim_sprint'],
+    row: ['row_sprint', 'row_sprint', 'row_sprint', 'row_sprint', 'row_sprint', 'row_sprint'] },
+};
+
+// =============================================================================
+// Athlete presets
+// =============================================================================
+// emph: share of training aimed at Endurance, Strength and Power.
+// mode: main endurance mode. hard: the hard endurance session types it rotates.
+// power: which power ladders it draws from. pre: resilience work that suits it.
+// eTests: endurance gate tests. mass: whether extra muscle can help.
+const ATHLETES = [
+  { id: 'marathon', name: 'Endurance runner (half marathon to ultra)', emph: [70, 20, 10], mode: 'run', hard: ['threshold', 'vo2'], long: true, power: ['hop', 'bound', 'sprint'], pre: ['soleus', 'nordic', 'tib_raise', 'copen_s', 'psoas_march'], eTests: ['run5k'], mass: false,
+    note: 'Run economy and durability decide results. Heavy strength and short plyometrics make each stride cheaper without adding bulk.' },
+  { id: 'middle', name: 'Middle-distance runner (800 m to 10 km)', emph: [55, 20, 25], mode: 'run', hard: ['vo2', 'threshold'], long: true, power: ['bound', 'hop', 'sprint'], pre: ['nordic', 'soleus', 'copen_s', 'psoas_march', 'tib_raise'], eTests: ['run5k'], mass: false,
+    note: 'Needs a big aerobic engine and real speed. VO2max intervals and sprint work sit on top of an easy base.' },
+  { id: 'trail', name: 'Trail and mountain runner', emph: [65, 25, 10], mode: 'run', hard: ['threshold', 'hills'], long: true, power: ['hop', 'bound', 'sprint'], pre: ['sl_balance', 'soleus', 'nordic', 'tib_raise', 'copen_s'], eTests: ['run5k'], mass: false,
+    note: 'Climbing and descending call for strong quads, ankles that react well, and long easy volume.' },
+  { id: 'cyclist', name: 'Road or gravel cyclist', emph: [70, 20, 10], mode: 'bike', hard: ['threshold', 'vo2'], long: true, power: ['jump', 'sprint'], pre: ['bird_dog', 'tspine', 'couch', 'sl_balance', 'pull_apart'], eTests: ['ftp'], mass: false,
+    note: 'Power-to-weight rules. Strength work targets the legs and trunk with low reps, so watts go up while weight stays put. Cycling puts no load on the bones, so a few jumps help bone health.' },
+  { id: 'swimmer', name: 'Swimmer', emph: [55, 25, 20], mode: 'swim', hard: ['threshold', 'vo2'], long: false, power: ['jump', 'upper', 'sprint'], pre: ['band_er', 'ytw', 'scap_push', 'tspine', 'curl_up'], eTests: ['swim400'], mass: false,
+    note: 'Shoulder health and a strong pull matter most. Dryland jumps help starts and turns.' },
+  { id: 'triathlete', name: 'Triathlete', emph: [70, 20, 10], mode: 'mixed', modes: ['run', 'bike', 'swim'], hard: ['threshold', 'vo2'], long: true, power: ['hop', 'jump', 'sprint'], pre: ['soleus', 'band_er', 'nordic', 'bird_dog', 'tib_raise'], eTests: ['run5k', 'ftp', 'swim400'], mass: false,
+    note: 'Three sports share one recovery budget. Most sessions stay easy so the hard ones land.' },
+  { id: 'rower', name: 'Rower or paddler', emph: [50, 30, 20], mode: 'row', hard: ['threshold', 'vo2'], long: true, power: ['jump', 'throw', 'lift'], pre: ['bird_dog', 'curl_up', 'tspine', 'pull_apart', 'hip_9090'], eTests: ['row2k'], mass: true,
+    note: 'Rowing rewards a big engine and strong legs and back. Some extra muscle helps if it stays useful.' },
+  { id: 'xc_ski', name: 'Nordic skier', emph: [65, 20, 15], mode: 'mixed', modes: ['run', 'bike', 'row'], hard: ['threshold', 'vo2'], long: true, power: ['bound', 'throw', 'hop'], pre: ['copen_s', 'band_er', 'sl_balance', 'bird_dog', 'nordic'], eTests: ['run5k'], mass: false,
+    note: 'Whole-body endurance. Upper-body pulling power and single-leg balance carry over to the snow.' },
+  { id: 'sprinter', name: 'Sprinter (100 to 400 m)', emph: [10, 35, 55], mode: 'run', hard: ['speedEnd'], easyType: 'tempo', long: false, power: ['sprint', 'bound', 'jump', 'lift'], pre: ['nordic', 'psoas_march', 'copen_s', 'soleus', 'askling'], eTests: ['ift'], mass: false,
+    note: 'Speed is power over a few seconds. Heavy strength, plyometrics and full-rest sprints come first; tempo runs keep the aerobic base.' },
+  { id: 'jumper', name: 'Jumper (long, triple, high jump)', emph: [10, 35, 55], mode: 'run', hard: [], easyType: 'tempo', long: false, power: ['bound', 'jump', 'hop', 'lift'], pre: ['nordic', 'soleus', 'tib_raise', 'copen_s', 'sl_balance'], eTests: ['ift'], mass: false,
+    note: 'Reactive strength and approach speed. Tendons need careful build-up of jump volume.' },
+  { id: 'thrower', name: 'Thrower or powerlifter-style strength athlete', emph: [5, 45, 50], mode: 'run', hard: [], easyType: 'tempo', long: false, power: ['throw', 'lift', 'jump'], pre: ['band_er', 'ytw', 'bird_dog', 'tspine', 'hip_9090'], eTests: ['ift'], mass: true,
+    note: 'Force and speed of the whole chain. Here extra muscle mass does help, so the plan allows some.' },
+  { id: 'field', name: 'Field team sport (soccer, rugby, hockey, lacrosse)', emph: [35, 30, 35], mode: 'run', hard: ['intermittent', 'rsa'], long: false, power: ['sprint', 'bound', 'jump', 'upper'], pre: ['nordic', 'copen', 'sl_balance', 'neck_iso', 'soleus'], eTests: ['ift'], mass: false,
+    note: 'Repeated sprints and changes of direction. Nordic curls and Copenhagen planks cut hamstring and groin injuries sharply.' },
+  { id: 'court', name: 'Court sport (basketball, volleyball, tennis, badminton)', emph: [30, 30, 40], mode: 'run', hard: ['intermittent', 'rsa'], long: false, power: ['jump', 'hop', 'sprint', 'upper'], pre: ['sl_balance', 'soleus', 'band_er', 'nordic', 'copen_s'], eTests: ['ift'], mass: false,
+    note: 'Jumps, cuts and quick feet. Ankle balance work and tendon loading keep you on court.' },
+  { id: 'combat', name: 'Combat sport (wrestling, BJJ, boxing, MMA)', emph: [35, 35, 30], mode: 'mixed', modes: ['run', 'bike', 'row'], hard: ['rounds', 'intermittent'], long: false, power: ['throw', 'jump', 'upper', 'lift'], pre: ['neck_iso', 'band_er', 'wrist_iso', 'bird_dog', 'copen_s'], eTests: ['ift'], mass: false,
+    note: 'Strength in your weight class, power, and the engine for hard rounds. Neck and grip work protect you.' },
+  { id: 'climber', name: 'Climber', emph: [20, 55, 25], mode: 'mixed', modes: ['run', 'bike'], hard: ['intermittent'], long: false, power: ['jump', 'upper'], pre: ['band_er', 'ytw', 'wrist_curl', 'finger_hang', 'scap_push'], eTests: ['ift'], mass: false,
+    note: 'Strength-to-weight in the fingers, pulling and trunk. Leave legs strong but lean.' },
+  { id: 'hybrid', name: 'Hybrid or obstacle racer', emph: [45, 35, 20], mode: 'run', hard: ['threshold', 'intermittent'], long: true, power: ['bound', 'jump', 'sprint', 'lift'], pre: ['nordic', 'soleus', 'band_er', 'copen_s', 'wrist_curl'], eTests: ['run5k'], mass: false,
+    note: 'Run well, carry well, climb well. Grip and carries get their own place.' },
+  { id: 'tactical', name: 'Tactical or first responder', emph: [40, 40, 20], mode: 'run', hard: ['intermittent', 'threshold'], long: false, power: ['bound', 'jump', 'sprint', 'throw'], pre: ['bird_dog', 'curl_up', 'soleus', 'neck_iso', 'sl_balance'], eTests: ['run5k'], mass: false,
+    note: 'Load carriage, sprints, drags and long shifts. A durable back and feet matter as much as fitness.' },
+  { id: 'general', name: 'All-round athlete', emph: [34, 33, 33], mode: 'run', hard: ['threshold', 'intermittent'], long: true, power: ['jump', 'bound', 'sprint', 'upper'], pre: ['nordic', 'band_er', 'copen_s', 'soleus', 'bird_dog'], eTests: ['run5k'], mass: false,
+    note: 'Balanced development of all three qualities, with nothing neglected.' },
+];
+const ATHLETE = Object.fromEntries(ATHLETES.map(a => [a.id, a]));
+
+const MODES = { run: 'Running', bike: 'Cycling', swim: 'Swimming', row: 'Rowing or erg', mixed: 'Mixed modes' };
+const MODE_VERB = { run: 'Run', bike: 'Ride', swim: 'Swim', row: 'Row' };
+
+// Quick-start profiles fill several sections at once.
+const QUICK = [
+  { id: '', name: 'Choose a quick start…' },
+  { id: 'new', name: 'Brand new to training', set: { trainAge: 0, days: [0, 2, 4], minutes: 35, equip: 0 } },
+  { id: 'back', name: 'Returning after a long break', set: { trainAge: 1, days: [0, 2, 4, 5], minutes: 45, equip: 1 } },
+  { id: 'busy', name: 'Busy schedule (3 × 30 min)', set: { days: [1, 3, 5], minutes: 30 } },
+  { id: 'bal', name: 'Balanced (4 × 50 min)', set: { days: [0, 2, 4, 5], minutes: 50 } },
+  { id: 'comm', name: 'Committed (5 × 60 min)', set: { days: [0, 1, 3, 4, 5], minutes: 60, equip: 2 } },
+  { id: 'serious', name: 'Serious amateur (6 × 75 min, doubles)', set: { days: [0, 1, 2, 3, 4, 5], minutes: 75, doubles: true, equip: 2, trainAge: 3 } },
+  { id: 'pro', name: 'Full-time athlete (6 × 90 min, doubles)', set: { days: [0, 1, 2, 3, 4, 5], minutes: 90, doubles: true, equip: 2, trainAge: 4 } },
+  { id: 'masters', name: 'Masters athlete (45+)', set: { age: 50, days: [0, 2, 3, 5], minutes: 60, trainAge: 3, equip: 2 } },
+];
+
+// =============================================================================
+// Injuries and weak areas
+// =============================================================================
+// Each region lists the stress tags it rules out, and a rehab path in phases.
+// Phase doses follow common, published loading programs.
+const INJURIES = [
+  { id: 'achilles', name: 'Achilles tendon', avoid: ['impact', 'ankle'], impact: true,
+    phases: [
+      ['Calm it down', [['calf_iso', '5 × 45 s each side, daily'], ['soleus', '3 × 15 slow, every other day']]],
+      ['Heavy slow loading', [['hsr_calf', '3 sets, 15 down to 6 reps over 12 weeks, 3 × a week'], ['seated_calf', '3 × 10–12 heavy']]],
+      ['Spring back', [['pogo', '3 × 20 contacts, both legs, then single leg'], ['sl_calf_step', '3 × 15 with weight']]],
+    ],
+    ev: 'Heavy slow resistance works as well as eccentric-only programs for Achilles tendinopathy (Beyer 2015). Pain up to 3–5/10 during loading is fine if it settles by the next morning (Silbernagel 2007).',
+    gate: '25 single-leg calf raises and 20 single-leg hops with pain at 2/10 or lower, and no morning stiffness the next day.' },
+  { id: 'plantar', name: 'Plantar fascia (heel pain)', avoid: ['impact'], impact: true,
+    phases: [
+      ['Calm it down', [['calf_iso', '5 × 45 s, daily'], ['short_foot', '3 × 10 × 5 s holds, daily']]],
+      ['High-load raises', [['towel_calf', '3 sets of 12, then 10 and 8 reps with a backpack, every other day']]],
+      ['Return to impact', [['pogo', '3 × 20, both legs'], ['sl_calf_step', '3 × 15']]],
+    ],
+    ev: 'High-load calf raises with the toes on a towel improved plantar fasciitis faster than stretching alone (Rathleff 2015).',
+    gate: 'First steps in the morning are painless and you can do 3 × 12 towel raises with a loaded backpack.' },
+  { id: 'shin', name: 'Shins (medial tibial stress)', avoid: ['impact'], impact: true,
+    phases: [
+      ['Unload', [['tib_raise', '3 × 15, daily'], ['soleus', '3 × 15, every other day']]],
+      ['Build capacity', [['sl_calf_step', '3 × 15'], ['tib_raise', '3 × 20 with a weight']]],
+      ['Graded return', [['pogo', '2 × 20, both legs'], ['sl_pogo', '2 × 10 each']]],
+    ],
+    ev: 'Load management is the main treatment. Running volume returns in small steps on soft surfaces, and calf strength protects the tibia. Pain at one spot on the bone, or at night, needs a scan to rule out a stress fracture.',
+    gate: '30 minutes of easy running with no pain during or the next day, and 20 single-leg hops without pain.' },
+  { id: 'knee', name: 'Knee (patellar tendon or kneecap pain)', avoid: ['impact', 'knee'], impact: true,
+    phases: [
+      ['Isometrics', [['spanish_iso', '5 × 45 s, daily; often eases pain'], ['wall_sit', '3 × 30 s'], ['clam', '3 × 15 each']]],
+      ['Heavy slow loading', [['decline_squat', '3 × 15 down to 3 × 6 heavy, 3 × a week'], ['side_hip', '3 × 15 each']]],
+      ['Energy storage', [['snap_down', '3 × 6'], ['pogo', '3 × 20'], ['box_jump', '3 × 5']]],
+    ],
+    ev: 'Combining hip and knee strengthening is the best-supported treatment for kneecap pain (Crossley 2016 consensus). Patellar tendons respond to progressive heavy slow loading (Kongsgaard 2009).',
+    gate: 'A single-leg decline squat with load and 3 × 10 single-leg hops at pain 2/10 or lower.' },
+  { id: 'hamstring', name: 'Hamstrings', avoid: ['ham'], impact: false,
+    phases: [
+      ['Protect and activate', [['bridge_iso', '5 × 30 s, daily'], ['askling', '1 set each of the 3 drills, pain-free']]],
+      ['Lengthen under load', [['ll_bridge', '3 × 10 each'], ['nordic', '2 × 5 slow, twice a week']]],
+      ['Return to speed', [['nordic', '3 × 6–8'], ['strides', '6 × 60 m building from 70% to 90%']]],
+    ],
+    ev: 'The Nordic hamstring curl roughly halves hamstring injuries (van der Horst 2015; meta-analysis by van Dyk 2019). Lengthening drills sped up return to sport (Askling 2013).',
+    gate: 'Full-speed sprinting without pain or fear, and equal Nordic or bridge strength on both sides.' },
+  { id: 'groin', name: 'Groin or adductors', avoid: ['groin'], impact: false,
+    phases: [
+      ['Isometrics', [['add_squeeze', '5 × 10 s, daily'], ['side_plank_k', '3 × 20 s each']]],
+      ['Copenhagen build', [['copen_s', '3 × 15–30 s each, 3 × a week'], ['lateral_lunge', '3 × 8 each']]],
+      ['Sport speed', [['copen', '3 × 20–30 s each'], ['lat_pogo', '3 × 20']]],
+    ],
+    ev: 'The Copenhagen adduction program cut groin problems by about 40% in soccer players (Harøy 2019).',
+    gate: 'Pain-free hard adductor squeeze, Copenhagen plank 30 s each side, and pain-free cutting.' },
+  { id: 'back', name: 'Lower back', avoid: ['spine'], impact: false,
+    phases: [
+      ['Settle', [['curl_up', '5, 3, 1 × 10 s holds (reverse pyramid)'], ['side_plank_k', '5, 3, 1 × 10 s each'], ['bird_dog', '5, 3, 1 × 10 s each']]],
+      ['Build', [['side_plank', '3 × 30 s each'], ['glute_bridge', '3 × 12'], ['pallof', '3 × 10 each']]],
+      ['Load the hinge', [['kb_deadlift', '3 × 8 light and smooth'], ['sa_carry', '3 × 30 m each']]],
+    ],
+    ev: 'The McGill "big 3" builds trunk endurance without much spine load. Staying active usually beats rest for non-specific low back pain. Numbness, weakness in a leg, or bladder changes need medical care at once.',
+    gate: 'Side plank 60 s each side and a light hip hinge without pain.' },
+  { id: 'shoulder', name: 'Shoulder', avoid: ['overhead', 'shoulder'], impact: false,
+    phases: [
+      ['Isometrics', [['er_iso', '5 × 30–45 s, daily'], ['scap_push', '2 × 10']]],
+      ['Rotator cuff strength', [['side_er', '3 × 12–15 each'], ['band_er', '3 × 15'], ['ytw', '2 × 8 each letter']]],
+      ['Back overhead', [['face_pull', '3 × 15'], ['landmine', '3 × 8 each'], ['kneel_press', '3 × 8 light']]],
+    ],
+    ev: 'Progressive cuff and shoulder-blade strengthening is the first-line treatment for most shoulder pain, and works about as well as surgery for impingement-type pain.',
+    gate: 'Full pain-free range overhead, and side-lying rotation strength equal on both sides.' },
+  { id: 'elbow', name: 'Elbow (tennis or golfer\'s elbow)', avoid: ['grip', 'elbow'], impact: false,
+    phases: [
+      ['Isometrics', [['wrist_iso', '5 × 30–45 s, daily']]],
+      ['Eccentric loading', [['wrist_ext', '3 × 15 slow, daily (Tyler twist)'], ['wrist_curl', '3 × 15']]],
+      ['Grip under load', [['farmer', '3 × 30 m, light'], ['dead_hang', '3 × 20 s']]],
+    ],
+    ev: 'Adding eccentric wrist extension (the Tyler twist) to usual care roughly doubled improvement in tennis elbow (Tyler 2010).',
+    gate: 'Pain-free grip at full strength and pain-free pulling.' },
+  { id: 'wrist', name: 'Wrist', avoid: ['wrist'], impact: false,
+    phases: [
+      ['Settle', [['wrist_iso', '5 × 30 s']]],
+      ['Build', [['wrist_curl', '3 × 15'], ['fist_push', '3 × 10']]],
+      ['Load bearing', [['plank', '3 × 30 s'], ['pushup', '3 × 10']]],
+    ],
+    ev: 'Gradual loading in pain-free ranges. Pushing on fists or handles keeps the wrist straight while it heals.',
+    gate: 'Pain-free push-ups on flat hands.' },
+  { id: 'neck', name: 'Neck', avoid: ['neck'], impact: false,
+    phases: [
+      ['Settle', [['chin_tuck', '3 × 10 × 5 s']]],
+      ['Isometrics', [['neck_iso', '3 rounds, 10 s each direction']]],
+      ['Strength', [['neck_iso', '3 rounds of 20 s, firmer pushes'], ['face_pull', '3 × 15']]],
+    ],
+    ev: 'Neck strength is linked to fewer concussions and neck injuries in contact sport. Sudden numbness or weakness in the arms needs a doctor.',
+    gate: 'Pain-free full range and firm isometric holds in all four directions.' },
+  { id: 'ankle', name: 'Ankle sprains (repeated)', avoid: ['ankle'], impact: true,
+    phases: [
+      ['Balance', [['sl_balance', '3 × 30 s each, daily']]],
+      ['Control', [['star_excursion', '3 × 5 reaches each'], ['sl_calf', '3 × 15 each']]],
+      ['Reactive', [['lat_pogo', '3 × 20'], ['sl_pogo', '3 × 10 each']]],
+    ],
+    ev: 'Balance training cuts repeat ankle sprains by about a third (Hupperets 2009; review by Schiftan 2015).',
+    gate: '30 s eyes-closed single-leg balance and pain-free side-to-side hops.' },
+];
+const INJURY = Object.fromEntries(INJURIES.map(i => [i.id, i]));
+const INJ_STATUS = { none: 'Fine', weak: 'Weak area', rehab: 'Recovering', pain: 'Painful now' };
+
+// =============================================================================
+// Tests and gates
+// =============================================================================
+// base: targets for leaving stages 1..6 (a male athlete under 35 whose sport puts
+// this quality first). fem: factor for female targets. low: lower is better.
+const TESTS = {
+  easy: { q: 'E', name: 'Longest continuous easy session', unit: 'min', base: [20, 30, 45, 60, 90, 120], fem: 1, age: false,
+    how: 'The longest you can keep going at a conversational pace in your main mode, without stopping.' },
+  run5k: { q: 'E', name: '5 km run time trial', unit: 'time', low: true, base: [2160, 1800, 1560, 1380, 1200, 1050], fem: 1.12, age: true,
+    how: 'Flat route or track, after a 15 minute warm-up with strides. Run it as an even effort.' },
+  ftp: { q: 'E', name: 'Bike FTP (20 min test × 0.95)', unit: 'W', rel: 'bw', base: [1.5, 2.2, 2.8, 3.4, 4.0, 4.6], fem: 0.88, age: true,
+    how: 'On a smart trainer or power meter: warm up 15 minutes, ride 20 minutes as hard as you can hold, take 95% of the average.' },
+  swim400: { q: 'E', name: '400 m swim time trial', unit: 'time', low: true, base: [720, 570, 480, 420, 360, 315], fem: 1.08, age: true,
+    how: 'Freestyle in a 25 or 50 m pool after an easy 400 m warm-up.' },
+  row2k: { q: 'E', name: '2,000 m erg time trial', unit: 'time', low: true, base: [600, 525, 480, 450, 420, 395], fem: 1.12, age: true,
+    how: 'Concept2 damper 4–6 after a 10 minute warm-up; aim for even splits.' },
+  ift: { q: 'E', name: '30-15 Intermittent Fitness Test', unit: 'km/h', base: [13, 15, 16.5, 18, 19.5, 21], fem: 0.88, age: true,
+    how: '30 s shuttles at rising speed with 15 s walks, from an audio track. Your score is the last stage you finish.' },
+  squat: { q: 'S', name: 'Back squat, estimated 1RM', unit: 'kg', rel: 'bw', base: [0.75, 1.0, 1.25, 1.5, 1.75, 2.0], fem: 0.8, age: true, eq: 2,
+    how: 'Work up to a heavy set of 3–5 good reps. Estimated 1RM = weight × (1 + reps ÷ 30).' },
+  trapdl: { q: 'S', name: 'Trap-bar deadlift, estimated 1RM', unit: 'kg', rel: 'bw', base: [1.0, 1.3, 1.6, 1.9, 2.2, 2.5], fem: 0.8, age: true, eq: 2,
+    how: 'Same as the squat: a heavy set of 3–5 reps with a flat back, then estimate.' },
+  pullups: { q: 'S', name: 'Strict pull-ups', unit: 'reps', base: [1, 4, 8, 12, 16, 20], fem: 0.5, age: true, bar: true,
+    how: 'From a dead hang, chin over the bar, no kipping. Count clean reps only.' },
+  pushups: { q: 'S', name: 'Push-ups', unit: 'reps', base: [10, 20, 30, 40, 50, 60], fem: 0.6, age: true, eqMax: 1,
+    how: 'Chest to a fist\'s height from the floor, body straight, no rests at the top.' },
+  slsquat: { q: 'S', name: 'Single-leg squat to a knee-height box (weaker leg)', unit: 'reps', base: [3, 6, 10, 15, 20, 25], fem: 0.85, age: true, eqMax: 1,
+    how: 'Sit to touch the box and stand on one leg, no rocking. Count the weaker leg.' },
+  broad: { q: 'P', name: 'Standing broad jump', unit: 'cm', rel: 'ht', base: [0.95, 1.1, 1.25, 1.35, 1.45, 1.55], fem: 0.85, age: true,
+    how: 'Two feet, arm swing allowed, measured to the back of the closest heel. Best of 3.' },
+  cmj: { q: 'P', name: 'Countermovement jump height', unit: 'cm', base: [25, 32, 40, 47, 55, 62], fem: 0.8, age: true,
+    how: 'Hands on the hips, measured with a jump mat or a phone app. Best of 3.' },
+  sprint20: { q: 'P', name: '20 m sprint from a standing start', unit: 's', low: true, base: [3.9, 3.6, 3.35, 3.2, 3.05, 2.95], fem: 1.09, age: true, modes: ['run'],
+    how: 'Start 50 cm behind the line, timing gates or a slow-motion video. Best of 3, full rest.' },
+  calfsl: { q: 'R', name: 'Single-leg calf raises to fatigue (weaker leg)', unit: 'reps', base: [10, 15, 20, 25, 30, 35], fem: 1, age: false,
+    how: 'Off a step, full range, one rep every 2 seconds, fingertips on a wall for balance.' },
+  sideplank: { q: 'R', name: 'Side plank hold (weaker side)', unit: 's', base: [30, 45, 60, 75, 90, 120], fem: 1, age: false,
+    how: 'Feet stacked, hips high. Stop when the hips drop.' },
+  slbridge: { q: 'R', name: 'Single-leg bridge reps (weaker side)', unit: 'reps', base: [10, 15, 20, 25, 30, 35], fem: 1, age: false,
+    how: 'Shoulders on the floor, one foot down, full hip lockout each rep.' },
+};
+const Q = { E: 'Endurance', S: 'Strength', P: 'Power', R: 'Resilience' };
+const Q_WHAT = {
+  E: 'Aerobic engine and the ability to hold pace',
+  S: 'Maximal force without extra bulk',
+  P: 'Force applied fast: jumping, sprinting, throwing',
+  R: 'Tendons, joints and trunk that tolerate the work',
+};
+const STAGES = ['Foundation', 'Base', 'Build', 'Advanced', 'Elite prep', 'Elite'];
+const STAGE_FOCUS = {
+  E: ['Build the habit: easy, frequent, short. No hard sessions yet.', 'Grow easy volume about 10% a block; add one controlled threshold session.', 'Polarized training: about 80% easy, 20% hard, with threshold and VO2max work.', 'Longer threshold repeats and VO2max sets; long session grows.', 'Race-specific intensities and bigger weeks with planned recovery.', 'Peak volume, sharpening and tapers around key tests.'],
+  S: ['Learn the patterns with bodyweight and light loads, 2 sessions a week.', 'Load the main lifts for sets of 5–6 with reps in reserve.', 'Sets of 4–5 at 80–85% effort; heavier, never to failure.', 'Low reps (3–4) with long rests; strength gains with little size gain.', 'Waves of 2–3 rep sets; keep total volume modest.', 'Maintain strength in 1–2 short heavy sessions while peaking.'],
+  P: ['Landing mechanics and low-level hops.', 'Jumps, throws and strides at full intent, low volume.', 'Box jumps, bounds and acceleration sprints.', 'Reactive work: hurdle hops and flying sprints, plus Olympic-style pulls in a gym.', 'Depth jumps and sport-specific speed.', 'High quality, low volume: keep it fast and fresh.'],
+  R: ['Daily mobility and basic tendon and trunk work.', 'Hamstring, groin, calf and shoulder prehab twice a week.', 'Progress the prehab exercises (longer levers, more load).', 'Keep prehab in every week, even when time is short.', 'Target the weak links found in your tests.', 'Maintain everything; never skip it in a busy block.'],
+};
+
+// Endurance heart-rate zones as shares of max heart rate, with RPE out of 10.
+const ZONES = [
+  { z: 1, name: 'Recovery', lo: 0.50, hi: 0.68, rpe: '1–2', talk: 'Full conversation' },
+  { z: 2, name: 'Easy aerobic', lo: 0.68, hi: 0.80, rpe: '3–4', talk: 'Talk in full sentences' },
+  { z: 3, name: 'Tempo', lo: 0.80, hi: 0.87, rpe: '5–6', talk: 'Short sentences' },
+  { z: 4, name: 'Threshold', lo: 0.87, hi: 0.93, rpe: '7–8', talk: 'A few words' },
+  { z: 5, name: 'VO2max', lo: 0.93, hi: 1.00, rpe: '9', talk: 'No talking' },
+];
+
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAYS_LONG = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const IT_PALETTE = ['#FFD23F', '#4DD9A6', '#5AA9FF', '#FF7A59', '#C98BFF', '#FF5C8A', '#7BE0E8', '#B8E05A'];
+
+// =============================================================================
+// Profile: everything the person enters. Stored in this browser only.
+// =============================================================================
+const STORE_KEY = 'fpp:profile';
+function mondayOf(d) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+function isoDate(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function parseDate(s) { const m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+const DEFAULTS = () => ({
+  v: 1, athlete: 'marathon', emph: null, mode: '', bodyGoal: 'maintain',
+  sex: 'm', age: 30, height: 178, weight: 72, bf: null, rhr: null, hrmax: null, units: 'metric',
+  trainAge: 2, tests: {}, testLog: [], override: { E: 0, S: 0, P: 0, R: 0 }, inj: {},
+  days: [0, 1, 3, 5], minutes: 60, doubles: false, sessionTime: '17:30', wake: '06:30', sleep: 8.5, meals: 4, life: 1,
+  equip: 2, bar: true, planStart: isoDate(mondayOf(new Date())), swaps: {}, checkin: null,
+});
+let P = load();
+function load() {
+  const d = DEFAULTS();
+  try {
+    const s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+    if (s && typeof s === 'object') return sanitize({ ...d, ...s });
+  } catch (e) { /* nothing saved */ }
+  return d;
+}
+function sanitize(p) {
+  const d = DEFAULTS();
+  if (!ATHLETE[p.athlete]) p.athlete = d.athlete;
+  if (!Array.isArray(p.days)) p.days = d.days;
+  p.days = [...new Set(p.days.filter(x => Number.isInteger(x) && x >= 0 && x < 7))].sort((a, b) => a - b);
+  for (const k of ['age', 'height', 'weight', 'minutes', 'sleep', 'meals', 'trainAge', 'equip', 'life']) if (!isFinite(+p[k])) p[k] = d[k]; else p[k] = +p[k];
+  p.age = clamp(p.age, 12, 90); p.height = clamp(p.height, 120, 230); p.weight = clamp(p.weight, 30, 200);
+  p.minutes = clamp(p.minutes, 20, 180); p.meals = clamp(Math.round(p.meals), 3, 6); p.sleep = clamp(p.sleep, 6, 11);
+  p.trainAge = clamp(Math.round(p.trainAge), 0, 4); p.equip = clamp(Math.round(p.equip), 0, 2); p.life = clamp(Math.round(p.life), 0, 2);
+  if (!p.tests || typeof p.tests !== 'object') p.tests = {};
+  for (const k of Object.keys(p.tests)) if (!TESTS[k] || !isFinite(+p.tests[k]) || +p.tests[k] <= 0) delete p.tests[k];
+  if (!Array.isArray(p.testLog)) p.testLog = [];
+  p.testLog = p.testLog.filter(r => r && TESTS[r.id] && isFinite(+r.value)).slice(-300);
+  p.override = { E: 0, S: 0, P: 0, R: 0, ...(p.override || {}) };
+  if (!p.inj || typeof p.inj !== 'object') p.inj = {};
+  for (const k of Object.keys(p.inj)) if (!INJURY[k] || !INJ_STATUS[p.inj[k]?.status] || p.inj[k].status === 'none') delete p.inj[k];
+  if (p.emph && !(Array.isArray(p.emph) && p.emph.length === 3 && p.emph.every(x => isFinite(x) && x >= 0))) p.emph = null;
+  if (p.mode && !MODES[p.mode]) p.mode = '';
+  if (!parseDate(p.planStart)) p.planStart = d.planStart;
+  if (!p.swaps || typeof p.swaps !== 'object') p.swaps = {};
+  if (!['maintain', 'lean', 'build'].includes(p.bodyGoal)) p.bodyGoal = 'maintain';
+  if (!['m', 'f'].includes(p.sex)) p.sex = 'm';
+  if (!/^\d\d:\d\d$/.test(p.sessionTime)) p.sessionTime = d.sessionTime;
+  if (!/^\d\d:\d\d$/.test(p.wake)) p.wake = d.wake;
+  return p;
+}
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(P)); } catch (e) { /* storage unavailable */ } }
+
+// =============================================================================
+// Small helpers
+// =============================================================================
+function clamp(x, a, b) { return Math.min(b, Math.max(a, x)); }
+function round(x, step = 1) { return Math.round(x / step) * step; }
+function fmtTime(s) { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}` : `${m}:${String(r).padStart(2, '0')}`; }
+function parseTime(t) {
+  if (t == null || t === '') return null;
+  const parts = String(t).trim().split(':').map(Number);
+  if (parts.some(x => !isFinite(x) || x < 0)) return null;
+  return parts.reduce((a, b) => a * 60 + b, 0) || null;
+}
+function hm(min) { min = ((Math.round(min) % 1440) + 1440) % 1440; return `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`; }
+function toMin(s) { const [h, m] = s.split(':').map(Number); return h * 60 + m; }
+function plural(n, w) { return `${n} ${w}${n === 1 ? '' : 's'}`; }
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function uid() { return Math.random().toString(36).slice(2, 10); }
+function lerpArr(arr, i) { const a = Math.floor(i), b = Math.min(arr.length - 1, a + 1), t = i - a; return arr[a] + (arr[b] - arr[a]) * t; }
+
+// =============================================================================
+// The model: everything derived from the profile
+// =============================================================================
+function emphasis() {
+  const raw = P.emph || ATHLETE[P.athlete].emph;
+  const sum = raw.reduce((a, b) => a + b, 0) || 1;
+  const [E, S, Pw] = raw.map(x => Math.round(x / sum * 100));
+  return { E, S, P: Pw };
+}
+function bandOf(share) { return share >= 40 ? 'high' : share >= 20 ? 'mid' : 'low'; }
+const BAND_IDX = { high: 1, mid: 0.8, low: 0.6 };
+const BAND_F = { high: 1, mid: 0.8, low: 0.6 };
+
+function modesOf(a) {
+  if (P.mode && P.mode !== 'mixed') return [P.mode];
+  if (P.mode === 'mixed' || a.mode === 'mixed') return a.modes || ['run', 'bike'];
+  return [a.mode];
+}
+const MODE_TEST = { run: 'run5k', bike: 'ftp', swim: 'swim400', row: 'row2k' };
+function testsFor(q, m) {
+  if (q === 'E') {
+    const list = P.mode && P.mode !== 'mixed' ? [MODE_TEST[P.mode]] : m.athlete.eTests.slice();
+    return [...new Set([...list, 'easy'])];
+  }
+  if (q === 'S') return P.equip >= 2 ? ['squat', 'trapdl', ...(P.bar ? ['pullups'] : [])] : ['pushups', 'slsquat', ...(P.bar ? ['pullups'] : [])];
+  if (q === 'P') return ['broad', 'cmj', ...(m.modes.includes('run') ? ['sprint20'] : [])];
+  return ['calfsl', 'sideplank', 'slbridge'];
+}
+// The target for leaving stage k (1..6) on a test.
+function target(id, k, m) {
+  const t = TESTS[id];
+  const band = t.q === 'R' || id === 'easy' ? 'mid' : m.band[t.q];
+  let v = lerpArr(t.base, (k - 1) * BAND_IDX[band]);
+  if (t.rel === 'bw') v *= P.weight;
+  if (t.rel === 'ht') v *= P.height;
+  const ageF = t.age ? Math.max(0.6, 1 - 0.008 * Math.max(0, P.age - 35)) : 1;
+  const sexF = P.sex === 'f' ? t.fem : 1;
+  if (t.low) v = v * sexF / ageF; else v = v * sexF * ageF;
+  if (t.unit === 'time') return Math.round(v);
+  if (t.unit === 'kg') return round(v, 2.5);
+  if (t.unit === 'W') return Math.round(v / 5) * 5;
+  if (t.unit === 'reps') return Math.max(1, Math.ceil(v));
+  if (t.unit === 's') return t.low ? Math.round(v * 100) / 100 : Math.round(v / 5) * 5;
+  if (t.unit === 'km/h') return Math.round(v * 2) / 2;
+  if (t.unit === 'cm') return Math.round(v);
+  return Math.round(v);
+}
+function passes(id, value, k, m) { const t = TESTS[id], tg = target(id, k, m); return t.low ? value <= tg : value >= tg; }
+function metCount(id, value, m) { let n = 0; for (let k = 1; k <= 6; k++) { if (passes(id, value, k, m)) n = k; else break; } return n; }
+const TRAIN_AGE_STAGE = [1, 1, 2, 3, 4];
+const TRAIN_AGES = ['Not yet training', 'Under 1 year', '1–3 years', '3–5 years', '5+ years'];
+function stageInfo(q, m) {
+  const ids = testsFor(q, m);
+  let entered = ids.filter(id => P.tests[id] > 0);
+  if (q === 'E' && entered.some(id => id !== 'easy')) entered = entered.filter(id => id !== 'easy');
+  const byTest = entered.map(id => ({ id, value: P.tests[id], met: metCount(id, P.tests[id], m) }));
+  let auto = TRAIN_AGE_STAGE[P.trainAge], src = 'training age';
+  if (byTest.length) { auto = Math.min(6, Math.min(...byTest.map(t => t.met)) + 1); src = 'tests'; }
+  const over = P.override[q];
+  return { q, stage: over || auto, auto, src: over ? 'set by you' : src, ids, byTest, maxed: byTest.length && byTest.every(t => t.met >= 6) };
+}
+
+function injuryState() {
+  const list = Object.entries(P.inj).map(([id, v]) => ({ ...INJURY[id], status: v.status, phase: clamp(v.phase || 1, 1, 3) }));
+  const avoid = new Set();
+  let impactPain = false, impactRehab = false;
+  for (const i of list) {
+    if (i.status === 'pain' || i.status === 'rehab') i.avoid.forEach(t => avoid.add(t));
+    if (i.impact && i.status === 'pain') impactPain = true;
+    if (i.impact && i.status === 'rehab') impactRehab = true;
+  }
+  return { list, avoid, impactPain, impactRehab };
+}
+
+function buildModel() {
+  const a = ATHLETE[P.athlete];
+  const emph = emphasis();
+  const m = { athlete: a, emph, band: { E: bandOf(emph.E), S: bandOf(emph.S), P: bandOf(emph.P), R: 'mid' } };
+  m.modes = modesOf(a);
+  m.inj = injuryState();
+  // Swap running out while an impact injury is painful.
+  m.altMode = m.modes.find(x => x !== 'run') || 'bike';
+  m.hrmax = P.hrmax || Math.round(208 - 0.7 * P.age);
+  m.rhr = P.rhr || null;
+  m.stage = {}; m.info = {};
+  for (const q of ['E', 'S', 'P', 'R']) { const s = stageInfo(q, m); m.stage[q] = s.stage; m.info[q] = s; }
+  m.bw = P.weight;
+  const start = parseDate(P.planStart) || mondayOf(new Date());
+  m.planStart = start;
+  m.todayWeek = Math.max(1, Math.floor((mondayOf(new Date()) - start) / 6048e5) + 1);
+  m.todayIdx = (new Date().getDay() + 6) % 7;
+  return m;
+}
+
+// =============================================================================
+// Exercise selection
+// =============================================================================
+function okEx(id, m) {
+  const ex = EX[id];
+  return ex && !ex.tags.some(t => m.inj.avoid.has(t));
+}
+function barSafe(id) { return P.bar ? id : (NO_BAR[id] || id); }
+function pickStrength(pattern, stage, m) {
+  const lad = LAD[pattern];
+  const tiers = [];
+  for (let t = P.equip; t >= 0; t--) if (lad[t]) tiers.push(t);
+  for (const t of tiers) {
+    for (let s = stage; s >= 1; s--) {
+      const id = barSafe(lad[t][s - 1]);
+      if (okEx(id, m)) {
+        const easier = s > 1 ? barSafe(lad[t][s - 2]) : null;
+        const harder = s < 6 ? barSafe(lad[t][s]) : null;
+        return { id, easier: easier && easier !== id && okEx(easier, m) ? easier : null, harder: harder && harder !== id ? harder : null, swapped: s !== stage || t !== tiers[0] };
+      }
+    }
+  }
+  for (const id of SAFE_ALT[pattern] || []) if (okEx(id, m)) return { id, easier: null, harder: null, swapped: true };
+  return null;
+}
+const LOADED = new Set(['goblet', 'db_rfess', 'back_squat', 'front_squat', 'kb_deadlift', 'db_rdl', 'sl_db_rdl', 'trapbar_dl', 'rdl', 'db_lunge', 'db_step_up', 'db_lat_lunge', 'db_floor_press', 'db_bench', 'bench', 'db_row', 'chest_row', 'kneel_press', 'landmine', 'ohp', 'w_pullup', 'seated_calf']);
+const HOLDS = new Set(['plank', 'll_plank', 'hollow', 'side_plank_k', 'side_plank', 'spanish_iso', 'wall_sit', 'bridge_iso', 'calf_iso', 'er_iso', 'wrist_iso', 'dead_hang', 'sl_balance', 'copen_s', 'copen', 'couch']);
+const CARRIES = new Set(['farmer', 'sa_carry', 'bag_carry']);
+
+// Sets, reps and rest for one strength exercise.
+function strengthDose(id, main, stage, m, wk) {
+  const i = stage - 1, band = m.band.S;
+  const build = P.bodyGoal === 'build' && m.athlete.mass;
+  let d;
+  if (CARRIES.has(id)) d = { sets: 3, reps: '30 m (or 30 s)', work: 35, rest: 75, note: 'Heavy enough that grip is the limit by the last set.' };
+  else if (HOLDS.has(id)) { const s = [20, 30, 40, 45, 60, 60][i]; d = { sets: 3, reps: `${s} s${/side|copen/.test(id) ? ' each side' : ''}`, work: s * (/side|copen/.test(id) ? 2 : 1), rest: 45, hold: s }; }
+  else if (['dead_bug', 'pallof', 'ab_roll', 'calf_raise', 'sl_calf', 'sl_calf_step'].includes(id)) {
+    const r = id === 'ab_roll' ? [6, 8, 8, 10, 10, 12][i] : [10, 10, 12, 12, 15, 15][i];
+    d = { sets: 3, reps: `${r}${['dead_bug', 'pallof', 'sl_calf', 'sl_calf_step'].includes(id) ? ' each side' : ''}`, work: r * 3, rest: 45 };
+  } else if (LOADED.has(id)) {
+    if (main) {
+      d = { sets: [3, 3, 4, 4, 5, 4][i], reps: [8, 6, 5, 4, 3, 3][i], rpe: [6.5, 7, 7.5, 8, 8, 8.5][i], rest: [120, 150, 180, 180, 210, 210][i] };
+      if (build) { d.reps += 3; d.sets += 1; d.rest = 120; }
+    } else d = { sets: 3, reps: [10, 8, 8, 6, 6, 6][i], rpe: 7, rest: 90 };
+    if (band === 'low') d.sets = Math.max(2, d.sets - 1);
+    d.work = clamp(d.reps * 4, 15, 45);
+    d.reps = `${d.reps}${/rfess|lunge|step_up|sl_|kneel|db_row/.test(id) ? ' each side' : ''}`;
+  } else {
+    // Bodyweight ladder: reps in a range, slow on the way down, then climb the ladder.
+    d = { sets: [2, 3, 3, 3, 4, 4][i], reps: stage <= 2 ? '8–12' : '6–10', rest: 90, work: 40, note: 'Lower for 3 seconds. When every set reaches the top of the range, move up the ladder.' };
+    if (/split|rfess|skater|pistol|lunge|step_up|sl_|archer/.test(id)) d.reps += ' each side';
+    if (band === 'low') d.sets = Math.max(2, d.sets - 1);
+    if (id === 'pullup_neg') { d.reps = '3–5 (5 s down)'; }
+  }
+  // Within a block: build for three weeks, then unload.
+  if (wk.w === 2 && d.rpe) d.rpe += 0.5;
+  if (wk.w === 3) { d.sets = Math.min(6, d.sets + 1); if (d.rpe) d.rpe += 0.5; }
+  if (wk.deload) { d.sets = Math.max(2, Math.ceil(d.sets * 0.6)); if (d.rpe) d.rpe = Math.max(5, d.rpe - 1.5); }
+  if (d.rpe) d.rpe = Math.min(9, d.rpe);
+  return d;
+}
+function doseText(d) {
+  const rir = d.rpe ? `, RPE ${d.rpe} (${Math.max(1, Math.round(10 - d.rpe))} in reserve)` : '';
+  return `${d.sets} × ${d.reps}${rir}, rest ${fmtRest(d.rest)}`;
+}
+function fmtRest(s) { return s >= 60 ? `${Math.round(s / 30) / 2} min` : `${s} s`; }
+
+// =============================================================================
+// Sessions
+// =============================================================================
+function zoneText(z, m) {
+  const Z = ZONES[z - 1];
+  let hr;
+  if (m.rhr) { const r = m.hrmax - m.rhr; hr = `${Math.round(m.rhr + r * (Z.lo - 0.05))}–${Math.round(m.rhr + r * (Z.hi - 0.03))}`; }
+  else hr = `${Math.round(m.hrmax * Z.lo)}–${Math.round(m.hrmax * Z.hi)}`;
+  return `Z${z} ${Z.name}, ${hr} bpm, RPE ${Z.rpe}`;
+}
+const MODE_FACTOR = { run: 1, bike: 1.5, swim: 1, row: 1 };
+const LONG_CAP = { run: 150, bike: 240, swim: 80, row: 100 };
+
+// One endurance session: steps for the timer and a summary.
+function enduranceBlock(type, mode, m, wk, budget) {
+  const st = m.stage.E, i = st - 1, bandF = BAND_F[m.band.E], verb = MODE_VERB[mode] || 'Go';
+  const impactCut = mode === 'run' && m.inj.impactRehab ? 0.75 : 1;
+  const steps = [];
+  const repsScale = r => Math.max(2, Math.round(r * (wk.deload ? 0.65 : wk.w === 3 ? 1.15 : 1)));
+  const easyMin = () => Math.round([25, 35, 45, 55, 65, 75][i] * bandF * MODE_FACTOR[mode] * wk.mult * impactCut);
+  let title, hard = true, summary;
+  const warm = (min, extra) => { steps.push({ label: `Warm up: easy ${verb.toLowerCase()}, building to Z2`, secs: min * 60, z: 2, kind: 'warm' }); if (extra) steps.push(extra); };
+  const cool = min => steps.push({ label: `Cool down: easy ${verb.toLowerCase()}`, secs: min * 60, z: 1, kind: 'cool' });
+  if (type === 'easy' || type === 'long' || type === 'recovery') {
+    hard = false;
+    let min = easyMin();
+    if (type === 'long') min = Math.min(LONG_CAP[mode], Math.round(min * 1.75));
+    if (type === 'recovery') min = Math.min(30, Math.round(min * 0.6));
+    min = Math.max(15, Math.min(min, budget || min));
+    const z = type === 'recovery' ? 1 : 2;
+    steps.push({ label: `${type === 'long' ? 'Long' : type === 'recovery' ? 'Recovery' : 'Easy'} ${verb.toLowerCase()}, ${zoneText(z, m).split(',')[0]}`, secs: min * 60, z, kind: 'work' });
+    title = `${type === 'long' ? 'Long' : type === 'recovery' ? 'Recovery' : 'Easy'} ${verb.toLowerCase()} · ${min} min`;
+    summary = `${min} min at ${zoneText(z, m)}.`;
+    if (type === 'long' && min >= 75) summary += ` Take 30–60 g of carbohydrate an hour after the first hour${min >= 150 ? ', up to 90 g with mixed sugars' : ''}.`;
+  } else if (type === 'tempo') {
+    hard = false;
+    const reps = repsScale([6, 8, 10, 12, 14, 16][i]);
+    warm(8);
+    for (let r = 1; r <= reps; r++) { steps.push({ label: `Tempo 100 m at 65–75% speed (${r}/${reps})`, secs: 20, z: 3, kind: 'work' }); if (r < reps) steps.push({ label: 'Walk back', secs: 45, z: 1, kind: 'rest' }); }
+    cool(5);
+    title = `Tempo runs · ${reps} × 100 m`;
+    summary = `${reps} × 100 m at 65–75% of top speed with 45 s walks: aerobic work that keeps you fast and light.`;
+  } else if (type === 'threshold') {
+    let [reps, len] = [[3, 5], [3, 8], [4, 8], [3, 12], [4, 12], [3, 15]][i];
+    reps = repsScale(reps);
+    const rec = mode === 'swim' ? 45 : 120;
+    warm(12);
+    for (let r = 1; r <= reps; r++) { steps.push({ label: `Threshold ${verb.toLowerCase()} Z4 (${r}/${reps})`, secs: len * 60, z: 4, kind: 'work' }); if (r < reps) steps.push({ label: 'Easy recovery', secs: rec, z: 1, kind: 'rest' }); }
+    cool(8);
+    title = `Threshold · ${reps} × ${len} min`;
+    summary = `${reps} × ${len} min at ${zoneText(4, m)}, ${fmtRest(rec)} easy between. Comfortably hard: you could hold it for about an hour.`;
+  } else if (type === 'vo2' || type === 'hills') {
+    let [reps, len] = [[4, 2], [4, 3], [5, 3], [4, 4], [5, 4], [6, 4]][i];
+    if (type === 'hills') { reps = [6, 8, 8, 10, 10, 12][i]; len = 1.5; }
+    reps = repsScale(reps);
+    const rec = Math.round(len * 60 * (type === 'hills' ? 1.2 : 0.75));
+    warm(12, mode === 'run' ? { label: '4 relaxed strides', secs: 80, z: 3, kind: 'warm' } : null);
+    for (let r = 1; r <= reps; r++) { steps.push({ label: `${type === 'hills' ? 'Uphill, hard' : 'VO2max'} Z5 (${r}/${reps})`, secs: len * 60, z: 5, kind: 'work' }); if (r < reps) steps.push({ label: type === 'hills' ? 'Jog down' : 'Easy recovery', secs: rec, z: 1, kind: 'rest' }); }
+    cool(8);
+    title = type === 'hills' ? `Hill repeats · ${reps} × 90 s` : `VO2max intervals · ${reps} × ${len} min`;
+    summary = `${reps} × ${len === 1.5 ? '90 s' : len + ' min'} at ${zoneText(5, m)}, ${fmtRest(rec)} easy between. Hard but even: the last rep should match the first.`;
+  } else if (type === 'intermittent') {
+    let [sets, reps] = [[1, 8], [2, 8], [2, 10], [3, 10], [3, 12], [3, 15]][i];
+    if (wk.deload) sets = Math.max(1, sets - 1);
+    warm(10);
+    for (let s = 1; s <= sets; s++) {
+      for (let r = 1; r <= reps; r++) { steps.push({ label: `15 s fast at 90% of your 30-15 speed (set ${s}, ${r}/${reps})`, secs: 15, z: 5, kind: 'work' }); steps.push({ label: 'Jog or walk', secs: 15, z: 1, kind: 'rest' }); }
+      if (s < sets) steps.push({ label: 'Easy between sets', secs: 180, z: 1, kind: 'rest' });
+    }
+    cool(6);
+    title = `15/15 intervals · ${sets} × ${reps}`;
+    summary = `${sets} set${sets > 1 ? 's' : ''} of ${reps} × (15 s fast, 15 s easy), 3 min between sets. Builds the repeated high-intensity fitness team and court sports need.`;
+  } else if (type === 'rsa') {
+    let sets = [1, 2, 2, 3, 3, 3][i]; if (wk.deload) sets = Math.max(1, sets - 1);
+    const dist = st <= 2 ? 20 : 30;
+    warm(12, { label: '3 build-up runs to 80%', secs: 60, z: 3, kind: 'warm' });
+    for (let s = 1; s <= sets; s++) {
+      for (let r = 1; r <= 6; r++) { steps.push({ label: `Sprint ${dist} m all out (set ${s}, ${r}/6)`, secs: 5, z: 5, kind: 'work' }); if (r < 6) steps.push({ label: 'Walk back', secs: 20, z: 1, kind: 'rest' }); }
+      if (s < sets) steps.push({ label: 'Easy between sets', secs: 240, z: 1, kind: 'rest' });
+    }
+    cool(6);
+    title = `Repeated sprints · ${sets} × 6 × ${dist} m`;
+    summary = `${sets} × 6 sprints of ${dist} m, 20 s between, 4 min between sets.`;
+  } else if (type === 'rounds') {
+    let [rounds, len] = [[3, 2], [4, 3], [5, 3], [6, 3], [5, 5], [6, 5]][i];
+    rounds = repsScale(rounds);
+    warm(10);
+    for (let r = 1; r <= rounds; r++) { steps.push({ label: `Round ${r}/${rounds}: hard, Z4 to Z5 surges`, secs: len * 60, z: 4, kind: 'work' }); if (r < rounds) steps.push({ label: 'Rest between rounds', secs: 60, z: 1, kind: 'rest' }); }
+    cool(6);
+    title = `Fight rounds · ${rounds} × ${len} min`;
+    summary = `${rounds} rounds of ${len} min (pads, bag, sparring drills or the ${verb.toLowerCase()}), 1 min rest: matches the demands of competition.`;
+  } else if (type === 'speedEnd') {
+    if (st < 3) return enduranceBlock('tempo', mode, m, wk, budget);
+    let reps = [2, 3, 3, 4][Math.min(3, i - 2)]; if (wk.deload) reps = 2;
+    warm(15, { label: 'Sprint drills and 3 build-ups', secs: 300, z: 3, kind: 'warm' });
+    for (let r = 1; r <= reps; r++) { steps.push({ label: `150 m at 90% (${r}/${reps})`, secs: 20, z: 5, kind: 'work' }); if (r < reps) steps.push({ label: 'Full recovery (walk)', secs: 420, z: 1, kind: 'rest' }); }
+    cool(8);
+    title = `Speed endurance · ${reps} × 150 m`;
+    summary = `${reps} × 150 m at 90% with 6–8 min walking rest.`;
+  }
+  // Short sessions: drop repeats, then shorten the warm-up and cool-down.
+  const total = () => steps.reduce((a, s) => a + s.secs, 0) / 60;
+  if (hard && budget && total() > budget * 1.1) {
+    for (const st of steps) { if (st.kind === 'warm' && st.secs > 480) st.secs = 480; if (st.kind === 'cool' && st.secs > 300) st.secs = 300; }
+    let cut = 0;
+    while (total() > budget * 1.1 && steps.filter(x => x.kind === 'work').length > 2) {
+      let i = steps.length - 1;
+      while (i >= 0 && steps[i].kind !== 'work') i--;
+      const prev = steps[i - 1];
+      steps.splice(i, 1);
+      if (prev && prev.kind === 'rest') steps.splice(i - 1, 1);
+      cut++;
+    }
+    if (cut) { const n = steps.filter(x => x.kind === 'work').length; title += ` (${n} reps to fit your time)`; }
+  }
+  const minutes = Math.round(total());
+  return { kind: 'E', type, mode, hard, title, summary, steps, minutes };
+}
+
+function strengthBlock(letter, m, wk, budget) {
+  const st = m.stage.S;
+  let pats = STRENGTH_DAYS[letter].slice();
+  if (m.athlete.id === 'climber') pats = pats.map(p => p === 'hpush' && letter !== 'A' ? 'vpull' : p);
+  if (m.athlete.id === 'swimmer' && letter === 'B') pats = pats.map(p => p === 'vpush' ? 'vpull' : p);
+  const items = [];
+  const used = new Set();
+  pats.forEach((pat, n) => {
+    const pick = pickStrength(pat, st, m);
+    if (!pick || used.has(pick.id)) return;
+    used.add(pick.id);
+    const main = n < 2;
+    const d = strengthDose(pick.id, main, st, m, wk);
+    items.push({ ex: pick.id, pat, main, easier: pick.easier, harder: pick.harder, swapped: pick.swapped, d, mins: d.sets * (d.work + d.rest) / 60 });
+  });
+  // Fit the time: drop accessories from the end, then trim sets.
+  let total = () => items.reduce((a, x) => a + x.mins, 0);
+  while (total() > budget && items.length > 3) items.splice(items.length - 1, 1);
+  for (const x of items.slice().reverse()) if (total() > budget && x.d.sets > 2) { x.d.sets -= 1; x.mins = x.d.sets * (x.d.work + x.d.rest) / 60; }
+  const minutes = Math.round(total());
+  return { kind: 'S', letter, title: `Strength ${letter}`, items, minutes,
+    summary: P.bodyGoal === 'build' && m.athlete.mass ? 'Moderate reps for some useful muscle, plus heavy main lifts.' : 'Heavy, low reps, long rests, never to failure: strength without much size.' };
+}
+
+function powerBlock(m, wk, n, budget) {
+  const st = m.stage.P, i = st - 1, band = BAND_F[m.band.P];
+  const contacts = Math.round([30, 40, 60, 80, 90, 100][i] * band * (wk.deload ? 0.6 : 1));
+  const picks = [];
+  const order = m.athlete.power.slice();
+  // Rotate the order so each power session leads with something different.
+  for (let r = 0; r < n % order.length; r++) order.push(order.shift());
+  for (const kind of order) {
+    let id = null;
+    if (kind === 'sprint') {
+      const mode = m.inj.impactPain ? m.altMode : m.modes[n % m.modes.length];
+      const lad = POW.sprint[mode === 'run' && m.inj.avoid.has('ham') ? 'hill' : mode] || POW.sprint.run;
+      id = lad[i];
+    } else if (kind === 'upper' || kind === 'throw') id = POW[kind][P.equip >= 1 ? 1 : 0][i];
+    else if (kind === 'lift') id = POW.lift[P.equip] ? POW.lift[P.equip][i] : null;
+    else id = POW[kind][i];
+    if (id && okEx(id, m) && !picks.some(p => p.ex === id)) picks.push({ ex: id, kind });
+    if (picks.length >= (budget >= 14 ? 3 : 2)) break;
+  }
+  // Nothing left after injury swaps: fall back to low-impact power work.
+  if (!picks.length) for (const id of ['mb_chest', 'mb_rot', 'inc_plyo_push', 'kb_swing', 'bike_sprint']) {
+    if ((/^mb_/.test(id) && P.equip < 1) || (id === 'kb_swing' && P.equip < 1)) continue;
+    if (okEx(id, m) && picks.length < 2) picks.push({ ex: id, kind: id === 'bike_sprint' ? 'sprint' : id === 'kb_swing' ? 'lift' : 'upper' });
+  }
+  const items = picks.map(p => {
+    let d;
+    if (p.kind === 'sprint') {
+      const reps = Math.max(3, Math.round([4, 5, 6, 6, 8, 8][i] * band * (wk.deload ? 0.7 : 1)));
+      const dist = { strides: '60–80 m', accel: st <= 3 ? '10–20 m' : '20–30 m', flying: '20 m build + 20–30 m fast', hill_sprint: '8–10 s', bike_sprint: '8–10 s', swim_sprint: '12.5–25 m', row_sprint: '8–10 strokes' }[p.ex];
+      d = { sets: reps, reps: dist, rest: p.ex === 'strides' ? 60 : 120, work: 10, note: 'Full effort, full rest: stop if speed drops.' };
+    } else if (p.kind === 'lift') {
+      d = p.ex === 'kb_swing' ? { sets: 4, reps: 10, rest: 75, work: 20 } : { sets: 4, reps: 3, rest: 120, work: 10, note: 'Light enough to move fast; stop if the bar slows.' };
+    } else if (p.kind === 'upper' || p.kind === 'throw') {
+      d = { sets: 3, reps: /rot/.test(p.ex) ? '5 each side' : 5, rest: 60, work: 15 };
+    } else {
+      const per = /pogo|hurdle_jump/.test(p.ex) ? 15 : /sl_/.test(p.ex) ? 6 : 5;
+      const sets = clamp(Math.round(contacts / picks.length / per), 2, 6);
+      d = { sets, reps: `${per}${/sl_/.test(p.ex) ? ' each leg' : ''}`, rest: 60, work: per * 2 };
+    }
+    return { ex: p.ex, kind: p.kind, d, mins: d.sets * (d.work + d.rest) / 60 };
+  });
+  let total = () => items.reduce((a, x) => a + x.mins, 0);
+  while (total() > budget && items.length > 1) items.pop();
+  return { kind: 'P', title: 'Power', items, minutes: Math.round(total()), summary: `About ${contacts} foot contacts in all. Every rep at full intent; quality ends the set, not fatigue.` };
+}
+
+const MOBILITY = ['hip_9090', 'tspine', 'ankle_kw', 'couch', 'wgs'];
+function resDose(id, st, wk) {
+  const i = st - 1;
+  const half = wk.deload;
+  const D = {
+    nordic: { sets: [2, 2, 3, 3, 3, 3][i], reps: [3, 4, 4, 5, 6, 6][i], rest: 90, work: 30, note: 'Lower as slowly as you can.' },
+    copen_s: { sets: 2, reps: `${[15, 20, 25, 30, 30, 30][i]} s each side`, rest: 45, work: 50, hold: [15, 20, 25, 30, 30, 30][i] },
+    copen: { sets: 3, reps: `${[15, 20, 25, 30, 35, 40][i]} s each side`, rest: 45, work: 60, hold: [15, 20, 25, 30, 35, 40][i] },
+    soleus: { sets: 3, reps: [12, 15, 15, 20, 20, 20][i], rest: 45, work: 40 },
+    tib_raise: { sets: 2, reps: [15, 15, 20, 20, 25, 25][i], rest: 30, work: 40 },
+    band_er: { sets: 2, reps: 15, rest: 30, work: 40 }, side_er: { sets: 2, reps: '12 each side', rest: 30, work: 60 },
+    ytw: { sets: 2, reps: '8 each letter', rest: 45, work: 60 }, pull_apart: { sets: 2, reps: 15, rest: 30, work: 30 },
+    neck_iso: { sets: 2, reps: '10 s each direction', rest: 30, work: 40, hold: 10 }, chin_tuck: { sets: 2, reps: '8 × 5 s', rest: 30, work: 40 },
+    sl_balance: { sets: 2, reps: '30 s each leg', rest: 15, work: 60, hold: 30 }, star_excursion: { sets: 2, reps: '5 reaches each leg', rest: 30, work: 60 },
+    wrist_iso: { sets: 3, reps: '30 s', rest: 30, work: 30, hold: 30 }, wrist_curl: { sets: 2, reps: 15, rest: 30, work: 40 },
+    finger_hang: st >= 3 ? { sets: 5, reps: '10 s', rest: 120, work: 10, hold: 10 } : null,
+    psoas_march: { sets: 2, reps: '10 each side', rest: 30, work: 40 }, askling: { sets: 1, reps: '10 each drill', rest: 30, work: 120 },
+    bird_dog: { sets: 2, reps: '6 × 8 s each side', rest: 30, work: 90 }, curl_up: { sets: 2, reps: '5 × 10 s', rest: 30, work: 60 },
+    scap_push: { sets: 2, reps: 10, rest: 30, work: 30 },
+    hip_9090: { sets: 2, reps: '8 switches', rest: 15, work: 45 }, tspine: { sets: 2, reps: '8 each side', rest: 15, work: 60 },
+    ankle_kw: { sets: 2, reps: '10 each side', rest: 15, work: 45 }, couch: { sets: 2, reps: '45 s each side', rest: 15, work: 90, hold: 45 },
+    wgs: { sets: 1, reps: '5 each side', rest: 15, work: 90 }, band_row: { sets: 2, reps: 15, rest: 30, work: 30 },
+  };
+  let d = D[id] || { sets: 2, reps: 12, rest: 30, work: 40 };
+  if (!d) return null;
+  d = { ...d };
+  if (half) d.sets = Math.max(1, d.sets - 1);
+  return d;
+}
+function resilienceBlock(m, wk, n, extra = []) {
+  const st = m.stage.R;
+  let pool = m.athlete.pre.map(id => id === 'copen_s' && st >= 3 ? 'copen' : id).filter(id => okEx(id, m) && (id !== 'finger_hang' || st >= 3));
+  if (!pool.length) pool = ['bird_dog', 'band_er'];
+  const ids = [pool[(n * 2) % pool.length], pool[(n * 2 + 1) % pool.length], MOBILITY[n % MOBILITY.length], ...extra];
+  const items = [...new Set(ids)].filter(id => okEx(id, m) || MOBILITY.includes(id)).map(id => { const d = resDose(id, st, wk); return d && { ex: id, d, mins: d.sets * (d.work + d.rest) / 60 }; }).filter(Boolean);
+  return { kind: 'R', title: 'Resilience', items, minutes: Math.round(items.reduce((a, x) => a + x.mins, 0)), summary: 'Prehab for the injuries your sport tends to cause, plus mobility.' };
+}
+function rehabBlock(m) {
+  const items = [];
+  const rank = { pain: 0, rehab: 1, weak: 2 };
+  const list = m.inj.list.slice().sort((a, b) => rank[a.status] - rank[b.status]);
+  const per = list.length >= 3 ? 1 : 2;
+  for (const inj of list) {
+    const phase = inj.status === 'weak' ? 2 : inj.status === 'pain' ? 1 : inj.phase;
+    for (const [id, dose] of inj.phases[phase - 1][1].slice(0, per)) {
+      if (items.some(x => x.ex === id) || items.length >= 4) continue;
+      items.push({ ex: id, dose, region: inj.name, status: inj.status, phase, d: { sets: 3, reps: dose, rest: 45, work: HOLDS.has(id) ? 45 : 40, hold: HOLDS.has(id) ? 45 : 0 }, mins: 2.5 });
+    }
+  }
+  if (!items.length) return null;
+  return { kind: 'X', title: 'Rehab and weak areas', items, minutes: Math.round(items.reduce((a, x) => a + x.mins, 0)), summary: 'Pain up to 3/10 during these is acceptable if it has settled by the next morning.' };
+}
+
+function warmBlock(sess, m) {
+  const has = k => sess.blocks.some(b => b.kind === k);
+  const mode = sess.blocks.find(b => b.kind === 'E')?.mode || (m.inj.impactPain ? m.altMode : m.modes[0]);
+  const steps = [
+    { label: `Raise: easy ${(MODE_VERB[mode] || 'move').toLowerCase()} or skipping`, secs: 240 },
+    { label: 'Mobilize: leg swings, world\'s greatest stretch, hip 90/90', secs: 150 },
+    { label: 'Activate: glute bridges and band pull-aparts', secs: 90 },
+  ];
+  if (has('P') || has('S')) steps.push({ label: has('P') ? 'Potentiate: pogo hops and 2 build-up jumps' : 'Potentiate: 2 light ramp-up sets of the first lift', secs: 90 });
+  return { kind: 'W', title: 'Warm-up (RAMP)', steps, minutes: Math.round(steps.reduce((a, s) => a + s.secs, 0) / 60) };
+}
+function coolBlock() {
+  const steps = [{ label: 'Easy movement, bring the breathing down', secs: 180 }, { label: 'Slow breathing: 4 s in, 6 s out', secs: 90 }];
+  return { kind: 'C', title: 'Cool-down', steps, minutes: 5 };
+}
+
+const TEST_TAGS = { broad: ['impact'], cmj: ['impact'], sprint20: ['impact', 'ham'], squat: ['knee', 'spine'], trapdl: ['spine'], pullups: ['grip', 'shoulder'], pushups: ['wrist', 'shoulder'], slsquat: ['knee'], calfsl: ['ankle'] };
+function gateBlocks(kind, m) {
+  const items = [], skipped = [];
+  const qs = kind === 'A' ? ['P', 'S', 'R'] : ['E'];
+  for (const q of qs) {
+    const info = m.info[q];
+    const next = Math.min(6, info.stage);
+    for (const id of info.ids) {
+      if (q === 'E' && id === 'easy' && info.ids.length > 1 && P.tests.easy == null) continue;
+      if ((TEST_TAGS[id] || []).some(t => m.inj.avoid.has(t)) || (m.inj.impactPain && (id === 'run5k' || id === 'ift'))) { skipped.push(TESTS[id].name); continue; }
+      items.push({ test: id, q, tgt: target(id, next, m), stage: next });
+    }
+  }
+  if (kind === 'B' && !items.length) items.push({ test: 'easy', q: 'E', tgt: target('easy', m.stage.E, m), stage: m.stage.E });
+  return { kind: 'T', title: kind === 'A' ? 'Gate tests: power, strength, resilience' : 'Gate test: endurance', items,
+    minutes: kind === 'A' ? 50 : 40, summary: (kind === 'A' ? 'Power first while fresh, then strength (3–5 min rests), then resilience.' : 'Treat it like race day: easy day before, normal breakfast 2–3 h before, same warm-up you would race with.') + (skipped.length ? ` Left out while an injury recovers: ${skipped.join(', ')}.` : '') };
+}
+
+// =============================================================================
+// The week
+// =============================================================================
+function weekInfo(weekNo) {
+  const w = ((weekNo - 1) % 4) + 1;
+  return { no: weekNo, block: Math.ceil(weekNo / 4), w, deload: w === 4, mult: [1, 1.08, 1.16, 0.65][w - 1] };
+}
+function planWeek(m, weekNo) {
+  const wk = weekInfo(weekNo);
+  const avail = P.days.slice().sort((a, b) => a - b);
+  const D = avail.length, M = P.minutes;
+  const days = DAYS.map((name, idx) => ({ idx, name, avail: avail.includes(idx), units: [], sessions: [] }));
+  if (!D) return { wk, days, units: [] };
+  const a = m.athlete, b = m.band;
+
+  // How many of each kind of session this week.
+  let nS = b.S === 'high' && D >= 5 ? 3 : 2;
+  if (D <= 2) nS = Math.min(nS, D);
+  let nH = b.E === 'high' ? (D >= 5 ? 2 : 1) : (b.E === 'mid' || a.hard.length) ? 1 : 0;
+  if (!a.hard.length) nH = a.id === 'sprinter' && m.stage.E >= 3 ? 1 : 0;
+  if (a.id === 'sprinter' && m.stage.E >= 3) nH = 1;
+  if (m.stage.E === 1 && !['intermittent', 'rsa', 'rounds'].includes(a.hard[0])) nH = 0;
+  if (m.stage.E === 1 && nH) nH = Math.min(nH, 1);
+  const wantLong = a.long && b.E !== 'low';
+  let nEasy = b.E === 'high' ? Math.max(1, D - nH) : b.E === 'mid' ? Math.max(1, Math.round(D / 2) - nH + (wantLong ? 0 : 0)) : 1;
+  if (wantLong) nEasy = Math.max(1, nEasy);
+  const nP = b.P === 'high' ? Math.min(3, D) : b.P === 'mid' ? 2 : 1;
+  const nR = clamp(2 + (m.stage.R <= 2 ? 1 : 0), 2, D);
+  const nX = m.inj.list.length ? Math.min(D, m.inj.list.some(i => i.status !== 'weak') ? 4 : 3) : 0;
+
+  const units = [];
+  const modes = m.inj.impactPain ? m.modes.map(x => x === 'run' ? m.altMode : x) : m.modes;
+  let mi = 0;
+  const nextMode = () => modes[(mi++) % modes.length];
+  const easyType = a.easyType || 'easy';
+  if (wantLong) units.push({ k: 'long', hard: false, load: 1.5, mode: modes.includes('bike') && modes.length > 1 ? 'bike' : modes[0] });
+  for (let h = 0; h < nH; h++) {
+    const type = a.hard[(h + (wk.no % 2 === 0 && nH === 1 ? 1 : 0)) % a.hard.length] || 'threshold';
+    units.push({ k: 'hard', type, hard: true, load: 2, mode: type === 'rsa' || type === 'intermittent' ? (m.inj.impactPain ? m.altMode : 'run') : nextMode() });
+  }
+  for (let s = 0; s < nS; s++) units.push({ k: 'str', letter: 'ABC'[s], hard: true, load: 2 });
+  for (let e = 0; e < nEasy - (wantLong ? 1 : 0); e++) {
+    let mode = nextMode();
+    if (mode === 'run' && m.inj.impactRehab && e % 2 === 1) mode = m.altMode;
+    units.push({ k: 'easy', type: easyType, hard: false, load: 1, mode });
+  }
+  for (let p = 0; p < nP; p++) units.push({ k: 'pow', n: p, load: 0.8 });
+  for (let r = 0; r < nR; r++) units.push({ k: 'res', n: r, load: 0.3 });
+  for (let x = 0; x < nX; x++) units.push({ k: 'rehab', load: 0.2 });
+
+  // Deload week doubles as the gate week: tests stand in for competitions.
+  if (wk.deload) {
+    const s0 = units.find(u => u.k === 'str');
+    if (s0) Object.assign(s0, { k: 'gateA', hard: true, load: 2 });
+    const h0 = units.find(u => u.k === 'hard') || units.find(u => u.k === 'easy') || units.find(u => u.k === 'long');
+    if (h0) Object.assign(h0, { k: 'gateB', hard: true, load: 2 });
+    for (let i = units.length - 1; i >= 0; i--) if (units[i].k === 'pow' && units[i].n > 0) units.splice(i, 1);
+  }
+
+  // A day off each week: with 7 days, the lightest day becomes a recovery day.
+  const recoveryDay = D === 7 ? (wantLong ? 0 : 3) : -1;
+  const est = u => ({ long: 90, hard: 55, str: 40, easy: 40, pow: 12, res: 10, rehab: 10, gateA: 50, gateB: 40 }[u.k]);
+  const isMain = u => ['long', 'hard', 'str', 'easy', 'gateA', 'gateB'].includes(u.k);
+  const cap = P.doubles ? M * 2 : M;
+  const order = ['gateA', 'gateB', 'long', 'hard', 'str', 'easy', 'pow', 'res', 'rehab'];
+  units.sort((x, y) => order.indexOf(x.k) - order.indexOf(y.k));
+  const prior = m.emph.E >= m.emph.S + m.emph.P ? 'E' : 'S';
+  for (const u of units) {
+    let best = null, bestCost = Infinity;
+    for (const d of days) {
+      if (!d.avail) continue;
+      const ks = d.units.map(x => x.k);
+      let c = d.units.reduce((s, x) => s + x.load, 0);
+      const mins = d.units.reduce((s, x) => s + est(x), 0) + (d.units.length ? 0 : 15);
+      const hardHere = d.units.some(x => x.hard);
+      const near = [-1, 1].map(o => days[(d.idx + o + 7) % 7]).filter(x => x.avail);
+      const hardNear = near.filter(x => x.units.some(y => y.hard)).length;
+      if (d.idx === recoveryDay && (u.hard || u.k === 'long' || u.k === 'pow')) c += 100;
+      if (u.k === 'long') { if (d.idx >= 5) c -= 3; if (d.idx === 6) c -= 0.5; }
+      if (u.k === 'gateB') { const ga = days.find(x => x.units.some(y => y.k === 'gateA')); if (ga && d.idx <= ga.idx) c += 5; }
+      if (u.k === 'gateA') c += d.idx * 0.3;
+      if (u.hard) {
+        c += hardNear * 2;
+        if (u.k === 'str' && ks.includes('str')) c += 100;
+        if ((u.k === 'hard' || u.k === 'gateB') && (ks.includes('hard') || ks.includes('long') || ks.includes('gateB'))) c += 100;
+        if (u.k === 'gateA' && ks.includes('gateB')) c += 100;
+        if (u.k === 'gateB' && ks.includes('gateA')) c += 100;
+        // Endurance-first athletes keep easy days easy by stacking strength on hard days.
+        if (u.k === 'str' && prior === 'E' && ks.includes('hard')) c -= 2.5;
+        if (u.k === 'str' && ks.includes('long')) c += 3;
+        if (near.some(x => x.units.some(y => y.k === 'long')) && u.k === 'hard') c += 1;
+      }
+      if (u.k === 'easy') { if (ks.includes('gateA')) c += 100; if (ks.some(k => ['easy', 'long', 'hard', 'gateB'].includes(k))) c += P.doubles && prior === 'E' ? 4 : 100; }
+      if (u.k === 'pow') {
+        if (ks.includes('pow')) c += 100;
+        if (ks.includes('str')) c -= 2; else if (ks.includes('easy')) c -= 1;
+        if (ks.includes('hard') || ks.includes('long')) c += 2;
+        if (ks.includes('gateA') || ks.includes('gateB')) c += 100;
+      }
+      if (u.k === 'res') { if (ks.includes('res')) c += 100; if (!hardHere) c -= 0.5; if (ks.includes('gateA')) c += 3; }
+      if (u.k === 'rehab') { if (ks.includes('rehab')) c += 100; }
+      const add = est(u) + (d.units.length ? 0 : 15);
+      if (mins + add > cap) c += 3 + (mins + add - cap) / 5;
+      if (isMain(u) && d.units.filter(isMain).length >= (P.doubles ? 2 : 1)) c += isMain(u) && u.k === 'str' && prior === 'E' && ks.includes('hard') ? 2 : 6;
+      c += d.idx * 0.01;
+      if (c < bestCost) { bestCost = c; best = d; }
+    }
+    if (best && bestCost < 90) best.units.push(u);
+  }
+
+  // Build sessions for each day.
+  let sCount = 0, pCount = 0, rCount = 0;
+  for (const d of days) {
+    if (!d.units.length) continue;
+    const mains = d.units.filter(isMain);
+    const extras = d.units.filter(u => !isMain(u));
+    const total = d.units.reduce((s, u) => s + est(u), 0) + 15;
+    let groups = [d.units];
+    if (P.doubles && mains.length >= 2 && total > M) {
+      const first = mains.find(u => (prior === 'E' ? ['hard', 'long', 'easy', 'gateB'] : ['str', 'gateA']).includes(u.k)) || mains[0];
+      const am = [first, ...extras.filter(u => u.k === 'pow' && first.k !== 'easy')];
+      groups = [am, d.units.filter(u => !am.includes(u))];
+    }
+    groups.forEach((g, gi) => {
+      const sess = { day: d.idx, slot: groups.length > 1 ? (gi ? 'PM' : 'AM') : '', blocks: [], recovery: d.idx === recoveryDay };
+      const ordered = g.slice().sort((x, y) => {
+        const rank = u => u.k === 'pow' ? 0 : u.k === 'gateA' ? 1 : u.k === 'gateB' ? 1 : (prior === 'E' ? ({ hard: 2, long: 2, easy: 3, str: 4 }[u.k]) : ({ str: 2, hard: 3, long: 3, easy: 4 }[u.k])) ?? (u.k === 'res' ? 6 : 7);
+        return rank(x) - rank(y);
+      });
+      // Share the session's time between its parts.
+      const has = k => g.some(u => u.k === k);
+      const eFirst = ['easy', 'long', 'hard'].includes(ordered.find(u => u.k !== 'pow')?.k) && !has('pow');
+      const avail = M - 5 - (has('pow') ? 12 : 0) - (has('res') ? 10 : 0) - (has('rehab') ? 10 : 0) - (eFirst ? 0 : 10);
+      const hasE = g.some(u => ['easy', 'long', 'hard'].includes(u.k));
+      const sBudget = has('str') ? (hasE ? clamp(Math.round(avail * (prior === 'E' ? 0.4 : 0.55)), 20, 45) : clamp(avail, 20, 50)) : 0;
+      const eBudget = Math.max(20, avail - sBudget);
+      for (const u of ordered) {
+        if (u.k === 'str') sess.blocks.push(strengthBlock(u.letter, m, wk, sBudget));
+        else if (u.k === 'pow') { const pb = powerBlock(m, wk, pCount++, 12); if (pb.items.length) sess.blocks.push(pb); }
+        else if (u.k === 'res') sess.blocks.push(resilienceBlock(m, wk, rCount++));
+        else if (u.k === 'rehab') { const r = rehabBlock(m); if (r) sess.blocks.push(r); }
+        else if (u.k === 'gateA') sess.blocks.push(gateBlocks('A', m));
+        else if (u.k === 'gateB') sess.blocks.push(gateBlocks('B', m));
+        else {
+          const budget = eBudget;
+          const type = sess.recovery ? 'recovery' : u.k === 'long' ? 'long' : u.type;
+          sess.blocks.push(enduranceBlock(type, u.mode, m, wk, type === 'long' ? Math.max(budget, Math.round(M * (b.E === 'high' ? 2 : 1.5))) : budget));
+        }
+      }
+      if (!sess.blocks.length) return;
+      sess.blocks.unshift(warmBlock(sess, m));
+      sess.blocks.push(coolBlock());
+      // Endurance blocks have their own warm-up when they are first.
+      const e = sess.blocks.find(x => x.kind === 'E');
+      if (e && e.steps[0]?.kind === 'warm' && sess.blocks[1] === e) sess.blocks.splice(0, 1);
+      else if (e && !e.steps.some(s => s.kind === 'warm') && sess.blocks[1] === e && e.type !== 'tempo') sess.blocks.splice(0, 1, { kind: 'W', title: 'Warm-up', steps: [{ label: 'Start the first 5–10 minutes extra easy', secs: 0 }], minutes: 0 });
+      fitSession(sess, M);
+      sess.minutes = sess.blocks.reduce((s, x) => s + (x.minutes || 0), 0);
+      sess.hard = sess.blocks.some(x => x.kind === 'S' || x.kind === 'T' || (x.kind === 'E' && x.hard));
+      sess.title = sessionTitle(sess);
+      d.sessions.push(sess);
+    });
+  }
+
+  // Swaps the person made for this week.
+  for (const [x, y] of (P.swaps[weekNo] || [])) {
+    if (days[x] && days[y]) {
+      const tmp = days[x].sessions; days[x].sessions = days[y].sessions; days[y].sessions = tmp;
+      days[x].sessions.forEach(s => s.day = x); days[y].sessions.forEach(s => s.day = y);
+    }
+  }
+  fillCoverage(days, m, wk);
+  for (const d of days) d.sessions.forEach(s => { s.minutes = s.blocks.reduce((t, x) => t + (x.minutes || 0), 0); });
+  return { wk, days };
+}
+// Trim a session that runs well past the time available.
+function fitSession(sess, M) {
+  const mins = () => sess.blocks.reduce((t, x) => t + (x.minutes || 0), 0);
+  if (mins() <= M * 1.1) return;
+  const hasRamp = sess.blocks[0]?.kind === 'W' && sess.blocks[0].minutes > 0;
+  for (const b of sess.blocks) if (b.kind === 'E' && hasRamp && b.steps[0]?.kind === 'warm' && b.steps[0].secs > 300) { b.steps[0].secs = 300; b.minutes = Math.round(b.steps.reduce((a, x) => a + x.secs, 0) / 60); }
+  for (const kind of ['R', 'X', 'P']) {
+    const b = sess.blocks.find(x => x.kind === kind);
+    while (b && mins() > M * 1.1 && b.items.length > (kind === 'P' ? 1 : 2)) { b.items.pop(); b.minutes = Math.round(b.items.reduce((a, x) => a + x.mins, 0)); }
+  }
+  const r = sess.blocks.findIndex(x => x.kind === 'R');
+  if (mins() > M * 1.1 && r >= 0 && sess.blocks.some(x => x.kind === 'X')) sess.blocks.splice(r, 1);
+}
+function sessionTitle(s) {
+  const parts = [];
+  for (const b of s.blocks) {
+    if (b.kind === 'E') parts.push(b.title.split(' · ')[0]);
+    if (b.kind === 'S') parts.push(b.title);
+    if (b.kind === 'P' && !s.blocks.some(x => x.kind === 'S')) parts.push('Power');
+    if (b.kind === 'T') parts.push(b.title.includes('endurance') ? 'Endurance gate test' : 'Gate tests');
+  }
+  if (!parts.length) parts.push(s.blocks.some(b => b.kind === 'X') ? 'Rehab and mobility' : 'Resilience and mobility');
+  if (s.recovery) parts[0] = 'Recovery day: ' + parts[0];
+  return parts.join(' + ');
+}
+
+// Weekly sets per muscle group. Main strength sets count fully, power and prehab partly.
+function coverage(days) {
+  const sets = Object.fromEntries(GROUPS.map(([g]) => [g, 0]));
+  for (const d of days) for (const s of d.sessions) for (const b of s.blocks) {
+    if (!b.items) continue;
+    const w = b.kind === 'S' ? 1 : b.kind === 'P' ? 0.5 : 0.75;
+    for (const it of b.items) {
+      const ex = EX[it.ex]; if (!ex) continue;
+      for (const [g, share] of Object.entries(ex.groups)) sets[g] += (it.d?.sets || 2) * share * w;
+    }
+  }
+  return sets;
+}
+const FILL = { core: 'dead_bug', delt: 'ytw', chest: 'scap_push', quad: 'wall_sit', glute: 'glute_bridge', lats: 'band_pulldown', neck: 'neck_iso', rc: 'band_er', add: 'copen_s', hipf: 'psoas_march', shin: 'tib_raise', lowb: 'bird_dog', fore: 'wrist_curl', bi: 'band_row', tri: 'scap_push', calf: 'soleus', ham: 'nordic', uback: 'pull_apart' };
+function fillCoverage(days, m, wk) {
+  const cov = coverage(days);
+  const missing = Object.keys(cov).filter(g => cov[g] < 1.5 && FILL[g]);
+  if (!missing.length) return;
+  const all = days.flatMap(d => d.sessions);
+  const host = all.filter(s => s.blocks.some(b => b.kind === 'R')).concat(all);
+  if (!host.length) return;
+  let n = 0;
+  for (const g of missing) {
+    let id = FILL[g];
+    if (!okEx(id, m)) id = { neck: 'chin_tuck', add: 'add_squeeze', ham: 'bridge_iso', calf: 'calf_iso' }[g];
+    if (!id || !okEx(id, m)) continue;
+    const s = host[n++ % host.length];
+    let blk = s.blocks.find(b => b.kind === 'R');
+    if (!blk) { blk = { kind: 'R', title: 'Resilience', items: [], minutes: 0, summary: 'Small doses that round out every major muscle group.' }; s.blocks.splice(s.blocks.length - 1, 0, blk); }
+    if (blk.items.some(x => x.ex === id)) continue;
+    const d = resDose(id, m.stage.R, wk) || { sets: 2, reps: 12, rest: 30, work: 40 };
+    blk.items.push({ ex: id, d, mins: d.sets * (d.work + d.rest) / 60, fill: GROUP_NAME[g] });
+    blk.minutes = Math.round(blk.items.reduce((a, x) => a + x.mins, 0));
+  }
+}
+
+// =============================================================================
+// Readiness: today's check-in adjusts today's session.
+// =============================================================================
+function readiness(ci) {
+  if (!ci) return null;
+  const reasons = [];
+  let score = 0;
+  const ratio = (+ci.sleep || 0) / P.sleep;
+  score += ratio >= 0.95 ? 25 : ratio >= 0.85 ? 18 : ratio >= 0.7 ? 10 : 3;
+  if (ratio < 0.85) reasons.push(`short sleep (${ci.sleep} h of ${P.sleep} h)`);
+  score += [25, 20, 14, 7, 2][clamp(ci.sore, 1, 5) - 1];
+  if (ci.sore >= 4) reasons.push('heavy soreness');
+  score += [2, 7, 14, 20, 25][clamp(ci.energy, 1, 5) - 1];
+  if (ci.energy <= 2) reasons.push('low energy');
+  score += [25, 20, 14, 7, 2][clamp(ci.stress, 1, 5) - 1];
+  if (ci.stress >= 4) reasons.push('high stress');
+  const up = +ci.rhrUp || 0;
+  if (up >= 8) { score -= 20; reasons.push(`resting heart rate up ${up} bpm`); }
+  else if (up >= 5) { score -= 10; reasons.push(`resting heart rate up ${up} bpm`); }
+  if (ci.ill) { score = Math.min(score, 30); reasons.push('feeling ill'); }
+  score = clamp(score, 0, 100);
+  let level = score >= 75 ? 'good' : score >= 55 ? 'warn' : 'bad';
+  if (ci.pain && level === 'good') level = 'warn';
+  return { score, level, reasons };
+}
+function adjustSession(sess, level, m) {
+  const s = JSON.parse(JSON.stringify(sess));
+  if (level === 'good') return s;
+  if (level === 'bad') {
+    const mode = s.blocks.find(b => b.kind === 'E')?.mode || (m.inj.impactPain ? m.altMode : m.modes[0]);
+    const verb = (MODE_VERB[mode] || 'walk').toLowerCase();
+    const keep = s.blocks.filter(b => b.kind === 'X');
+    s.blocks = [
+      { kind: 'E', type: 'recovery', mode, hard: false, title: `Recovery ${verb} or walk · 20–30 min`, summary: `${zoneText(1, m)}. Or rest completely if you feel ill.`, steps: [{ label: `Recovery ${verb}, Z1`, secs: 1500, z: 1, kind: 'work' }], minutes: 25 },
+      resilienceBlock(m, weekInfo(4), 3), ...keep,
+    ];
+    s.title = 'Recovery instead of: ' + sess.title;
+  } else {
+    for (const b of s.blocks) {
+      if (b.kind === 'S') for (const it of b.items) { it.d.sets = Math.max(2, it.d.sets - 1); if (it.d.rpe) it.d.rpe = Math.min(it.d.rpe, 7); }
+      if (b.kind === 'P') { b.items = b.items.slice(0, 2); b.items.forEach(it => { it.d.sets = Math.max(2, Math.ceil(it.d.sets / 2)); }); }
+      if (b.kind === 'E' && b.hard) {
+        const work = b.steps.filter(x => x.kind === 'work');
+        const keepN = Math.max(2, Math.round(work.length * 0.6));
+        let seen = 0;
+        b.steps = b.steps.filter(x => { if (x.kind !== 'work' && x.kind !== 'rest') return true; if (x.kind === 'work') seen++; return seen <= keepN && !(x.kind === 'rest' && seen === keepN); });
+        b.title += ' (cut to ' + keepN + ' reps)';
+      }
+      if (b.kind === 'E' && !b.hard) { b.steps.forEach(x => { if (x.kind === 'work') x.secs = Math.round(x.secs * 0.75 / 60) * 60; }); b.title = b.title.replace(/· (\d+) min/, (_, n) => `· ${Math.round(n * 0.75)} min`); }
+      b.minutes = b.steps ? Math.round(b.steps.reduce((a, x) => a + x.secs, 0) / 60) : b.minutes;
+    }
+    s.title = 'Lighter: ' + sess.title;
+  }
+  s.minutes = s.blocks.reduce((t, x) => t + (x.minutes || 0), 0);
+  return s;
+}
+
+// =============================================================================
+// Fuel
+// =============================================================================
+function bmr() {
+  if (P.bf > 3 && P.bf < 60) return 370 + 21.6 * P.weight * (1 - P.bf / 100);
+  return 10 * P.weight + 6.25 * P.height - 5 * P.age + (P.sex === 'm' ? 5 : -161);
+}
+const MET = { easy: { run: 8, bike: 6.8, swim: 7, row: 7 }, hard: 11, S: 5, P: 6, R: 2.5, X: 2.5, W: 4, C: 3, T: 7 };
+function dayLoad(d) {
+  let kcal = 0, easy = 0, hard = 0, other = 0, longest = 0;
+  for (const s of d.sessions) for (const b of s.blocks) {
+    const min = b.minutes || 0;
+    let met;
+    if (b.kind === 'E') { met = b.hard ? MET.hard : (MET.easy[b.mode] || 7); if (b.hard) hard += min; else easy += min; longest = Math.max(longest, min); }
+    else { met = MET[b.kind] || 3; other += min; }
+    kcal += (met - 1) * P.weight * min / 60;
+  }
+  return { kcal: Math.round(kcal), easy, hard, other, total: easy + hard + other, longest };
+}
+function fuelFor(d, m) {
+  const L = dayLoad(d);
+  const life = [1.3, 1.45, 1.65][P.life];
+  const base = bmr() * life;
+  let kcal = base + L.kcal;
+  const goal = P.bodyGoal;
+  if (goal === 'lean') kcal *= 0.88;
+  if (goal === 'build') kcal *= 1.08;
+  const kg = P.weight;
+  const trainMin = L.total;
+  let cpk;
+  if (trainMin === 0) cpk = m.emph.E >= 50 ? 4 : 3;
+  else if (L.easy + L.hard >= 180) cpk = 9;
+  else if (L.easy + L.hard >= 90 || (L.hard >= 40 && trainMin >= 75)) cpk = 7;
+  else if (trainMin >= 45 || L.hard) cpk = m.emph.E >= 40 ? 6 : 5;
+  else cpk = 4;
+  if (goal === 'lean') cpk = Math.max(3, cpk - 1);
+  let ppk = m.emph.E >= 55 ? 1.6 : 1.8;
+  if (goal === 'lean') ppk = 2.2;
+  if (P.age >= 50) ppk += 0.2;
+  ppk = Math.min(2.4, ppk);
+  let C = cpk * kg, Pr = ppk * kg, F = (kcal - 4 * C - 4 * Pr) / 9;
+  const fMin = 0.8 * kg;
+  if (F < fMin) { C = Math.max(3 * kg, (kcal - 4 * Pr - 9 * fMin) / 4); F = (kcal - 4 * C - 4 * Pr) / 9; if (F < fMin) { F = fMin; kcal = 4 * C + 4 * Pr + 9 * F; } }
+  const ffm = P.bf > 3 && P.bf < 60 ? kg * (1 - P.bf / 100) : kg * (P.sex === 'm' ? 0.85 : 0.75);
+  const ea = (kcal - L.kcal) / ffm;
+  return { kcal: Math.round(kcal), C: Math.round(C), Pr: Math.round(Pr), F: Math.round(F), cpk, ppk, water: Math.round((0.035 * kg + 0.6 * (trainMin / 60)) * 10) / 10, L, ea: Math.round(ea), base: Math.round(base) };
+}
+function sessionTimes(d) {
+  const times = [];
+  const wake = toMin(P.wake);
+  d.sessions.forEach((s, i) => {
+    let start = toMin(P.sessionTime);
+    if (s.slot === 'AM') start = Math.min(wake + 75, 9 * 60);
+    if (s.slot === 'PM') start = Math.max(toMin(P.sessionTime), Math.min(wake + 75, 9 * 60) + 6 * 60);
+    times.push({ s, start, end: start + (s.minutes || 45) });
+  });
+  return times;
+}
+// A flexible meal plan around the day's sessions.
+function mealPlan(d, f) {
+  const wake = toMin(P.wake), bed = wake + 24 * 60 - Math.round(P.sleep * 60);
+  const ses = sessionTimes(d);
+  const ev = [];
+  ev.push({ t: wake + 30, name: 'Breakfast', w: 1.2, main: true });
+  ev.push({ t: 12 * 60 + 30, name: 'Lunch', w: 1.2, main: true });
+  ev.push({ t: Math.min(19 * 60, bed - 150), name: 'Dinner', w: 1.2, main: true });
+  for (const x of ses) {
+    ev.push({ t: x.start - 75, name: 'Pre-session snack', w: 0.9, pre: true, s: x.s });
+    ev.push({ t: x.end + 30, name: 'Recovery meal or snack', w: 1.6, post: true, s: x.s });
+  }
+  if (P.meals >= 4) ev.push({ t: bed - 60, name: 'Pre-sleep protein', w: 0.4, sleep: true });
+  ev.sort((a, b) => a.t - b.t);
+  // Merge anything within 75 minutes of a main meal into it.
+  const out = [];
+  for (const e of ev) {
+    const near = out.find(o => Math.abs(o.t - e.t) < 75);
+    if (near) { near.w += e.w * 0.5; near.pre = near.pre || e.pre; near.post = near.post || e.post; if (e.post) near.name = near.main ? `${near.name} (recovery meal)` : e.name; if (e.post || e.pre) near.t = e.post ? Math.max(near.t, e.t) : Math.min(near.t, e.t); continue; }
+    out.push({ ...e });
+  }
+  // Match the number of eating times the person wants.
+  while (out.length > P.meals) {
+    const drop = out.filter(o => !o.main && !o.post).sort((a, b) => a.w - b.w)[0] || out.filter(o => !o.post).sort((a, b) => a.w - b.w)[0];
+    if (!drop) break; out.splice(out.indexOf(drop), 1);
+  }
+  while (out.length < P.meals) {
+    let gap = null;
+    for (let i = 0; i < out.length - 1; i++) { const g = out[i + 1].t - out[i].t; if (!gap || g > gap.g) gap = { i, g }; }
+    if (!gap || gap.g < 150) break;
+    out.splice(gap.i + 1, 0, { t: out[gap.i].t + Math.round(gap.g / 2), name: 'Snack', w: 0.6 });
+  }
+  const wsum = out.reduce((a, o) => a + o.w, 0);
+  const perP = Math.round(f.Pr / out.length);
+  return out.map(o => {
+    const carbs = Math.round(f.C * o.w / wsum);
+    let tip = o.post ? `About ${Math.round(0.3 * P.weight)}–${Math.round(0.4 * P.weight)} g protein with carbohydrate; sooner if you train again within 8 hours.` :
+      o.pre ? 'Easy to digest: carbohydrate, a little protein, low fat and fibre.' :
+        o.sleep ? '30–40 g of slow protein (milk, yogurt, cottage cheese) supports overnight recovery.' : 'Protein, vegetables, carbohydrate to match the day, healthy fats.';
+    return { time: hm(Math.round(o.t / 5) * 5), name: o.name, carbs, protein: o.sleep ? Math.max(30, Math.min(40, perP)) : perP, tip };
+  });
+}
+
+// =============================================================================
+// IntervalTimer export
+// =============================================================================
+const ICON_OF = { W: 'flame', C: 'wave', S: 'dumbbell', P: 'up', R: 'wave', X: 'target', T: 'star' };
+function iv(title, secs, icon, extra = {}) {
+  const duration = Math.max(1, Math.round(secs));
+  return { id: uid(), title: title.slice(0, 80), icon, iconImg: null, duration, mode: duration >= 60 ? 'm' : 's', media: null, audio: null, cues: {}, hold: false, ...extra };
+}
+function itemName(it) { return it.test ? TESTS[it.test].name : EX[it.ex]?.name || it.ex; }
+function sessionToRoutine(sess, label, color) {
+  const intervals = [];
+  for (const b of sess.blocks) {
+    if (b.steps) {
+      for (const st of b.steps) {
+        if (!st.secs) continue;
+        const icon = b.kind === 'W' ? 'flame' : b.kind === 'C' ? 'wave' : st.kind === 'rest' ? 'moon' : st.kind === 'warm' ? 'flame' : st.kind === 'cool' ? 'wave' : st.z >= 4 ? 'bolt' : 'heart';
+        intervals.push(iv(st.label, st.secs, icon));
+      }
+      continue;
+    }
+    if (b.kind === 'T') {
+      for (const it of b.items) intervals.push(iv(`Test: ${TESTS[it.test].name} (target ${fmtVal(it.test, it.tgt)})`, 60, 'star', { open: true }));
+      continue;
+    }
+    if (!b.items) continue;
+    b.items.forEach((it, n) => {
+      const ex = EX[it.ex]; const d = it.d || { sets: 2, reps: 10, rest: 30, work: 40 };
+      const lastItem = n === b.items.length - 1;
+      for (let s = 1; s <= d.sets; s++) {
+        const what = `${ex.name}: ${it.dose && b.kind === 'X' ? it.dose : d.reps}${d.rpe ? ` @ RPE ${d.rpe}` : ''} (set ${s}/${d.sets})`;
+        const extra = d.hold ? {} : { open: true };
+        const one = iv(what, d.hold ? d.work : Math.max(20, d.work), d.hold ? 'target' : ICON_OF[b.kind], extra);
+        if (it.easier && EX[it.easier]) {
+          one.vars = [null, { ...iv(`${EX[it.easier].name} (easier): ${d.reps} (set ${s}/${d.sets})`, one.duration, ICON_OF[b.kind]), open: true }];
+          delete one.vars[1].id; delete one.vars[1].hold;
+          one.vi = 0;
+        }
+        intervals.push(one);
+        if (!(lastItem && s === d.sets) && d.rest) intervals.push(iv(s === d.sets ? `Rest, next: ${EX[b.items[n + 1]?.ex]?.name || 'next block'}` : 'Rest', d.rest, 'moon'));
+      }
+    });
+  }
+  return { id: uid(), name: label.slice(0, 60), color, created: Date.now(), cues: { start: { kind: 'builtin', id: 'whistle' } }, intervals };
+}
+function routinesFile(list) {
+  return { app: 'interval', kind: 'routines', version: 1, exported: new Date().toISOString(), picked: list.map(r => r.id), routines: list };
+}
+function fmtVal(id, v) {
+  const t = TESTS[id];
+  if (v == null) return '–';
+  if (t.unit === 'time') return fmtTime(v);
+  if (t.unit === 'kg') return `${v} kg (${(v / P.weight).toFixed(2)} × BW)`;
+  if (t.unit === 'W') return `${v} W (${(v / P.weight).toFixed(1)} W/kg)`;
+  return `${v} ${t.unit}`;
+}
+
+// =============================================================================
+// Screens
+// =============================================================================
+const $ = id => document.getElementById(id);
+const VIEW = { tab: 'paths', week: null, fuelDay: null, exportWeek: null, picked: new Set() };
+let M = null, PLAN = null;
+
+function toast(msg) {
+  document.querySelector('.toast')?.remove();
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.append(t);
+  setTimeout(() => t.remove(), 2600);
+}
+function download(name, data) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }));
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+const qChip = q => `<span class="chip ${q}">${Q[q]}</span>`;
+
+// ---------- Units ----------
+const imperial = () => P.units === 'imperial';
+const shownW = kg => imperial() ? Math.round(kg * 2.20462 * 10) / 10 : kg;
+const shownH = cm => imperial() ? Math.round(cm / 2.54 * 10) / 10 : cm;
+
+// ---------- The "You" panel ----------
+function sel(k, opts, val) { return `<select data-k="${k}">${opts.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(val) ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>`; }
+function num(k, val, attrs = '') { return `<input type="number" inputmode="decimal" data-k="${k}" value="${val ?? ''}" ${attrs}>`; }
+function field(label, control, hint) { return `<label class="f"><span class="l">${label}</span>${control}${hint ? `<span class="small muted">${hint}</span>` : ''}</label>`; }
+
+function renderYou() {
+  const a = ATHLETE[P.athlete];
+  const e = emphasis();
+  const m = M;
+  const testInput = id => {
+    const t = TESTS[id], v = P.tests[id];
+    const shown = v == null ? '' : t.unit === 'time' ? fmtTime(v) : v;
+    const ph = t.unit === 'time' ? 'mm:ss' : t.unit;
+    const met = v ? metCount(id, v, m) : null;
+    return `<div class="test-row"><div class="tl">${esc(t.name)}<small>${met == null ? 'Not entered' : met >= 6 ? 'All gates passed' : `Passed ${met} of 6 gates · next ${fmtVal(id, target(id, met + 1, m))}`}</small></div>
+      <input data-k="test.${id}" value="${esc(shown)}" placeholder="${ph}" inputmode="${t.unit === 'time' ? 'text' : 'decimal'}" aria-label="${esc(t.name)}"></div>`;
+  };
+  const qSec = q => {
+    const info = m.info[q];
+    return `<div style="margin:10px 0 4px" class="row"><b class="q-${q}">${Q[q]}</b><span class="chip ${q}">Stage ${info.stage}: ${STAGES[info.stage - 1]}</span><span class="small muted">from ${info.src}</span></div>
+      ${info.ids.map(testInput).join('')}
+      ${field('Stage', sel(`override.${q}`, [[0, `Automatic (${STAGES[info.auto - 1]})`], ...STAGES.map((s, i) => [i + 1, `${i + 1}. ${s}`])], P.override[q]))}`;
+  };
+  const injRow = inj => {
+    const v = P.inj[inj.id] || { status: 'none', phase: 1 };
+    return `<div class="inj"><span>${esc(inj.name)}</span>${sel(`inj.${inj.id}.status`, Object.entries(INJ_STATUS), v.status)}
+      ${v.status === 'rehab' ? `<div class="ph">${sel(`inj.${inj.id}.phase`, inj.phases.map((p, i) => [i + 1, `Phase ${i + 1}: ${p[0]}`]), v.phase || 1)}</div>` : ''}</div>`;
+  };
+  const openNow = [...$('you').querySelectorAll('details.sec')].map(d => d.open);
+  $('you').innerHTML = `
+  <details class="sec" open><summary>Athlete</summary><div class="body">
+    ${field('Quick start', sel('quick', QUICK.map(x => [x.id, x.name]), ''), 'Fills schedule, equipment and experience at once.')}
+    ${field('Athlete type', sel('athlete', ATHLETES.map(x => [x.id, x.name]), P.athlete))}
+    <p class="small muted">${esc(a.note)}</p>
+    <div class="emph">
+      <span class="q-E">Endurance</span><input type="range" min="0" max="100" data-k="emph.0" value="${e.E}"><output>${e.E}%</output>
+      <span class="q-S">Strength</span><input type="range" min="0" max="100" data-k="emph.1" value="${e.S}"><output>${e.S}%</output>
+      <span class="q-P">Power</span><input type="range" min="0" max="100" data-k="emph.2" value="${e.P}"><output>${e.P}%</output>
+    </div>
+    <div class="row" style="margin:6px 0 10px"><span class="small muted">${P.emph ? 'Your own balance.' : 'Balance from the preset.'}</span>${P.emph ? '<button class="btn sm" data-act="resetEmph">Use preset balance</button>' : ''}</div>
+    <div class="grid2">
+      ${field('Endurance mode', sel('mode', [['', `Preset (${a.mode === 'mixed' ? 'mixed' : MODES[a.mode]})`], ...Object.entries(MODES)], P.mode))}
+      ${field('Body size goal', sel('bodyGoal', [['maintain', 'Stay the same'], ['lean', 'Lean down slowly'], ['build', 'Add useful muscle']], P.bodyGoal))}
+    </div>
+    ${P.bodyGoal === 'build' && !a.mass ? '<p class="small note warn">Your sport rarely rewards extra mass. The plan keeps strength work heavy and low-rep anyway; muscle gain will be slow.</p>' : ''}
+  </div></details>
+
+  <details class="sec" open><summary>Body</summary><div class="body">
+    <div class="grid3">
+      ${field('Sex', sel('sex', [['m', 'Male'], ['f', 'Female']], P.sex))}
+      ${field('Age', num('age', P.age, 'min="12" max="90"'))}
+      ${field('Units', sel('units', [['metric', 'kg, cm'], ['imperial', 'lb, in']], P.units))}
+      ${field(`Height (${imperial() ? 'in' : 'cm'})`, num('height', shownH(P.height)))}
+      ${field(`Weight (${imperial() ? 'lb' : 'kg'})`, num('weight', shownW(P.weight)))}
+      ${field('Body fat %', num('bf', P.bf, 'placeholder="optional"'))}
+      ${field('Resting HR', num('rhr', P.rhr, 'placeholder="optional"'))}
+      ${field('Max HR', num('hrmax', P.hrmax, `placeholder="${Math.round(208 - 0.7 * P.age)}"`))}
+      ${field('Daily life', sel('life', [[0, 'Mostly sitting'], [1, 'On my feet'], [2, 'Physical job']], P.life))}
+    </div>
+  </div></details>
+
+  <details class="sec" open><summary>Conditioning</summary><div class="body">
+    ${field('Consistent training', sel('trainAge', TRAIN_AGES.map((t, i) => [i, t]), P.trainAge), 'Used for any quality without test results.')}
+    <p class="small muted">Enter your latest results. Each one sets your stage, and the Gates tab shows what unlocks the next.</p>
+    ${['E', 'S', 'P', 'R'].map(qSec).join('')}
+  </div></details>
+
+  <details class="sec"${Object.keys(P.inj).length ? ' open' : ''}><summary>Injuries and weak areas <span class="chip${Object.keys(P.inj).length ? ' warn' : ''}">${Object.keys(P.inj).length}</span></summary><div class="body">
+    <p class="small muted">Weak areas get extra prehab. Recovering areas get a phased rehab path and the exercises that strain them are swapped. Painful areas also lose impact work; please get them assessed.</p>
+    ${INJURIES.map(injRow).join('')}
+  </div></details>
+
+  <details class="sec" open><summary>Schedule and equipment</summary><div class="body">
+    <span class="small muted">Training days</span>
+    <div class="days" style="margin:3px 0 10px">${DAYS.map((d, i) => `<label><input type="checkbox" data-k="day.${i}"${P.days.includes(i) ? ' checked' : ''}>${d}</label>`).join('')}</div>
+    <div class="grid2">
+      ${field(`Session length: <b>${P.minutes} min</b>`, `<input type="range" min="20" max="150" step="5" data-k="minutes" value="${P.minutes}">`)}
+      ${field('Usual session start', `<input type="time" data-k="sessionTime" value="${P.sessionTime}">`)}
+      ${field('Equipment', sel('equip', [[0, 'Bodyweight and a band'], [1, 'Home: dumbbells or kettlebells'], [2, 'Full gym']], P.equip))}
+      ${field('Pull-up bar', sel('bar', [['1', 'Yes'], ['0', 'No']], P.bar ? '1' : '0'))}
+    </div>
+    <label class="row small" style="margin-bottom:10px"><input type="checkbox" data-k="doubles"${P.doubles ? ' checked' : ''}> Two sessions a day are possible</label>
+    <div class="grid3">
+      ${field('Wake time', `<input type="time" data-k="wake" value="${P.wake}">`)}
+      ${field('Sleep target (h)', num('sleep', P.sleep, 'step="0.25" min="6" max="11"'))}
+      ${field('Meals a day', sel('meals', [3, 4, 5, 6].map(n => [n, n]), P.meals))}
+    </div>
+    ${field('Plan started (week 1 begins)', `<input type="date" data-k="planStart" value="${P.planStart}">`)}
+    ${P.days.length < 2 ? '<p class="note warn">Pick at least 2 training days.</p>' : ''}
+  </div></details>
+
+  <details class="sec"><summary>Your data</summary><div class="body">
+    <p class="small muted">Saved in this browser. Back it up to move it to another device.</p>
+    <div class="row"><button class="btn sm" data-act="saveProfile">Back up profile</button><button class="btn sm" data-act="loadProfile">Restore…</button><button class="btn sm" data-act="resetProfile">Start over</button></div>
+  </div></details>
+  <p class="disclaimer">An educational planner, not medical advice. Get a professional assessment for pain, recent injuries, heart or health conditions before hard training.</p>`;
+  const secs = $('you').querySelectorAll('details.sec');
+  if (openNow.length === secs.length) secs.forEach((d, i) => { d.open = openNow[i]; });
+}
+
+function setPath(k, raw, el) {
+  const parts = k.split('.');
+  const n = v => (v === '' || v == null ? null : Number(v));
+  if (k === 'quick') {
+    const q = QUICK.find(x => x.id === raw);
+    if (q?.set) { Object.assign(P, JSON.parse(JSON.stringify(q.set))); toast(`Applied: ${q.name}`); }
+    return true;
+  }
+  if (k === 'athlete') { P.athlete = raw; P.emph = null; P.mode = ''; return true; }
+  if (parts[0] === 'emph') {
+    const e = emphasis(); const cur = [e.E, e.S, e.P];
+    cur[+parts[1]] = Number(raw);
+    P.emph = cur; return false;
+  }
+  if (parts[0] === 'test') {
+    const t = TESTS[parts[1]];
+    const v = t.unit === 'time' ? parseTime(raw) : n(raw);
+    if (v && v > 0) P.tests[parts[1]] = v; else delete P.tests[parts[1]];
+    return true;
+  }
+  if (parts[0] === 'override') { P.override[parts[1]] = Number(raw); return true; }
+  if (parts[0] === 'inj') {
+    const id = parts[1]; const cur = P.inj[id] || { status: 'none', phase: 1 };
+    if (parts[2] === 'status') cur.status = raw; else cur.phase = Number(raw);
+    if (cur.status === 'none') delete P.inj[id]; else P.inj[id] = cur;
+    return true;
+  }
+  if (parts[0] === 'day') {
+    const i = +parts[1]; const s = new Set(P.days);
+    if (el.checked) s.add(i); else s.delete(i);
+    P.days = [...s].sort((a, b) => a - b); return true;
+  }
+  if (k === 'doubles') { P.doubles = el.checked; return true; }
+  if (k === 'bar') { P.bar = raw === '1'; return true; }
+  if (k === 'height') { const v = n(raw); if (v) P.height = clamp(imperial() ? v * 2.54 : v, 120, 230); return false; }
+  if (k === 'weight') { const v = n(raw); if (v) P.weight = clamp(imperial() ? v / 2.20462 : v, 30, 200); return false; }
+  if (['age', 'minutes', 'sleep', 'meals', 'trainAge', 'equip', 'life'].includes(k)) { const v = n(raw); if (v != null && isFinite(v)) P[k] = v; return k !== 'minutes' && k !== 'age'; }
+  if (['bf', 'rhr', 'hrmax'].includes(k)) { const v = n(raw); P[k] = v && v > 0 ? v : null; return false; }
+  P[k] = raw;
+  return true;
+}
+
+// ---------- Loop diagrams ----------
+function ringSVG(segs, cur, label, colors) {
+  const n = segs.length, R = 60, cx = 75, cy = 75, gap = n > 1 ? 0.05 : 0;
+  let s = '';
+  segs.forEach((t, i) => {
+    const a0 = (i / n) * 2 * Math.PI - Math.PI / 2 + gap, a1 = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2 - gap;
+    const p = a => `${(cx + R * Math.cos(a)).toFixed(1)} ${(cy + R * Math.sin(a)).toFixed(1)}`;
+    const big = a1 - a0 > Math.PI ? 1 : 0;
+    s += `<path d="M ${p(a0)} A ${R} ${R} 0 ${big} 1 ${p(a1)}" stroke="${colors[i] || 'var(--line)'}" stroke-width="${i === cur ? 16 : 10}" fill="none" opacity="${cur < 0 || i === cur ? 1 : 0.55}"><title>${esc(t)}</title></path>`;
+    const am = (a0 + a1) / 2, lr = R + (n > 5 ? 0 : 0);
+    if (n <= 7) s += `<text x="${(cx + (lr - 25) * Math.cos(am)).toFixed(1)}" y="${(cy + (lr - 25) * Math.sin(am) + 3).toFixed(1)}" font-size="${n <= 4 ? 9 : 10}" text-anchor="middle" fill="var(--muted)">${esc(n <= 4 ? t : t.slice(0, 3))}</text>`;
+  });
+  s += `<text x="${cx}" y="${cy + 4}" font-size="12" font-weight="700" text-anchor="middle" fill="var(--text)">${esc(label)}</text>`;
+  return `<svg viewBox="0 0 150 150" role="img" aria-label="${esc(label)}">${s}</svg>`;
+}
+function dayColor(d) {
+  if (!d.sessions.length) return 'var(--line)';
+  const ks = d.sessions.flatMap(s => s.blocks.map(b => b.kind));
+  if (ks.includes('T')) return 'var(--bad)';
+  if (ks.includes('S')) return 'var(--S)';
+  if (d.sessions.some(s => s.blocks.some(b => b.kind === 'E' && b.hard))) return 'var(--E)';
+  if (ks.includes('E')) return 'color-mix(in srgb, var(--E) 55%, transparent)';
+  return 'var(--R)';
+}
+
+// ---------- Paths ----------
+function renderPaths() {
+  const m = M, a = m.athlete, e = m.emph;
+  const wk = weekInfo(VIEW.week);
+  const nextGate = Math.ceil(m.todayWeek / 4) * 4;
+  const gateDate = new Date(m.planStart); gateDate.setDate(gateDate.getDate() + (nextGate - 1) * 7 + 5);
+  const ladder = q => {
+    const info = m.info[q], st = info.stage;
+    const blocks = [1, 1, 2, 2, 3, 3][st - 1];
+    const tests = info.ids.filter(id => !(q === 'E' && id === 'easy' && info.ids.length > 1 && !P.tests.easy));
+    return `<div class="card"><div class="row"><h3 class="q-${q}" style="margin:0">${Q[q]}</h3><span class="chip ${q}">${m.band[q] === 'high' ? 'Priority' : m.band[q] === 'mid' ? 'Supporting' : 'Maintained'}</span><span class="small muted">${Q_WHAT[q]}</span></div>
+      <div class="ladder">${STAGES.map((s, i) => `<div class="st ${i + 1 < st ? 'done' : ''} ${i + 1 === st ? 'cur ' + q : ''}"><b>${i + 1}. ${s}</b>${i + 1 === st ? 'You are here' : i + 1 < st ? 'Passed' : ''}</div>`).join('')}</div>
+      <p class="small"><b>This stage:</b> ${esc(STAGE_FOCUS[q][st - 1])}</p>
+      ${info.maxed ? '<p class="small"><b>All gates passed.</b> Keep the quality with lower volume and spend the time on your weakest one.</p>' :
+        `<p class="small"><b>Gate to stage ${Math.min(6, st + 1)}:</b> ${tests.map(id => `${esc(TESTS[id].name)} ${TESTS[id].low ? '≤' : '≥'} <b>${fmtVal(id, target(id, st, m))}</b>${P.tests[id] ? ` <span class="muted">(now ${fmtVal(id, P.tests[id])})</span>` : ''}`).join(' · ')}</p>
+        <p class="small muted">Usually ${plural(blocks, 'block')} (${blocks * 4} weeks) of training. Next gate week: week ${nextGate}, around ${gateDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}.</p>`}
+    </div>`;
+  };
+  const injCards = m.inj.list.map(inj => {
+    const ph = inj.status === 'weak' ? 2 : inj.status === 'pain' ? 1 : inj.phase;
+    return `<div class="card"><div class="row"><h3 style="margin:0">${esc(inj.name)}</h3><span class="chip ${inj.status === 'pain' ? 'bad' : inj.status === 'rehab' ? 'warn' : 'R'}">${INJ_STATUS[inj.status]}</span></div>
+      <div class="ladder">${inj.phases.map((p, i) => `<div class="st ${i + 1 < ph ? 'done' : ''} ${i + 1 === ph ? 'cur R' : ''}"><b>Phase ${i + 1}: ${esc(p[0])}</b>${p[1].map(([id, d]) => `${esc(EX[id].name)}: ${esc(d)}`).join('<br>')}</div>`).join('')}</div>
+      <p class="small"><b>Move on when:</b> ${esc(inj.gate)}</p>
+      <p class="small muted">${esc(inj.ev)}</p>
+      ${inj.status === 'pain' ? '<p class="note bad">Painful now: see a physio or sports doctor. Until then the plan removes the exercises that strain this area and keeps only gentle isometrics.</p>' : ''}
+    </div>`;
+  }).join('');
+  const days = PLAN.days;
+  $('paths').innerHTML = `
+    <div class="card"><h2>${esc(a.name)}</h2><p>${esc(a.note)}</p>
+      <div class="bar" title="Training balance"><i style="width:${e.E}%;background:var(--E)"></i><i style="width:${e.S}%;background:var(--S)"></i><i style="width:${e.P}%;background:var(--P)"></i></div>
+      <p class="small muted" style="margin-top:6px"><span class="q-E">Endurance ${e.E}%</span> · <span class="q-S">Strength ${e.S}%</span> · <span class="q-P">Power ${e.P}%</span> · Mode: ${m.modes.map(x => MODES[x]).join(', ')}${m.inj.impactPain ? ` (running swapped for ${MODES[m.altMode].toLowerCase()} while it hurts)` : ''}</p>
+    </div>
+    <div class="card"><h2>Your main loops</h2>
+      <p class="small muted">Training works as loops inside loops. Each day you check in, train, eat and sleep. Each week alternates hard and easy days. Each 4-week block builds for three weeks, then unloads and tests. Passing a gate test moves you up a stage; missing it repeats the block with the same targets.</p>
+      <div class="loops">
+        <div class="loop">${ringSVG(['Check in', 'Train', 'Fuel', 'Sleep'], -1, 'Day', ['var(--R)', 'var(--S)', 'var(--P)', 'var(--E)'])}<b>Daily loop</b><br><span class="muted">Check-in on the Today tab adjusts the session.</span></div>
+        <div class="loop">${ringSVG(DAYS, VIEW.week === m.todayWeek ? m.todayIdx : -1, `Week ${VIEW.week}`, days.map(dayColor))}<b>Weekly loop</b><br><span class="muted">Hard days hard, easy days easy.</span></div>
+        <div class="loop">${ringSVG(['Build 1', 'Build 2', 'Build 3', 'Gate'], wk.w - 1, `Block ${wk.block}`, ['var(--accent)', 'var(--accent)', 'var(--accent)', 'var(--bad)'])}<b>Block loop</b><br><span class="muted">Week ${wk.w} of 4${wk.deload ? ': unload and test' : ''}.</span></div>
+        <div class="loop">${ringSVG(['E', 'S', 'P', 'R'].map(q => `${q} · ${m.stage[q]}`), -1, 'Stages', ['var(--E)', 'var(--S)', 'var(--P)', 'var(--R)'])}<b>Path loop</b><br><span class="muted">Stage → blocks → gate → next stage.</span></div>
+      </div>
+    </div>
+    ${['E', 'S', 'P', 'R'].map(ladder).join('')}
+    ${injCards ? `<h2 style="margin:18px 0 10px">Injury and weak-area paths</h2>${injCards}` : ''}
+    <p class="disclaimer">Targets are adjusted for sex${P.age > 35 ? ' and age' : ''}, and for how much your sport relies on each quality. They are sensible markers, not official standards.</p>`;
+}
+
+// ---------- Blocks and sessions ----------
+function itemHTML(it, b) {
+  if (it.test) {
+    const t = TESTS[it.test];
+    return `<li><details><summary><b>${esc(t.name)}</b> <span class="dose">target ${fmtVal(it.test, it.tgt)}</span></summary><div class="small muted">${esc(t.how)}</div></details></li>`;
+  }
+  const ex = EX[it.ex];
+  const dose = b.kind === 'X' ? esc(it.dose) : esc(doseText(it.d));
+  const extra = [];
+  if (it.easier) extra.push(`Easier: ${esc(EX[it.easier].name)}`);
+  if (it.harder) extra.push(`Harder: ${esc(EX[it.harder].name)}`);
+  if (it.swapped) extra.push('Swapped to suit your equipment or injuries');
+  if (it.fill) extra.push(`Added so ${esc(it.fill.toLowerCase())} get work this week`);
+  if (it.region) extra.push(`${esc(it.region)}, ${it.status === 'weak' ? 'prehab' : 'phase ' + it.phase}`);
+  if (it.d?.note) extra.push(esc(it.d.note));
+  return `<li><details><summary><b>${esc(ex.name)}</b> <span class="dose">${dose}</span></summary><div class="small muted">${esc(ex.cue)}${extra.length ? '<br>' + extra.join(' · ') : ''}</div></details></li>`;
+}
+function blockHTML(b) {
+  const cls = { E: 'E', S: 'S', P: 'P', R: 'R', X: 'X', T: 'X', W: '', C: '' }[b.kind];
+  let body = '';
+  if (b.items) body = `<ul>${b.items.map(it => itemHTML(it, b)).join('')}</ul>`;
+  else if (b.kind === 'E') body = `<p class="small" style="margin:0">${esc(b.summary)}</p>`;
+  else if (b.steps) body = `<p class="small muted" style="margin:0">${b.steps.map(s => esc(s.label)).join(' · ')}</p>`;
+  return `<div class="blk ${cls}"><h4>${esc(b.kind === 'E' ? b.title : b.title)}${b.minutes ? ` <small>${b.minutes} min</small>` : ''}</h4>${b.summary && b.kind !== 'E' && b.kind !== 'W' && b.kind !== 'C' ? `<div class="small muted">${esc(b.summary)}</div>` : ''}${body}</div>`;
+}
+function sessionHTML(s, weekNo, opts = {}) {
+  const key = `${weekNo}:${s.day}:${s.slot}`;
+  return `<div class="sess"><div class="row"><b>${s.slot ? s.slot + ': ' : ''}${esc(s.title)}</b><span class="small muted">${s.minutes} min</span>${s.hard ? '<span class="chip S">hard</span>' : '<span class="chip">easy</span>'}</div>
+    ${s.blocks.map(blockHTML).join('')}
+    <div class="row noprint" style="margin-top:6px"><button class="btn sm" data-act="exportOne" data-key="${key}"${opts.adjusted ? ' data-adjusted="1"' : ''}>Export to IntervalTimer</button></div></div>`;
+}
+function findSession(key, adjusted) {
+  const [w, d, slot] = key.split(':');
+  const plan = +w === PLAN.wk.no ? PLAN : planWeek(M, +w);
+  let s = plan.days[+d].sessions.find(x => x.slot === slot);
+  if (s && adjusted) { const r = readiness(P.checkin); if (r) s = adjustSession(s, r.level, M); }
+  return s;
+}
+function routineName(s, weekNo) { return `${DAYS[s.day]}${s.slot ? ' ' + s.slot : ''} W${weekNo} · ${s.title}`; }
+
+// ---------- Week ----------
+function renderWeek() {
+  const m = M, plan = PLAN, wk = plan.wk;
+  const L = plan.days.map(dayLoad);
+  const easyMin = L.reduce((a, x) => a + x.easy, 0), hardMin = L.reduce((a, x) => a + x.hard, 0), total = L.reduce((a, x) => a + x.total, 0);
+  const cov = coverage(plan.days);
+  const hardDays = plan.days.filter(d => d.sessions.some(s => s.hard)).length;
+  const stamp = d => { const x = new Date(m.planStart); x.setDate(x.getDate() + (wk.no - 1) * 7 + d); return x.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); };
+  const dayCard = d => {
+    const today = wk.no === m.todayWeek && d.idx === m.todayIdx;
+    const mins = d.sessions.reduce((a, s) => a + s.minutes, 0);
+    const swapOpts = DAYS.map((x, i) => i === d.idx ? '' : `<option value="${i}">${x}</option>`).join('');
+    return `<div class="day ${today ? 'today' : ''} ${d.sessions.length ? '' : 'rest'}">
+      <h3>${DAYS_LONG[d.idx]} <span class="small muted">${stamp(d.idx)}</span>${today ? '<span class="chip good">Today</span>' : ''}<span class="mins">${mins ? mins + ' min' : ''}</span></h3>
+      ${d.sessions.length ? d.sessions.map(s => sessionHTML(s, wk.no)).join('') : `<p class="small muted">${d.avail ? 'Nothing scheduled.' : 'Rest day. A walk and 10 minutes of mobility are fine.'}</p>`}
+      <div class="row noprint" style="margin-top:8px"><label class="small muted row">Swap with <select data-swap="${d.idx}" style="width:auto"><option value="">…</option>${swapOpts}</select></label></div>
+    </div>`;
+  };
+  const covRows = GROUPS.map(([g, name]) => {
+    const v = Math.round(cov[g] * 10) / 10;
+    const lvl = v >= 8 ? 'good' : v >= 3 ? '' : 'warn';
+    return `<tr><td>${name}</td><td class="n"><span class="chip ${lvl}">${v}</span></td></tr>`;
+  });
+  const half = Math.ceil(covRows.length / 2);
+  $('week').innerHTML = `
+    <div class="card noprint"><div class="row">
+      <button class="btn sm" data-act="weekPrev" aria-label="Previous week">◀</button>
+      <h2 style="margin:0">Week ${wk.no}</h2>
+      <button class="btn sm" data-act="weekNext" aria-label="Next week">▶</button>
+      ${wk.no !== m.todayWeek ? '<button class="btn sm" data-act="weekToday">This week</button>' : ''}
+      <span class="chip ${wk.deload ? 'bad' : 'good'}">Block ${wk.block}, week ${wk.w} of 4: ${wk.deload ? 'unload and gate tests' : ['build', 'build more', 'peak load'][wk.w - 1]}</span>
+      <button class="btn sm" data-act="print" style="margin-left:auto">Print</button>
+    </div>
+    <p class="small muted" style="margin:8px 0 0">${wk.deload ? 'Volume drops by about a third so you arrive fresh for the gate tests, which stand in for competitions.' : 'Load rises a little each week of the block. Missed a day? Use "Swap with" to move sessions, or untick the day on the left and the week rebuilds around it.'}</p></div>
+    <div class="kpis">
+      <div class="kpi"><b>${Math.round(total / 6) / 10} h</b><span>planned training</span></div>
+      <div class="kpi"><b>${easyMin + hardMin ? Math.round(easyMin / (easyMin + hardMin) * 100) : 0}%</b><span>endurance time easy${m.band.E === 'high' ? ' (aim ~80%)' : ''}</span></div>
+      <div class="kpi"><b>${hardDays}</b><span>hard days</span></div>
+      <div class="kpi"><b>${plan.days.filter(d => !d.sessions.length).length}</b><span>full rest days</span></div>
+    </div>
+    <div class="week">${plan.days.map(dayCard).join('')}</div>
+    <div class="card" style="margin-top:14px"><h3>Every major muscle group</h3><p class="small muted">Weighted sets this week. Strength sets count fully, prehab three quarters and power half. Endurance work adds more to the legs on top.</p>
+      <div class="grid2"><table class="heat">${covRows.slice(0, half).join('')}</table><table class="heat">${covRows.slice(half).join('')}</table></div></div>`;
+}
+
+// ---------- Today ----------
+function renderToday() {
+  const m = M;
+  const plan = m.todayWeek === PLAN.wk.no ? PLAN : planWeek(m, m.todayWeek);
+  const day = plan.days[m.todayIdx];
+  const ci = P.checkin && P.checkin.date === isoDate(new Date()) ? P.checkin : null;
+  const r = readiness(ci);
+  const c = ci || { sleep: P.sleep, sore: 2, energy: 3, stress: 2, rhrUp: 0, ill: false, pain: false };
+  const scale = (k, lo, hi) => `<select data-ci="${k}">${[1, 2, 3, 4, 5].map(n => `<option value="${n}"${+c[k] === n ? ' selected' : ''}>${n}${n === 1 ? ' ' + lo : n === 5 ? ' ' + hi : ''}</option>`).join('')}</select>`;
+  const status = r ? `<div class="status ${r.level}">${r.level === 'good' ? 'Ready: train as planned.' : r.level === 'warn' ? 'Amber: train, but lighter (fewer sets, capped effort, shorter intervals).' : 'Red: recovery only today.'} Readiness ${r.score}/100${r.reasons.length ? ' · ' + r.reasons.join(', ') : ''}</div>` : '<p class="small muted">Fill in the check-in to adjust today\'s session.</p>';
+  const sessions = day.sessions.map(s => r ? adjustSession(s, r.level, m) : s);
+  $('today').innerHTML = `
+    <div class="card"><h2>${DAYS_LONG[m.todayIdx]}, week ${m.todayWeek}</h2>
+      <div class="grid3">
+        ${field('Sleep last night (h)', `<input type="number" step="0.25" data-ci="sleep" value="${c.sleep}">`)}
+        ${field('Soreness', scale('sore', 'none', 'very'))}
+        ${field('Energy', scale('energy', 'empty', 'great'))}
+        ${field('Stress', scale('stress', 'calm', 'high'))}
+        ${field('Resting HR above normal (bpm)', `<input type="number" data-ci="rhrUp" value="${c.rhrUp || 0}">`)}
+      </div>
+      <div class="row small" style="margin-bottom:8px"><label class="row"><input type="checkbox" data-ci="ill"${c.ill ? ' checked' : ''}> Feeling ill</label><label class="row"><input type="checkbox" data-ci="pain"${c.pain ? ' checked' : ''}> New pain somewhere</label>
+        <button class="btn sm pri" data-act="checkin">Check in</button></div>
+      ${status}
+      ${ci?.pain ? '<p class="note warn">New pain: skip anything that makes it worse, and mark the area under Injuries if it lasts more than a couple of days.</p>' : ''}
+      ${ci?.ill ? '<p class="note bad">With fever, or symptoms below the neck (chest, stomach, aching muscles), rest completely. Mild head-cold symptoms only: easy movement is fine.</p>' : ''}
+    </div>
+    ${sessions.length ? sessions.map(s => `<div class="day today">${sessionHTML(s, m.todayWeek, { adjusted: !!r })}</div>`).join('') : '<div class="card"><p>No training today. Walk, stretch, eat well, and sleep.</p></div>'}`;
+}
+
+// ---------- Fuel ----------
+function renderFuel() {
+  const m = M, plan = PLAN;
+  if (VIEW.fuelDay == null) VIEW.fuelDay = m.todayIdx;
+  const fuels = plan.days.map(d => fuelFor(d, m));
+  const f = fuels[VIEW.fuelDay], d = plan.days[VIEW.fuelDay];
+  const meals = mealPlan(d, f);
+  const longest = Math.max(0, ...d.sessions.flatMap(s => s.blocks.filter(b => b.kind === 'E').map(b => b.minutes)));
+  const eaWarn = f.ea < 30 ? `<p class="note bad">Energy available after training is about ${f.ea} kcal per kg of lean mass, below the 30 that protects hormones, bones and performance (low energy availability, RED-S). Eat more on hard days${P.bodyGoal === 'lean' ? ' or slow the cut' : ''}.</p>` : f.ea < 40 && P.bodyGoal === 'lean' ? '<p class="note warn">Cutting on a training day leaves little spare energy. Keep the deficit on easy days.</p>' : '';
+  $('fuel').innerHTML = `
+    <div class="card"><h2>Daily fuel</h2>
+      <div class="pill-tabs">${DAYS.map((x, i) => `<button data-fday="${i}" class="${i === VIEW.fuelDay ? 'on' : ''}">${x}</button>`).join('')}</div>
+      <div class="kpis">
+        <div class="kpi"><b>${f.kcal}</b><span>kcal</span></div>
+        <div class="kpi"><b>${f.C} g</b><span>carbohydrate (${f.cpk} g/kg)</span></div>
+        <div class="kpi"><b>${f.Pr} g</b><span>protein (${f.ppk.toFixed(1)} g/kg)</span></div>
+        <div class="kpi"><b>${f.F} g</b><span>fat</span></div>
+        <div class="kpi"><b>${f.water} L</b><span>fluid, plus food</span></div>
+      </div>
+      <p class="small muted">${f.L.total ? `${f.L.total} min training, about ${f.L.kcal} kcal of it.` : 'Rest day.'} Resting and daily life: about ${f.base} kcal. Carbohydrate follows the training load (IOC and ACSM guidelines), protein stays steady, fat fills the rest${P.bodyGoal === 'lean' ? '; the deficit is about 12%' : P.bodyGoal === 'build' ? '; a small surplus of about 8%' : ''}.</p>
+      ${eaWarn}
+      <h3>When to eat</h3>
+      <table><tr><th>Time</th><th>Meal</th><th class="n">Carbs</th><th class="n">Protein</th><th>Tip</th></tr>
+        ${meals.map(x => `<tr><td>${x.time}</td><td>${esc(x.name)}</td><td class="n">${x.carbs} g</td><td class="n">${x.protein} g</td><td class="small muted">${esc(x.tip)}</td></tr>`).join('')}</table>
+      <p class="small muted" style="margin-top:6px">Times move with your wake time, session start and meals per day on the left. Meals are flexible: hitting the day's totals matters more than the exact clock time.</p>
+      ${longest >= 75 ? `<p class="note">During the ${longest} min session: ${longest >= 150 ? '60–90 g carbohydrate an hour (mixed glucose and fructose)' : '30–60 g carbohydrate an hour'}, 400–800 ml fluid an hour, and sodium if you sweat heavily.</p>` : ''}
+    </div>
+    <div class="card"><h3>The week</h3><div class="scroll"><table><tr><th>Day</th><th class="n">Training</th><th class="n">kcal</th><th class="n">Carbs</th><th class="n">Protein</th><th class="n">Fat</th></tr>
+      ${fuels.map((x, i) => `<tr><td>${DAYS[i]}</td><td class="n">${x.L.total} min</td><td class="n">${x.kcal}</td><td class="n">${x.C} g</td><td class="n">${x.Pr} g</td><td class="n">${x.F} g</td></tr>`).join('')}</table></div></div>
+    <div class="card"><h3>Supplements with good evidence</h3>
+      <table>
+        <tr><td><b>Caffeine</b></td><td class="small">3 mg/kg (about ${Math.round(3 * P.weight)} mg) 30–60 min before hard sessions and tests. Avoid within 8 h of bedtime.</td></tr>
+        <tr><td><b>Creatine monohydrate</b></td><td class="small">3–5 g a day. Improves repeated sprints, strength and power${m.emph.E >= 60 ? '; may add 1–2 kg of water weight, so weigh it against your power-to-weight' : ''}.</td></tr>
+        ${m.emph.E >= 40 ? '<tr><td><b>Dietary nitrate</b></td><td class="small">Beetroot juice with about 6–8 mmol nitrate 2–3 h before key endurance sessions.</td></tr>' : ''}
+        ${m.emph.P >= 25 || ['field', 'court', 'combat', 'rower', 'middle'].includes(m.athlete.id) ? '<tr><td><b>Beta-alanine</b></td><td class="small">3–6 g a day in split doses for efforts of 1–10 minutes. Tingling is harmless.</td></tr>' : ''}
+        <tr><td><b>Vitamin D and iron</b></td><td class="small">Only if a blood test shows you are low. Endurance athletes${P.sex === 'f' ? ', and women especially,' : ''} should check iron yearly.</td></tr>
+      </table>
+      <p class="small muted">If you are drug-tested, use only third-party-tested products (Informed Sport, NSF Certified for Sport).</p></div>`;
+}
+
+// ---------- Recover ----------
+function renderRecover() {
+  const m = M;
+  const wake = toMin(P.wake), bed = wake - Math.round(P.sleep * 60);
+  const hardDays = PLAN.days.filter(d => d.sessions.some(s => s.hard)).map(d => DAYS[d.idx]);
+  const rec = m.inj.list.length ? m.inj.list.map(i => `<li><b>${esc(i.name)}</b> (${INJ_STATUS[i.status].toLowerCase()}): ${esc(i.phases[(i.status === 'weak' ? 2 : i.status === 'pain' ? 1 : i.phase) - 1][0])}. ${esc(i.gate)}</li>`).join('') : '';
+  $('recover').innerHTML = `
+    <div class="card"><h2>Sleep</h2>
+      <div class="kpis"><div class="kpi"><b>${hm(bed - 30)}</b><span>start winding down</span></div><div class="kpi"><b>${hm(bed)}</b><span>lights out</span></div><div class="kpi"><b>${P.wake}</b><span>wake</span></div><div class="kpi"><b>${P.sleep} h</b><span>target</span></div></div>
+      <ul class="small">
+        <li>Athletes do best on 8–10 hours; extending sleep improved sprint times and accuracy in college athletes (Mah 2011).${P.sleep < 8 ? ' <b>Your target is under 8 hours. Consider raising it.</b>' : ''}</li>
+        <li>Keep the same wake time every day, even after a bad night. Morning daylight helps set the clock.</li>
+        <li>Cool, dark, quiet room. No caffeine within 8 hours of bed, and finish big meals 2–3 hours before.</li>
+        <li>On double days or after short nights: a 20–30 minute nap before 3 pm, or a full 90 minute nap.</li>
+      </ul></div>
+    <div class="card"><h2>Recovery built into the plan</h2>
+      <ul class="small">
+        <li><b>Hard and easy days alternate.</b> Hard days this week: ${hardDays.join(', ') || 'none'}. Easy days stay truly easy (Z1 and Z2), which is what makes the hard days work.</li>
+        <li><b>Every 4th week unloads</b> by about a third and ends with gate tests. If you feel run down before then, take the unload week early.</li>
+        <li><b>Readiness check</b> on the Today tab turns a planned session lighter or into recovery when sleep, soreness, mood or resting heart rate say so.</li>
+        <li><b>Strength and endurance on the same day:</b> put the one that matters more first, or split them by 6 hours or more if you can.</li>
+      </ul></div>
+    <div class="card"><h2>Recovery methods, ranked by evidence</h2>
+      <table>
+        <tr><td><b>Sleep</b></td><td class="small">The strongest recovery tool there is.</td></tr>
+        <tr><td><b>Food and fluid</b></td><td class="small">Protein and carbohydrate after training, fluid to replace sweat (about 1.25–1.5 L for every kg lost).</td></tr>
+        <tr><td><b>Easy days and unload weeks</b></td><td class="small">Planned above.</td></tr>
+        <tr><td><b>Massage, foam rolling, compression</b></td><td class="small">Small benefits for soreness and how you feel. Fine if you enjoy them.</td></tr>
+        <tr><td><b>Cold water immersion</b></td><td class="small">Helps when sessions or competitions come close together, but within about 4 hours after strength work it blunts strength gains (Roberts 2015). Keep it away from strength days.</td></tr>
+        <tr><td><b>Stretching</b></td><td class="small">Does not prevent soreness. Use it for range of motion, after sessions or on rest days.</td></tr>
+      </table></div>
+    ${rec ? `<div class="card"><h2>Injury remediation</h2><ul class="small">${rec}</ul>
+      <p class="small"><b>Pain-monitoring rule:</b> during rehab exercise, pain up to 3/10 (5/10 for tendons) is acceptable if it settles within 24 hours and doesn't build week to week. If it does, drop back a phase.</p>
+      <p class="small muted">See the Paths tab for each phase in full.</p></div>` : ''}
+    <div class="card"><h2>Warning signs</h2><ul class="small">
+      <li>Resting heart rate up 5–8 bpm for several mornings, poor sleep, low mood or a stall in performance: take 3–5 easy days.</li>
+      <li>Pain that changes how you move, pain on one spot of a bone, or pain at night: stop that activity and get it checked.</li>
+      <li>Missed or irregular periods, frequent illness or stress fractures can mean low energy availability: eat more and talk to a doctor.</li>
+      <li>Chest pain, fainting or unusual breathlessness: stop and seek medical care.</li></ul></div>`;
+}
+
+// ---------- Gates ----------
+function renderGates() {
+  const m = M;
+  const nextGate = Math.ceil(m.todayWeek / 4) * 4;
+  const rows = q => {
+    const info = m.info[q];
+    return info.ids.map(id => {
+      const t = TESTS[id], v = P.tests[id];
+      const met = v ? metCount(id, v, m) : m.stage[q] - 1;
+      const tg = target(id, Math.min(6, met + 1), m);
+      const hist = P.testLog.filter(r => r.id === id).slice(-4).map(r => `${r.date.slice(5)}: ${fmtVal(id, r.value)}`).join(' · ');
+      return `<tr><td><details><summary><b>${esc(t.name)}</b></summary><div class="small muted">${esc(t.how)}</div></details>${hist ? `<div class="small muted">${esc(hist)}</div>` : ''}</td>
+        <td class="small">${v ? fmtVal(id, v) : '–'}</td>
+        <td class="small">${met >= 6 ? 'all passed' : `${t.low ? '≤' : '≥'} ${fmtVal(id, tg)}`}</td>
+        <td><div class="row" style="flex-wrap:nowrap"><input data-log="${id}" placeholder="${t.unit === 'time' ? 'mm:ss' : t.unit}" style="width:86px"><button class="btn sm" data-act="log" data-id="${id}">Log</button></div></td></tr>`;
+    }).join('');
+  };
+  $('gates').innerHTML = `
+    <div class="card"><h2>Gate tests</h2>
+      <p>Gate tests stand in for competitions. They come at the end of every 4-week block (next: <b>week ${nextGate}</b>), after an unload week so you arrive fresh. Logging a result moves your stage straight away, and the whole plan adjusts.</p>
+      <ul class="small">
+        <li><b>Day 1, power and strength:</b> 15 min warm-up, then jumps and sprints (best of 3, full rest), then the strength tests (work up over 3–4 sets, 3–5 min rest), then resilience tests last.</li>
+        <li><b>Day 2 or later, endurance:</b> treat it like a race. Easy day before, usual breakfast 2–3 h before, caffeine if you use it, the same warm-up you would race with.</li>
+        <li>Same conditions each time (surface, time of day, equipment) so results compare fairly.</li>
+        <li>Missed a target? Repeat the block. Missed it twice? Check sleep, food and stress, then shift a little balance toward that quality on the left.</li>
+      </ul></div>
+    ${['E', 'S', 'P', 'R'].map(q => `<div class="card"><div class="row"><h3 class="q-${q}" style="margin:0">${Q[q]}</h3><span class="chip ${q}">Stage ${m.stage[q]}: ${STAGES[m.stage[q] - 1]}</span></div>
+      <div class="scroll"><table><tr><th>Test</th><th>Latest</th><th>Next gate</th><th>New result</th></tr>${rows(q)}</table></div></div>`).join('')}
+    <div class="card"><h3>Estimating a 1RM safely</h3><p class="small">You never need a true max. Work up to a weight you can lift for 3–5 good reps and use 1RM ≈ weight × (1 + reps ÷ 30). For example, 100 kg × 5 ≈ 117 kg.</p></div>`;
+}
+
+// ---------- Export ----------
+function renderExport() {
+  const m = M;
+  if (VIEW.exportWeek == null) VIEW.exportWeek = m.todayWeek;
+  const plan = VIEW.exportWeek === PLAN.wk.no ? PLAN : planWeek(m, VIEW.exportWeek);
+  const list = plan.days.flatMap(d => d.sessions.map(s => ({ s, key: `${plan.wk.no}:${s.day}:${s.slot}` })));
+  $('export').innerHTML = `
+    <div class="card"><h2>Export to IntervalTimer</h2>
+      <p>Each session becomes an IntervalTimer routine: timed steps for warm-ups, intervals and rests, and "tap when done" steps for sets of reps. Strength sets that have an easier version carry it as an IntervalTimer variant.</p>
+      <ol class="small"><li>Pick the sessions and download the file.</li><li>Open <a href="https://sonusario.github.io/IntervalTimer/" target="_blank" rel="noopener">IntervalTimer</a>, go to <b>Settings → Import routines</b>, and choose the file.</li><li>Imports are added next to your routines; nothing is replaced.</li></ol>
+      <div class="row" style="margin:10px 0">
+        <button class="btn sm" data-act="expPrev">◀</button><b>Week ${plan.wk.no}</b><button class="btn sm" data-act="expNext">▶</button>
+        <button class="btn sm" data-act="expAll">Select all</button><button class="btn sm" data-act="expNone">Select none</button>
+      </div>
+      <div class="exp-list">${list.map(({ s, key }) => `<label><input type="checkbox" data-pick="${key}"${VIEW.picked.has(key) ? ' checked' : ''}><span>${DAYS_LONG[s.day]}${s.slot ? ' ' + s.slot : ''}: ${esc(s.title)}<small>${s.minutes} min · ${s.blocks.length} parts</small></span></label>`).join('') || '<p class="muted">No sessions this week.</p>'}</div>
+      <div class="row" style="margin-top:10px"><button class="btn pri" data-act="expGo"${list.some(x => VIEW.picked.has(x.key)) ? '' : ' disabled'}>Download routines file</button></div>
+    </div>`;
+}
+
+// =============================================================================
+// Wiring
+// =============================================================================
+function renderOutputs() {
+  M = buildModel();
+  if (VIEW.week == null) VIEW.week = M.todayWeek;
+  PLAN = planWeek(M, VIEW.week);
+  renderPaths(); renderWeek(); renderToday(); renderFuel(); renderRecover(); renderGates(); renderExport();
+}
+function renderAll() { renderOutputs(); renderYou(); }
+function showTab(t) {
+  VIEW.tab = t;
+  document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === t));
+  try { localStorage.setItem('fpp:tab', t); } catch (e) { /* ignore */ }
+}
+$('tabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { showTab(b.dataset.tab); window.scrollTo(0, 0); } });
+
+let outTimer = 0;
+$('you').addEventListener('input', e => {
+  const el = e.target.closest('[data-k]'); if (!el) return;
+  const k = el.dataset.k;
+  if (el.type === 'range' || el.type === 'number') {
+    setPath(k, el.value, el); save();
+    if (k.startsWith('emph.')) { const ee = emphasis(); el.closest('.emph').querySelectorAll('output').forEach((o, i) => o.textContent = [ee.E, ee.S, ee.P][i] + '%'); }
+    if (k === 'minutes') el.closest('label').querySelector('b').textContent = `${P.minutes} min`;
+    clearTimeout(outTimer); outTimer = setTimeout(renderOutputs, 60);
+  }
+});
+$('you').addEventListener('change', e => {
+  const el = e.target.closest('[data-k]'); if (!el) return;
+  setPath(el.dataset.k, el.value, el);
+  P = sanitize(P); save();
+  renderAll();
+});
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act;
+  if (act === 'resetEmph') { P.emph = null; save(); renderAll(); }
+  else if (act === 'weekPrev') { VIEW.week = Math.max(1, VIEW.week - 1); renderOutputs(); }
+  else if (act === 'weekNext') { VIEW.week += 1; renderOutputs(); }
+  else if (act === 'weekToday') { VIEW.week = M.todayWeek; renderOutputs(); }
+  else if (act === 'print') window.print();
+  else if (act === 'exportOne') {
+    const s = findSession(b.dataset.key, b.dataset.adjusted === '1');
+    if (!s) return;
+    const w = +b.dataset.key.split(':')[0];
+    const r = sessionToRoutine(s, routineName(s, w), IT_PALETTE[s.day % IT_PALETTE.length]);
+    download(`interval-${DAYS[s.day]}-week${w}.json`, routinesFile([r]));
+    toast('Saved. Import it in IntervalTimer: Settings → Import routines');
+  }
+  else if (act === 'checkin') {
+    const ci = { date: isoDate(new Date()) };
+    document.querySelectorAll('[data-ci]').forEach(x => { ci[x.dataset.ci] = x.type === 'checkbox' ? x.checked : Number(x.value); });
+    P.checkin = ci; save(); renderOutputs();
+  }
+  else if (act === 'log') {
+    const id = b.dataset.id, inp = document.querySelector(`[data-log="${id}"]`), t = TESTS[id];
+    const v = t.unit === 'time' ? parseTime(inp.value) : Number(inp.value);
+    if (!v || v <= 0) { toast('Enter a result first'); return; }
+    const before = M.stage[t.q];
+    P.tests[id] = v; P.testLog.push({ id, value: v, date: isoDate(new Date()) }); save();
+    renderAll();
+    const after = M.stage[t.q];
+    toast(after > before ? `${Q[t.q]} moves up to stage ${after}: ${STAGES[after - 1]}` : `Logged ${fmtVal(id, v)}`);
+  }
+  else if (act === 'expPrev') { VIEW.exportWeek = Math.max(1, VIEW.exportWeek - 1); renderExport(); }
+  else if (act === 'expNext') { VIEW.exportWeek += 1; renderExport(); }
+  else if (act === 'expAll') { document.querySelectorAll('[data-pick]').forEach(x => VIEW.picked.add(x.dataset.pick)); renderExport(); }
+  else if (act === 'expNone') { VIEW.picked.clear(); renderExport(); }
+  else if (act === 'expGo') {
+    const list = [...VIEW.picked].filter(k => +k.split(':')[0] === VIEW.exportWeek).map(k => findSession(k)).filter(Boolean);
+    if (!list.length) return;
+    const routines = list.map(s => sessionToRoutine(s, routineName(s, VIEW.exportWeek), IT_PALETTE[s.day % IT_PALETTE.length]));
+    download(`interval-progression-week${VIEW.exportWeek}.json`, routinesFile(routines));
+    toast(`Saved ${plural(routines.length, 'routine')}`);
+  }
+  else if (act === 'saveProfile') download(`fitness-paths-profile-${isoDate(new Date())}.json`, { app: 'fitness-progression-paths', profile: P });
+  else if (act === 'loadProfile') $('filePick').click();
+  else if (act === 'resetProfile') { if (confirm('Clear everything you entered and start over?')) { P = DEFAULTS(); save(); VIEW.week = null; renderAll(); } }
+});
+document.addEventListener('change', e => {
+  const sw = e.target.closest('[data-swap]');
+  if (sw && sw.value !== '') {
+    const w = PLAN.wk.no; (P.swaps[w] = P.swaps[w] || []).push([+sw.dataset.swap, +sw.value]); save(); renderOutputs();
+    toast(`Swapped ${DAYS[+sw.dataset.swap]} and ${DAYS[+sw.value]} for week ${w}`);
+  }
+  const pk = e.target.closest('[data-pick]');
+  if (pk) { if (pk.checked) VIEW.picked.add(pk.dataset.pick); else VIEW.picked.delete(pk.dataset.pick); $('export').querySelector('[data-act="expGo"]').disabled = !VIEW.picked.size; }
+});
+document.addEventListener('click', e => { const f = e.target.closest('[data-fday]'); if (f) { VIEW.fuelDay = +f.dataset.fday; renderFuel(); } });
+$('filePick').addEventListener('change', async () => {
+  const f = $('filePick').files[0]; $('filePick').value = '';
+  if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (data?.app !== 'fitness-progression-paths' || !data.profile) throw new Error('not a profile');
+    P = sanitize({ ...DEFAULTS(), ...data.profile }); save(); VIEW.week = null; renderAll(); toast('Profile restored');
+  } catch (err) { toast('That file is not a Fitness Progression Paths profile'); }
+});
+
+// ---------- Theme and About ----------
+function setTheme(t) {
+  if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+  try { localStorage.setItem('fpp:theme', t || ''); } catch (e) { /* ignore */ }
+}
+try { setTheme(localStorage.getItem('fpp:theme') || null); } catch (e) { /* ignore */ }
+$('themeBtn').addEventListener('click', () => {
+  const cur = document.documentElement.dataset.theme;
+  const dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(dark ? 'light' : 'dark');
+});
+let logLoaded = false;
+function openAbout() {
+  $('aboutDlg').showModal();
+  if (logLoaded) return;
+  logLoaded = true;
+  fetch(`https://api.github.com/repos/${REPO}/commits?sha=main&per_page=100`)
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(commits => {
+      const bySha = new Map(commits.map(c => [c.sha, c]));
+      const items = [];
+      for (let c = commits[0]; c; c = c.parents[0] && bySha.get(c.parents[0].sha)) {
+        const lines = c.commit.message.split('\n');
+        const merged = /^Merge pull request #\d+/.test(lines[0]);
+        const text = (merged && lines.slice(1).find(l => l.trim())) || lines[0];
+        items.push(`<li><time>${c.commit.committer.date.slice(0, 10)}</time><a href="${esc(c.html_url)}" target="_blank" rel="noopener">${esc(text.trim())}</a></li>`);
+      }
+      $('aboutLog').innerHTML = items.join('');
+    })
+    .catch(() => {
+      logLoaded = false;
+      $('aboutLog').innerHTML = `<li class="muted">Couldn't load the change log. <a href="https://github.com/${REPO}/commits/main" target="_blank" rel="noopener">See the history on GitHub.</a></li>`;
+    });
+}
+$('aboutBtn').addEventListener('click', openAbout);
+$('aboutClose').addEventListener('click', () => $('aboutDlg').close());
+document.querySelectorAll('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
+$('buildNo').textContent = APP_BUILD;
+
+renderAll();
+let startTab = 'paths';
+try { startTab = localStorage.getItem('fpp:tab') || 'paths'; } catch (e) { /* ignore */ }
+if (!document.getElementById(startTab)) startTab = 'paths';
+if (startTab === 'you' && matchMedia('(min-width: 1000px)').matches) startTab = 'paths';
+showTab(startTab);
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (!e.data || e.data.type !== 'update-ready' || !e.data.build || e.data.build === APP_BUILD) return;
+    if (document.querySelector('.update-bar')) return;
+    const bar = document.createElement('div'); bar.className = 'update-bar';
+    bar.innerHTML = '<span>A newer version is ready.</span><button class="btn pri">Reload</button>';
+    bar.querySelector('button').onclick = () => location.reload();
+    document.body.append(bar);
+  });
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
