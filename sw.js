@@ -10,8 +10,9 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => e.waitUntil((async () => {
+  // Only this app's old caches: every app on this domain shares one Cache Storage.
   const names = await caches.keys();
-  await Promise.all(names.filter(n => n !== CACHE).map(n => caches.delete(n)));
+  await Promise.all(names.filter(n => n.startsWith('fpp-') && n !== CACHE).map(n => caches.delete(n)));
   await self.clients.claim();
 })()));
 
