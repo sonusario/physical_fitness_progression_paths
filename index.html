@@ -126,6 +126,9 @@ input[type="range"] { padding: 0; accent-color: var(--accent); background: trans
 .inj-grid { display: grid; gap: 4px 14px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 .inj { display: grid; grid-template-columns: 1fr 122px; gap: 6px; align-items: center; font-size: 13px; }
 .inj .ph { grid-column: 1 / -1; }
+.inj-abs { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 8px; }
+.inj-abs .inj { grid-template-columns: 1fr minmax(122px, 220px); }
+.grid4 { display: grid; gap: 6px 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-top: 6px; }
 table { border-collapse: collapse; width: 100%; font-size: 13px; }
 th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { color: var(--muted); font-weight: 600; }
@@ -289,7 +292,7 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
 <input type="file" id="filePick" accept="application/json,.json" hidden>
 <script>
 'use strict';
-const APP_BUILD = '2.0 (2026.11.10)';
+const APP_BUILD = '2.1 (2026.11.11)';
 const REPO = 'sonusario/physical_fitness_progression_paths';
 
 // =============================================================================
@@ -1018,6 +1021,179 @@ const MICROS = [
 ];
 
 // =============================================================================
+// More injuries, grouped by body region
+// =============================================================================
+for (const line of `
+toe_yoga|Toe spreading and big-toe presses|shin|none|Spread the toes wide, then press the big toe down while the others lift, and swap. Hold each for 5 seconds.
+ankle_evert|Banded ankle eversion|shin calf:.3|none|Band around the forefoot, turn the sole outward against it slowly, 3 seconds back.
+quad_iso|Isometric knee extension hold|quad|none|Sit with the knee bent about 60°, push the shin into a strap or wall and hold. Firm, but pain no higher than 3/10.
+tke|Banded terminal knee extension|quad|none|Band behind the knee, start slightly bent, squeeze the thigh to straighten fully, hold 2 seconds.
+rev_nordic|Reverse Nordic (kneeling lean-back)|quad hipf:.4|knee|Kneel tall, lean back in one line from knees to shoulders as far as you control, and return.
+hip_flex_iso|Isometric hip flexion hold|hipf|none|Lie on your back, one knee over the hip, push the thigh into your hand and hold without arching the back.
+hip_abd_iso|Isometric hip abduction against a wall|glute|none|Stand side-on to a wall, press the outside of the knee into it, hips level, and hold.
+hip_hike|Hip hike on a step|glute|none|Stand on one leg on a step, let the other hip drop, then lift it level using the standing hip.
+cat_cow|Cat-cow|lowb core:.3|none|On hands and knees, round the whole spine up, then let it sag, slowly and without forcing the end range.
+prone_press|Prone press-up|lowb|none|Lie face down, hands under the shoulders, press the chest up while the hips stay down. Stop if leg symptoms spread further down.
+nerve_glide|Sciatic nerve glide (seated slider)|ham:.2|none|Sit tall. Straighten the knee as you look up, bend it as you look down. Smooth and gentle, never into pain or tingling.
+thoracic_ext|Thoracic extension over a foam roller|uback|none|Roller across the upper back, hands behind the head, lean back over it for 2 breaths, then move it a little.
+biceps_iso|Isometric biceps hold|bi|none|Elbow at 90°, pull up against a fixed strap or your other hand and hold.
+db_curl|Slow curl (dumbbell or band)|bi fore:.3|elbow|Curl up in 1 second, lower in 3 seconds, elbow still at your side.
+finger_ext|Rubber-band finger extensions|fore|none|Band around the fingertips, open the hand fully against it, close slowly.
+finger_pull|Finger pulls with the feet on the floor|fore|grip|Hold an edge or loading pin with an open hand and pull to a load you choose. Never a full crimp.
+easy_walk|Walking or easy stationary cycling|quad:.2 calf:.2|none|Easy enough to talk in full sentences. Stop if symptoms rise by more than 2 points out of 10.
+walk_run|Walk-run intervals|quad:.3 calf:.4|impact|1 minute easy running, 1 minute walking, on a soft flat surface. Add running time only if the next day is pain-free.
+neck_rom|Gentle neck range of motion|neck|none|Turn, tilt and nod slowly through the comfortable range, without pushing into pain or dizziness.
+gaze_stab|Gaze stabilisation|neck:.2|none|Keep your eyes on a fixed target at arm's length while turning the head side to side for 30 seconds.
+noncontact|Non-contact sport drills|quad:.3 calf:.3|impact|Running, change of direction and skills from your sport, with no contact and no risk of a blow to the head.
+`.trim().split('\n')) { const [id, name, g, tags, cue] = line.split('|'); addEx(id, name, g, tags === 'none' ? '' : tags, cue); }
+
+const addInj = (id, name, avoid, impact, phases, ev, gate) => { const o = { id, name, avoid, impact, phases, ev, gate }; INJURIES.push(o); INJURY[id] = o; };
+// Foot and ankle
+addInj('ankle_stiff', 'Stiff ankle (limited bend)', [], false, [
+  ['Mobility', [['ankle_kw', '2 × 10 each side, daily'], ['soleus', '2 × 15 through the full range']]],
+  ['Strength in the new range', [['sl_calf_step', '3 × 12 slow, heel dropping fully'], ['tib_raise', '3 × 15']]],
+  ['Use it under load', [['split_squat', '3 × 8 each, front knee travelling over the toes'], ['ankle_kw', '1 × 10 each before sessions']]],
+], 'A stiff ankle changes how you squat, land and run, and shifts load to the knee and Achilles. Mobility sticks better when you load the new range straight afterwards. A hard block at the front of the ankle, as opposed to a calf stretch, is worth getting checked.',
+'Knee reaches about 10 cm past the toes in the knee-to-wall test with the heel down, and both sides are within 2 cm.');
+addInj('peroneal', 'Outer ankle (peroneal tendons)', ['ankle'], true, [
+  ['Calm it down', [['calf_iso', '5 × 45 s, daily'], ['ankle_evert', '5 × 20 s holds against the band']]],
+  ['Strength', [['ankle_evert', '3 × 15 slow'], ['sl_calf', '3 × 12 each'], ['sl_balance', '3 × 30 s each']]],
+  ['Reactive', [['lat_pogo', '3 × 20'], ['sl_pogo', '3 × 10 each']]],
+], 'Tendons respond to progressive loading and dislike sudden jumps in volume. Peroneal pain often follows an ankle sprain, so balance work belongs in the plan as well.',
+'25 single-leg calf raises and side-to-side hops with pain at 2/10 or lower.');
+addInj('forefoot', 'Forefoot and big toe (ball-of-foot pain, turf toe)', ['impact'], true, [
+  ['Unload', [['toe_yoga', '3 × 10 × 5 s, daily'], ['short_foot', '3 × 10 × 5 s holds']]],
+  ['Build', [['calf_raise', '3 × 15 slow, both legs, pain-free'], ['sl_balance', '3 × 30 s each']]],
+  ['Push off again', [['sl_calf', '3 × 12 each'], ['pogo', '3 × 20, both legs']]],
+], 'A stiffer shoe or a rocker sole takes load off the forefoot while it settles. Pain at one spot on a bone that gets worse with each run needs a scan to rule out a stress fracture.',
+'Single-leg calf raises and 20 hops on the forefoot without pain, and a pain-free push-off when walking fast.');
+addInj('flatfoot', 'Weak arches (flat feet)', [], false, [
+  ['Wake up the foot', [['short_foot', '3 × 10 × 5 s holds, daily'], ['toe_yoga', '3 × 10']]],
+  ['Strength', [['towel_calf', '3 × 12'], ['sl_balance', '3 × 30 s each, barefoot']]],
+  ['Spring', [['sl_calf_step', '3 × 15'], ['sl_pogo', '2 × 10 each']]],
+], 'Flat feet are not a problem by themselves. Strengthening the foot and calf helps when they come with pain or repeated lower-leg injuries.',
+'25 single-leg calf raises on each side without the arch collapsing.');
+// Lower leg
+addInj('calf', 'Calf strain', ['ankle', 'impact'], true, [
+  ['Protect and activate', [['calf_iso', '5 × 30 s, daily'], ['calf_raise', '2 × 15, both legs, pain-free']]],
+  ['Rebuild', [['sl_calf', '3 × 12 each'], ['soleus', '3 × 12, bent knee']]],
+  ['Return to running', [['sl_calf_step', '3 × 12 with weight'], ['pogo', '3 × 20'], ['walk_run', '10 rounds, every other day']]],
+], 'Calf strains come back when running returns before strength does, and the deep soleus muscle matters as much as the gastrocnemius. Calf pain with swelling, warmth or redness and no clear injury needs a doctor the same day.',
+'25 single-leg calf raises on each side, 20 single-leg hops, and strides at 90% without pain.');
+addInj('stressfx', 'Bone stress injury (after medical clearance)', ['impact'], true, [
+  ['Pain-free walking', [['easy_walk', '20–30 min, daily'], ['glute_bridge', '3 × 12'], ['soleus', '3 × 15 seated or standing, pain-free']]],
+  ['Strength', [['sl_calf_step', '3 × 12'], ['split_squat', '3 × 8 each'], ['tib_raise', '3 × 15']]],
+  ['Graded return', [['pogo', '2 × 20, both legs'], ['walk_run', '10 rounds every other day, adding running time each week']]],
+], 'Bone needs a medical diagnosis and a clearance date before impact returns. Bone stress injuries are often linked to low energy availability, low vitamin D or calcium, and fast jumps in volume, so check the Fuel tab too. Any return of pain at the same spot means stepping back a phase.',
+'30 minutes of continuous easy running with no pain during, that night, or the next day, and painless hopping on the spot.');
+// Knee
+addInj('itb', 'Outer knee (IT band)', ['impact'], true, [
+  ['Settle', [['side_hip', '3 × 15 each, daily'], ['clam', '3 × 15 each']]],
+  ['Hip control', [['step_up', '3 × 10 each, slow, knee tracking over the foot'], ['sl_rdl_bw', '3 × 8 each']]],
+  ['Back to running', [['skater', '3 × 6 each'], ['walk_run', '10 rounds on flat ground, every other day']]],
+], 'The best-supported approach is to cut the running that provokes it (often downhill and long slow runs), strengthen the hip, and return in steps. A slightly quicker, shorter stride reduces the load on the outside of the knee.',
+'30 minutes of easy running, including a gentle downhill, with no pain during or the next day.');
+addInj('acl', 'Knee ligament or surgery return (ACL, MCL)', ['impact', 'knee'], true, [
+  ['Range and quad activation', [['quad_iso', '5 × 30–45 s, daily'], ['heel_slide', '2 × 15'], ['glute_bridge', '3 × 12']]],
+  ['Strength', [['split_squat', '3 × 8 each'], ['step_up', '3 × 8 each'], ['slider_curl', '3 × 8'], ['sl_balance', '3 × 30 s each']]],
+  ['Landing and hopping', [['snap_down', '3 × 5'], ['box_jump', '3 × 5, soft landings'], ['sl_pogo', '3 × 10 each']]],
+], 'Follow your surgeon or physiotherapist first: their timeline overrides this one. Returning on criteria, with quad strength and hop tests within 10% of the other leg, and waiting at least 9 months after reconstruction, sharply lowers re-injury (Grindem 2016; Kyritsis 2016).',
+'Quad strength and single-leg hop distance within 10% of the other leg, no swelling after training, and clearance from your surgeon or physiotherapist.');
+addInj('meniscus', 'Meniscus or knee joint (swelling, osteoarthritis)', ['impact', 'knee'], true, [
+  ['Settle the joint', [['quad_iso', '5 × 30 s, daily'], ['tke', '3 × 15'], ['glute_bridge', '3 × 12']]],
+  ['Strength in a comfortable range', [['bw_box_squat', '3 × 10 to a pain-free depth'], ['step_up', '3 × 8 each, low step'], ['side_hip', '3 × 15 each']]],
+  ['Single-leg control', [['split_squat', '3 × 8 each'], ['sl_rdl_bw', '3 × 8 each'], ['sl_balance', '3 × 30 s each']]],
+], 'Supervised exercise worked as well as keyhole surgery for degenerative meniscus tears over two years (Kise 2016). Swelling the day after is the signal to do less. A knee that locks, or gives way, needs an assessment.',
+'Full squat depth and single-leg squats to a chair with no pain and no swelling the next day.');
+// Hip and thigh
+addInj('hipflexor', 'Hip flexor or front of hip', [], false, [
+  ['Isometrics', [['hip_flex_iso', '5 × 20 s each, daily'], ['glute_bridge', '3 × 12']]],
+  ['Strength', [['psoas_march', '3 × 10 each, slow'], ['couch', '2 × 45 s each, gentle']]],
+  ['Speed', [['reverse_lunge', '3 × 8 each'], ['strides', '6 × 60 m, building from 70% to 90%']]],
+], 'Hip flexors are strained by sprinting and kicking, and they recover with progressive loading rather than stretching alone. A deep pinch in the groin when the knee comes to the chest points to the hip joint instead.',
+'Pain-free resisted knee lift and sprinting at full speed.');
+addInj('quad', 'Quad strain', ['knee', 'impact'], true, [
+  ['Protect and activate', [['quad_iso', '5 × 30 s, daily'], ['wall_sit', '3 × 20 s, pain-free depth']]],
+  ['Rebuild', [['split_squat', '3 × 8 each'], ['step_up', '3 × 8 each']]],
+  ['Lengthen and sprint', [['rev_nordic', '2 × 5 slow'], ['strides', '6 × 60 m, building from 70% to 90%']]],
+], 'The quad is strained at long lengths during sprinting and kicking, so lengthening work under load comes before a return to speed.',
+'Full pain-free knee bend lying face down, and sprinting and kicking at full effort.');
+addInj('glutetend', 'Outer hip (gluteal tendon)', [], false, [
+  ['Isometrics', [['hip_abd_iso', '5 × 30 s each, daily'], ['glute_bridge', '3 × 12']]],
+  ['Strength', [['side_hip', '3 × 15 each'], ['hip_hike', '3 × 12 each'], ['sl_bridge', '3 × 10 each']]],
+  ['Single-leg load', [['step_up', '3 × 10 each'], ['lateral_lunge', '3 × 8 each']]],
+], 'Education plus exercise beat both a steroid injection and waiting for outer hip pain (Mellor 2018). Avoid positions that squash the tendon while it settles: crossing the legs, hanging on one hip, and stretching the outer hip.',
+'Standing on one leg for 30 s and climbing stairs without pain on the outside of the hip.');
+addInj('fai', 'Hip joint (impingement, labrum)', [], false, [
+  ['Settle', [['glute_bridge', '3 × 12'], ['bird_dog', '3 × 8 each'], ['hip_abd_iso', '5 × 30 s each']]],
+  ['Hip and trunk strength', [['side_plank', '3 × 30 s each'], ['sl_bridge', '3 × 10 each'], ['clam', '3 × 15 each']]],
+  ['Control under load', [['sl_rdl_bw', '3 × 8 each'], ['step_up', '3 × 10 each'], ['lateral_lunge', '3 × 8 each']]],
+], 'Hip and trunk strengthening improves impingement-type hip pain for many people. Keep squats and lunges above the depth where the front of the hip pinches, and do not stretch into the pinch.',
+'Squatting to parallel and running without a pinch at the front of the hip.');
+addInj('hamtend', 'High hamstring tendon (sit-bone pain)', ['ham'], false, [
+  ['Isometrics', [['bridge_iso', '5 × 30 s, daily']]],
+  ['Strength with the hip straight', [['sl_bridge', '3 × 10 each'], ['slider_curl', '3 × 8']]],
+  ['Strength with the hip bent', [['sl_rdl_bw', '3 × 8 each'], ['nordic', '2 × 5'], ['hill_sprint', '4 × 8 s']]],
+], 'The tendon is compressed against the sit bone when the hip is bent, so early loading keeps the hip straight and deep stretching waits. Long periods of sitting on hard seats also keep it sore.',
+'Sitting for an hour, and a single-leg Romanian deadlift with load, both at pain 2/10 or lower.');
+// Core and back
+addInj('sciatica', 'Back pain with leg symptoms (sciatica, disc)', ['spine'], false, [
+  ['Settle', [['easy_walk', '10–20 min, two or three times a day'], ['prone_press', '10 reps, several times a day, only if it eases the leg'], ['nerve_glide', '2 × 10 gentle']]],
+  ['Build', [['bird_dog', '3 × 8 each'], ['side_plank_k', '3 × 20 s each'], ['glute_bridge', '3 × 12']]],
+  ['Load the hinge', [['kb_deadlift', '3 × 8 light and smooth'], ['sa_carry', '3 × 30 m each'], ['pallof', '3 × 10 each']]],
+], 'Most sciatica settles over weeks to a few months, and staying gently active beats bed rest. Go to emergency care at once for numbness around the groin or saddle area, loss of bladder or bowel control, or a leg that is getting weaker.',
+'No leg symptoms for two weeks, and a light hip hinge and 30 minutes of walking without pain.');
+addInj('thoracic', 'Upper back stiffness', [], false, [
+  ['Mobility', [['tspine', '2 × 8 each side, daily'], ['cat_cow', '2 × 10']]],
+  ['Extension and control', [['thoracic_ext', '2 × 8'], ['ytw', '2 × 8 each letter']]],
+  ['Strength', [['face_pull', '3 × 15'], ['pull_apart', '3 × 15']]],
+], 'A stiff upper back passes the work on to the shoulders, neck and lower back in overhead and rotational sports. Mobility lasts when it is followed by upper-back strength.',
+'Comfortable overhead reach with the ribs down, and equal rotation to both sides.');
+addInj('oblique', 'Side or abdominal strain', ['abwall2'], false, [
+  ['Settle', [['ta_breath', '2 × 10 slow breaths'], ['dead_bug', '3 × 6 each, pain-free']]],
+  ['Build', [['side_plank_k', '3 × 20 s each'], ['pallof', '3 × 10 each'], ['bird_dog', '3 × 8 each']]],
+  ['Rotate and brace', [['side_plank', '3 × 30 s each'], ['sa_carry', '3 × 30 m each'], ['mb_rot', '3 × 5 each side, building from easy to hard']]],
+], 'Side strains are common in throwing, bowling and rowing, and return too early if rotation at full effort is rushed. Deep groin pain on coughing or sit-ups that does not settle needs an assessment.',
+'Full-effort rotation, coughing and a hard sit-up without pain.');
+// Shoulder and arm
+addInj('instab', 'Shoulder instability (after a dislocation)', ['overhead', 'shoulder'], false, [
+  ['Isometrics', [['er_iso', '5 × 30 s, daily'], ['scap_push', '2 × 10']]],
+  ['Cuff and shoulder-blade strength', [['side_er', '3 × 12–15 each'], ['band_er', '3 × 15'], ['ytw', '2 × 8 each letter']]],
+  ['Weight bearing and overhead', [['fist_push', '3 × 8'], ['landmine', '3 × 8 each'], ['kneel_press', '3 × 8 light']]],
+], 'A first dislocation needs an assessment, and repeat dislocations are common in young athletes in contact and overhead sports. Rehab builds control in the positions where the shoulder feels loose; the arm out to the side and rotated back comes last.',
+'Push-ups and a pain-free overhead press with no feeling of the shoulder slipping, and equal rotation strength on both sides.');
+addInj('biceps', 'Biceps tendon (front of shoulder or elbow)', ['elbow'], false, [
+  ['Isometrics', [['biceps_iso', '5 × 30 s, daily']]],
+  ['Slow loading', [['db_curl', '3 × 10, 3 s down'], ['band_row', '3 × 12']]],
+  ['Pulling again', [['inv_row', '3 × 8'], ['pullup_neg', '3 × 3']]],
+], 'Tendons respond to slow, progressive loading. A sudden pop with bruising and a changed shape of the biceps needs prompt medical review.',
+'Pull-ups and carrying heavy bags at pain 2/10 or lower.');
+addInj('fingers', 'Fingers (pulley strain)', ['grip'], false, [
+  ['Settle', [['finger_ext', '3 × 20, daily'], ['wrist_iso', '5 × 30 s']]],
+  ['Light pulling', [['finger_pull', '5 × 10 s open hand, light'], ['wrist_curl', '3 × 15']]],
+  ['Back to hanging', [['finger_pull', '5 × 10 s, building toward body weight'], ['dead_hang', '3 × 15 s on a bar or large edge']]],
+], 'Pulley strains in climbers heal with graded pulling in an open-hand grip, and full crimping returns last. A loud pop with a tendon that bowstrings away from the finger needs a hand specialist.',
+'Open-hand hangs at body weight without pain, before any full-crimp climbing.');
+// Neck and head
+addInj('concussion', 'Concussion (graded return)', ['impact', 'neck'], true, [
+  ['Symptom-limited activity', [['easy_walk', '10–20 min, keeping symptoms from rising more than 2 points'], ['neck_rom', '2 × 5 each direction']]],
+  ['Aerobic and balance', [['easy_walk', '20–30 min, building to a moderate effort'], ['gaze_stab', '3 × 30 s'], ['sl_balance', '3 × 30 s each']]],
+  ['Non-contact training', [['noncontact', '20–30 min, building intensity over several days'], ['neck_iso', '3 rounds, 10 s each direction']]],
+], 'See a doctor after any suspected concussion. Rest for the first 24 to 48 hours, then move up one step at a time, at least a day per step, and step back if symptoms rise (Amsterdam consensus, Patricios 2023). While you are in phases 1 and 2, pick "Rough" on Today so planned sessions turn into recovery. Contact and collision risk wait for medical clearance.',
+'No symptoms at rest or after hard non-contact training, and written clearance from a doctor before contact or any risk of a blow to the head.');
+
+// Body regions for the Injuries setup tab.
+const REGIONS = [
+  ['foot', 'Foot and ankle', ['achilles', 'plantar', 'ankle', 'ankle_stiff', 'peroneal', 'forefoot', 'flatfoot']],
+  ['leg', 'Lower leg', ['shin', 'calf', 'stressfx']],
+  ['knee', 'Knee', ['knee', 'itb', 'acl', 'meniscus']],
+  ['hip', 'Hip and thigh', ['hamstring', 'groin', 'hipflexor', 'quad', 'glutetend', 'fai', 'hamtend']],
+  ['core', 'Core and back', ['back', 'sciatica', 'thoracic', 'oblique', 'diastasis']],
+  ['arm', 'Shoulder and arm', ['shoulder', 'instab', 'elbow', 'biceps', 'wrist', 'fingers']],
+  ['head', 'Neck and head', ['neck', 'concussion']],
+];
+
+// =============================================================================
 // Profile: everything the person enters. Stored in this browser only.
 // =============================================================================
 const STORE_KEY = 'fpp:profile';
@@ -1219,7 +1395,7 @@ function pickStrength(pattern, stage, m) {
   return null;
 }
 const LOADED = new Set(['goblet', 'db_rfess', 'back_squat', 'front_squat', 'kb_deadlift', 'db_rdl', 'sl_db_rdl', 'trapbar_dl', 'rdl', 'db_lunge', 'db_step_up', 'db_lat_lunge', 'db_floor_press', 'db_bench', 'bench', 'db_row', 'chest_row', 'kneel_press', 'landmine', 'ohp', 'w_pullup', 'seated_calf']);
-const HOLDS = new Set(['plank', 'll_plank', 'hollow', 'side_plank_k', 'side_plank', 'spanish_iso', 'wall_sit', 'bridge_iso', 'calf_iso', 'er_iso', 'wrist_iso', 'dead_hang', 'sl_balance', 'copen_s', 'copen', 'couch']);
+const HOLDS = new Set(['plank', 'll_plank', 'hollow', 'side_plank_k', 'side_plank', 'spanish_iso', 'wall_sit', 'bridge_iso', 'calf_iso', 'er_iso', 'wrist_iso', 'dead_hang', 'sl_balance', 'copen_s', 'copen', 'couch', 'quad_iso', 'hip_flex_iso', 'hip_abd_iso', 'biceps_iso']);
 const CARRIES = new Set(['farmer', 'sa_carry', 'bag_carry']);
 
 // Sets, reps and rest for one strength exercise.
@@ -2083,7 +2259,7 @@ function fmtVal(id, v) {
 // =============================================================================
 const $ = id => document.getElementById(id);
 const FIRST_RUN = (() => { try { return !localStorage.getItem(STORE_KEY); } catch (e) { return false; } })();
-const VIEW = { tab: 'today', sub: { week: 'day', paths: 'rail', fuel: 'today', recover: 'sleep', setup: 'athlete' }, week: null, day: null, q: 'E', rail: null, macro: 'c', micro: 'iron', inj: null, sess: 0, exportWeek: null, picked: new Set() };
+const VIEW = { tab: 'today', sub: { week: 'day', paths: 'rail', fuel: 'today', recover: 'sleep', setup: 'athlete' }, week: null, day: null, q: 'E', rail: null, macro: 'c', micro: 'iron', inj: null, reg: 'foot', sess: 0, exportWeek: null, picked: new Set() };
 let M = null, PLAN = null;
 
 function toast(msg) {
@@ -2566,7 +2742,7 @@ function renderRecover() {
 function renderSetup() {
   const m = M, a = ATHLETE[P.athlete], e = emphasis(), sub = VIEW.sub.setup;
   const nInj = Object.keys(P.inj).length;
-  subtabs('setup', [['athlete', 'Athlete'], ['body', 'Body'], ['tests', 'Conditioning'], ['injuries', `Injuries${nInj ? ' · ' + nInj : ''}`], ['abs', `Split abs${P.inj.diastasis ? ' · on' : ''}`], ['schedule', 'Schedule'], ['data', 'Data']]);
+  subtabs('setup', [['athlete', 'Athlete'], ['body', 'Body'], ['tests', 'Conditioning'], ['injuries', `Injuries${nInj ? ' · ' + nInj : ''}`], ['schedule', 'Schedule'], ['data', 'Data']]);
   let h = '';
   if (sub === 'athlete') {
     h = `${FIRST_RUN && !VIEW.started ? `<div class="card note good" style="margin:0 0 10px"><b>Welcome.</b> Pick your athlete type and a quick start. Everything else has sensible defaults you can refine later. <button class="btn sm pri" data-act="start">Show my plan</button></div>` : ''}
@@ -2602,17 +2778,16 @@ function renderSetup() {
   } else if (sub === 'injuries') {
     const row = inj => { const v = P.inj[inj.id] || { status: 'none', phase: 1 }; return `<div class="inj"><span>${esc(inj.name)}</span>${sel(`inj.${inj.id}.status`, Object.entries(INJ_STATUS), v.status)}
       ${v.status === 'rehab' ? `<div class="ph">${sel(`inj.${inj.id}.phase`, inj.phases.map((p, i) => [i + 1, `Phase ${i + 1}: ${p[0]}`]), v.phase || 1)}</div>` : ''}</div>`; };
-    const dr = P.inj.diastasis;
-    h = `<div class="card"><p class="small muted"><b>Weak</b> adds prehab. <b>Recovering</b> adds a phased rehab path and swaps out what strains the area. <b>Painful now</b> also removes impact; please get it assessed.</p>
-        <div class="inj-grid">${INJURIES.filter(i => !i.custom).map(row).join('')}</div></div>`;
-  } else if (sub === 'abs') {
-    const dr = P.inj.diastasis;
-    h = `<div class="card"><h3>Split abs (diastasis recti)</h3>
-        <p class="small muted">A gap or soft ridge down the middle of the abdomen, common after pregnancy and also seen with heavy straining or weight changes. To check: lie on your back with knees bent, lift your head, and feel above and below the navel for how many fingers fit between the muscles.</p>
-        ${field('Do you have it?', sel('inj.diastasis.status', [['none', 'No'], ['rehab', 'Yes, include remediation']], dr ? 'rehab' : 'none'))}
-        ${dr ? `<div class="grid2">${field('Gap width', sel('inj.diastasis.gap', DR_OPTS.gap, dr.gap || 'mid'))}${field('Timing', sel('inj.diastasis.timing', DR_OPTS.timing, dr.timing || 'none'))}
+    const reg = REGIONS.find(r => r[0] === VIEW.reg) || REGIONS[0], dr = P.inj.diastasis;
+    const regPills = pills('reg', REGIONS.map(([id, name, ids]) => { const n = ids.filter(x => P.inj[x]).length; return [id, `${name}${n ? ' · ' + n : ''}`, '']; }), reg[0]);
+    const abs = reg[0] !== 'core' ? '' : `<div class="inj-abs"><div class="inj"><span><b>Split abs (diastasis recti)</b></span>${sel('inj.diastasis.status', [['none', 'No'], ['rehab', 'Yes, include remediation']], dr ? 'rehab' : 'none')}</div>
+        ${dr ? `<div class="grid4">${field('Gap width', sel('inj.diastasis.gap', DR_OPTS.gap, dr.gap || 'mid'))}${field('Timing', sel('inj.diastasis.timing', DR_OPTS.timing, dr.timing || 'none'))}
           ${field('Doming or coning on effort', sel('inj.diastasis.doming', DR_OPTS.doming, dr.doming || 'some'))}${field('Pelvic floor symptoms', sel('inj.diastasis.pf', DR_OPTS.pf, dr.pf || 'no'))}</div>
-          <p class="note">Your selections put you in <b>phase ${drPhase(dr)}: ${INJURY.diastasis.phases[drPhase(dr) - 1][0]}</b>. ${drPhase(dr) < 3 ? 'Planks, rollouts and hollow holds are swapped out of your sessions.' : 'Rollouts and hollow holds stay out until last.'} ${dr.pf === 'yes' || dr.timing === 'pp0' ? 'Impact work is swapped for low-impact.' : ''} <button class="btn sm" data-go="recover:rehab">See the full path</button></p>` : ''}</div>`;
+          <p class="note">You are in <b>phase ${drPhase(dr)}: ${INJURY.diastasis.phases[drPhase(dr) - 1][0]}</b>. ${drPhase(dr) < 3 ? 'Planks, rollouts and hollow holds are swapped out of your sessions.' : 'Rollouts and hollow holds stay out until last.'} ${dr.pf === 'yes' || dr.timing === 'pp0' ? 'Impact work is swapped for low-impact.' : ''} <button class="btn sm" data-go="recover:rehab">See the full path</button></p>`
+        : `<p class="small muted" style="margin:2px 0 0">A gap or soft ridge down the middle of the abdomen, common after pregnancy and also seen with heavy straining or weight changes. To check: lie on your back with knees bent, lift your head, and feel above and below the navel for how many fingers fit between the muscles.</p>`}</div>`;
+    h = `<div class="card">${regPills}
+        <div class="inj-grid">${reg[2].filter(id => id !== 'diastasis').map(id => row(INJURY[id])).join('')}</div>${abs}
+        <p class="small muted${reg[0] === 'core' && dr ? ' wide-only' : ''}" style="margin:8px 0 0"><b>Weak</b> adds prehab. <b>Recovering</b> adds a rehab path and swaps out what strains the area. <b>Painful now</b> also removes impact; get it assessed.</p></div>`;
   } else if (sub === 'schedule') {
     h = `<div class="cols two"><div class="card"><span class="small muted">Training days</span>
         <div class="days" style="margin:3px 0 10px">${DAYS.map((d, i) => `<label><input type="checkbox" data-k="day.${i}"${P.days.includes(i) ? ' checked' : ''}>${d}</label>`).join('')}</div>
@@ -2716,6 +2891,7 @@ document.addEventListener('click', e => {
   const rl = t.closest('[data-rail]'); if (rl) { VIEW.rail = rl.dataset.rail; return renderPaths(); }
   const mc = t.closest('[data-macro]'); if (mc) { VIEW.macro = mc.dataset.macro; return renderFuel(); }
   const mi = t.closest('[data-micro]'); if (mi) { VIEW.micro = mi.dataset.micro; VIEW.sub.fuel = 'micros'; return renderFuel(); }
+  const rg = t.closest('[data-reg]'); if (rg) { VIEW.reg = rg.dataset.reg; return renderSetup(); }
   const ij = t.closest('[data-inj]'); if (ij) { VIEW.inj = ij.dataset.inj; return renderRecover(); }
   const b = t.closest('[data-act]'); if (!b) return;
   const act = b.dataset.act;
