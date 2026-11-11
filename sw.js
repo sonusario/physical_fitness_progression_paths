@@ -1,6 +1,6 @@
 // Offline support: serve the cached copy first, refresh it in the background,
 // and tell open pages when a newer build of the app has arrived.
-const CACHE = 'fpp-v1';
+const CACHE = 'fpp-v2';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png'];
 const buildOf = text => { const m = /APP_BUILD = ['"]([^'"]*)['"]/.exec(text || ''); return m ? m[1] : ''; };
 const ONE = { ignoreSearch: true, ignoreVary: true };
