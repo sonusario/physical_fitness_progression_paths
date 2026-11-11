@@ -16,8 +16,8 @@ It is a single-file progressive web app with no build step, and it works offline
   - the prehab that suits the sport.
 - **Body.** Sex, age, height, weight, optional body fat and heart rates, daily activity, and units (metric or imperial).
 - **Conditioning.** Your training age, plus your latest test results. These include a 5 km run, bike FTP, 400 m swim, 2 km erg, 30-15 IFT, squat and trap-bar 1RM, pull-ups, push-ups, single-leg squats, broad jump, CMJ, 20 m sprint, calf raises, side plank and single-leg bridge. Results set your stage on each path, or you can set a stage yourself.
-- **Injuries and weak areas.** 12 regions, each marked as fine, weak, recovering or painful now, with a rehab phase for recovering areas.
-- **Split abs (diastasis recti).** Gap width, timing (including postpartum), doming on effort and pelvic floor symptoms. These place you in one of three phases (Reconnect, Rebuild, Reload), swap out planks, rollouts and hollow holds until you are ready for them, and switch to low-impact work where needed.
+- **Injuries and weak areas.** 34 conditions grouped by body region: foot and ankle, lower leg, knee, hip and thigh, core and back, shoulder and arm, neck and head. Each is marked as fine, weak, recovering or painful now, with a rehab phase for recovering areas. They range from tendon and muscle strains to stiff ankles, bone stress injuries, knee ligament and meniscus returns, sciatica, shoulder instability, finger pulleys and a graded return after concussion.
+- **Split abs (diastasis recti).** Under Core and back. Gap width, timing (including postpartum), doming on effort and pelvic floor symptoms place you in one of three phases (Reconnect, Rebuild, Reload), swap out planks, rollouts and hollow holds until you are ready for them, and switch to low-impact work where needed.
 - **Schedule.** Training days, session length, whether two sessions a day are possible, usual start time, wake time, sleep target, meals a day, equipment and pull-up bar, eating style, and the plan start date.
 - **Quick starts.** Fill several of these at once (new to training, returning, busy, committed, full-time, masters).
 
@@ -49,7 +49,7 @@ A first visit opens **Setup** with the athlete type and quick start. Every later
   - Micros: twelve vitamins and minerals athletes run short on, with your target, best foods, absorption tips, and a flag where your sport, sex or diet raises the risk.
   - Supplements: the few with good evidence.
 - **Recover.** Your sleep window, the recovery built into the plan, recovery methods ranked by evidence, injury and split abs remediation with a pain-monitoring rule, and warning signs.
-- **Setup.** Athlete, body, conditioning, injuries, split abs, schedule and data, with a one-line summary of the plan that updates as you change things.
+- **Setup.** Athlete, body, conditioning, injuries (by body region), schedule and data, with a one-line summary of the plan that updates as you change things.
 
 ## How the plan is built
 
