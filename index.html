@@ -47,6 +47,13 @@ h2 { font-size: 18px; } h3 { font-size: 15px; } h4 { font-size: 14px; }
 p { margin: 0 0 8px; }
 ul { margin: 0 0 8px; padding-left: 18px; }
 .muted { color: var(--muted); }
+/* Scrollbars match the theme; scrolling happens inside panes, never the page. */
+* { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--muted); }
+::-webkit-scrollbar-corner { background: transparent; }
 .small { font-size: 13px; }
 
 /* ---------- Shell: one screen, no page scrolling ---------- */
@@ -57,7 +64,7 @@ header.top h1 { font-size: 16px; margin: 0; flex: 1; min-width: 0; white-space: 
 .iconbtn { border: 0; background: transparent; color: var(--muted); border-radius: 8px; padding: 5px 8px; font: inherit; font-size: 13px; cursor: pointer; }
 .iconbtn:hover { background: var(--panel-2); color: var(--text); }
 nav.main { grid-area: nav; display: flex; background: var(--panel); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
-nav.main button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 10px 2px 9px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border-top: 3px solid transparent; }
+nav.main button { flex: 1 1 0; min-width: 0; border: 0; background: transparent; color: var(--muted); padding: 10px 0 9px; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; border-top: 3px solid transparent; white-space: nowrap; }
 nav.main button[aria-selected="true"] { color: var(--accent); border-top-color: var(--accent); }
 main { grid-area: main; min-height: 0; min-width: 0; padding: 10px 16px; max-width: 1200px; width: 100%; margin: 0 auto; }
 @media (min-width: 860px) {
@@ -66,7 +73,7 @@ main { grid-area: main; min-height: 0; min-width: 0; padding: 10px 16px; max-wid
   header.top h1 { flex: none; }
   header.top .tools { display: none; }
   nav.main { border-top: 0; border-bottom: 1px solid var(--line); gap: 2px; align-items: stretch; }
-  nav.main button { flex: none; padding: 0 14px; font-size: 14px; border-top: 0; border-bottom: 3px solid transparent; }
+  nav.main button { flex: none; padding: 0 12px; font-size: 14px; border-top: 0; border-bottom: 3px solid transparent; }
   nav.main button[aria-selected="true"] { border-bottom-color: var(--accent); }
   .tools.wide { grid-area: tools; display: flex; align-items: center; padding: 0 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
   main { padding: 14px 20px 16px; }
@@ -141,7 +148,7 @@ td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space:
 .kpi span { font-size: 12px; color: var(--muted); }
 
 /* ---------- Today ---------- */
-.today { height: 100%; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+.today { height: 100%; display: grid; gap: 8px 10px; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; }
 .today > * { min-width: 0; }
 .ready { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 .ready .q { font-weight: 700; margin-right: 2px; }
@@ -178,10 +185,11 @@ details.blk li details > div { padding: 0 0 4px 14px; color: var(--muted); }
 .dots i { flex: 1; height: 8px; border-radius: 999px; background: var(--line); }
 .dots i.now { outline: 2px solid var(--text); outline-offset: 1px; }
 @media (min-width: 860px) {
-  .today { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .today { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr); }
   .today .ready { grid-column: 2; grid-row: 1; }
-  .today .sesswrap { grid-column: 1; grid-row: 1 / span 2; }
-  .today .tiles { grid-column: 2; grid-row: 2; align-content: start; }
+  .today .nowbar { grid-column: 2; grid-row: 2; }
+  .today .sesswrap { grid-column: 1; grid-row: 1 / span 3; }
+  .today .tiles { grid-column: 2; grid-row: 3; align-content: start; min-height: 0; overflow-y: auto; }
   .tile { padding: 12px 14px; } .tile b { font-size: 24px; }
 }
 
@@ -197,7 +205,9 @@ details.blk li details > div { padding: 0 0 4px 14px; color: var(--muted); }
 .musc { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
 .musc div { display: flex; justify-content: space-between; align-items: center; background: var(--panel-2); border-radius: 8px; padding: 5px 10px; font-size: 13px; }
 .exp-list label { display: flex; gap: 8px; align-items: flex-start; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
-.exp-list label small { display: block; color: var(--muted); }
+.exp-list label small, .xrow small { display: block; color: var(--muted); }
+.xrow { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.xrow small { margin-top: 3px; }
 
 /* ---------- Paths ---------- */
 .railwrap { height: 100%; display: grid; gap: 10px; grid-template-rows: minmax(0, 1fr) auto; }
@@ -238,6 +248,74 @@ details.meal > summary .kc { font-size: 12px; color: var(--muted); white-space: 
 details.meal .mb { padding: 0 10px 8px; font-size: 13px; }
 .cover { display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0; }
 
+/* ---------- Time picker ---------- */
+.tp { display: flex; align-items: stretch; gap: 0; width: 100%; }
+.tp button { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); font: inherit; cursor: pointer; }
+.tp .tps { flex: none; width: 34px; font-weight: 700; color: var(--muted); }
+.tp .tps:first-child { border-radius: 8px 0 0 8px; } .tp .tps:last-child { border-radius: 0 8px 8px 0; }
+.tp .tpv { flex: 1; min-width: 0; border-left: 0; border-right: 0; padding: 5px 4px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tp button:hover { background: var(--accent-soft); }
+.tpgrid { display: grid; gap: 4px; margin: 4px 0 10px; }
+.tpgrid.h { grid-template-columns: repeat(6, 1fr); } .tpgrid.m { grid-template-columns: repeat(6, 1fr); }
+.tpgrid button, .seg button { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 8px; padding: 7px 0; font: inherit; font-weight: 600; cursor: pointer; font-variant-numeric: tabular-nums; }
+.tpgrid button.on, .seg button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.seg { display: inline-flex; gap: 4px; }
+.seg button { padding: 5px 14px; }
+.tpbig { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; margin: 0 0 6px; }
+.tpquick { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-bottom: 8px; }
+
+/* ---------- Day timeline ---------- */
+.nowbar { display: flex; align-items: center; gap: 8px; text-align: left; border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 12px; padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer; box-shadow: var(--shadow); min-width: 0; }
+.nowbar .k { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+.nowbar span.tx { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nowbar small { color: var(--muted); }
+.tl { position: relative; }
+details.ev { border-radius: 8px; }
+details.ev > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 52px 6px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 5px 6px; border-radius: 8px; }
+details.ev > summary::-webkit-details-marker { display: none; }
+details.ev > summary:hover { background: var(--panel-2); }
+details.ev time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; }
+details.ev .kb { align-self: stretch; border-radius: 3px; min-height: 18px; }
+details.ev .tt { font-weight: 600; font-size: 14px; min-width: 0; }
+details.ev .tt small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+details.ev .du { font-size: 12px; color: var(--muted); white-space: nowrap; }
+details.ev .eb { padding: 2px 8px 8px 72px; font-size: 13px; }
+details.ev .eb ol, details.ev .eb ul { margin: 2px 0 4px; padding-left: 18px; }
+details.ev.now > summary { background: var(--accent-soft); }
+details.ev.now time { color: var(--accent); font-weight: 700; }
+details.ev.past > summary { opacity: .6; }
+.k-sleep { background: var(--muted); } .k-wake, .k-med { background: var(--good); } .k-wind { background: var(--muted); opacity: .6; }
+.k-work { background: var(--line); } .k-break { background: var(--R); } .k-meal { background: var(--S); } .k-prep { background: color-mix(in srgb, var(--S) 45%, transparent); }
+.k-train { background: var(--E); }
+.legend { display: flex; gap: 4px 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 4px 0; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.legend i.ln { height: 2px; border-radius: 1px; vertical-align: 3px; width: 14px; }
+
+/* ---------- Charts ---------- */
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { font-size: 11px; fill: var(--muted); }
+.chart .grid line { stroke: var(--panel-2); stroke-width: 1; }
+.chart .axis { stroke: var(--line); stroke-width: 1; }
+.chart .hit { fill: transparent; }
+.chart [data-tip] { cursor: default; }
+.charts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.charts .card + .card { margin-top: 0; }
+.tip { position: fixed; z-index: 60; pointer-events: none; background: var(--text); color: var(--bg); font-size: 12px; padding: 5px 8px; border-radius: 8px; max-width: 240px; line-height: 1.35; }
+.bodyfig { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; max-width: 420px; margin: 0 auto; }
+.bodyfig svg { width: 100%; height: auto; }
+.ramp { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.ramp b { display: inline-block; width: 110px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, var(--panel-2)), var(--accent)); }
+.medn { border-left: 3px solid var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 6px 8px; margin: 4px 0; font-size: 13px; }
+.medn b { color: var(--warn); }
+.flag-med { color: var(--warn); font-weight: 700; }
+.chipbtn { cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; }
+.chipbtn.on { background: var(--bad-soft); color: var(--bad); border-color: var(--bad); text-decoration: line-through; }
+.avoid-grid { display: grid; gap: 8px 14px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.avoid-grid .grp { border-top: 1px solid var(--line); padding-top: 6px; }
+.avoid-grid .grp > div { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.medlist label { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.medlist label small { display: block; color: var(--muted); font-size: 12px; }
+
 dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); max-width: min(560px, calc(100vw - 32px)); padding: 18px; }
 dialog::backdrop { background: rgba(0,0,0,.45); }
 .about-log { list-style: none; padding: 0; margin: 0; font-size: 13px; max-height: 34vh; overflow-y: auto; }
@@ -261,19 +339,23 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
   </header>
   <nav class="main" role="tablist" id="tabs">
     <button data-tab="today" role="tab">Today</button>
+    <button data-tab="day" role="tab">Day</button>
     <button data-tab="week" role="tab">Week</button>
     <button data-tab="paths" role="tab">Paths</button>
     <button data-tab="fuel" role="tab">Fuel</button>
     <button data-tab="recover" role="tab">Recover</button>
+    <button data-tab="stats" role="tab">Stats</button>
     <button data-tab="setup" role="tab">Setup</button>
   </nav>
   <span class="tools wide"><button class="iconbtn" data-act="theme" title="Switch light or dark theme">Theme</button><button class="iconbtn" data-act="about">About</button></span>
   <main>
     <section id="today" class="panel"></section>
+    <section id="day" class="panel"><div class="subtabs" id="dayTabs"></div><div class="pane" id="dayPane"></div></section>
     <section id="week" class="panel"><div class="subtabs" id="weekTabs"></div><div class="pane" id="weekPane"></div></section>
     <section id="paths" class="panel"><div class="subtabs" id="pathsTabs"></div><div class="pane" id="pathsPane"></div></section>
     <section id="fuel" class="panel"><div class="subtabs" id="fuelTabs"></div><div class="pane" id="fuelPane"></div></section>
     <section id="recover" class="panel"><div class="subtabs" id="recoverTabs"></div><div class="pane" id="recoverPane"></div></section>
+    <section id="stats" class="panel"><div class="subtabs" id="statsTabs"></div><div class="pane" id="statsPane"></div></section>
     <section id="setup" class="panel"><div class="subtabs" id="setupTabs"></div><div class="live" id="setupLive"></div><div class="pane" id="setupPane"></div></section>
   </main>
 </div>
@@ -287,12 +369,14 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
   <ul class="about-log" id="aboutLog"><li class="muted">Loading changes…</li></ul>
   <div class="dlg-row"><button class="btn" id="aboutClose">Close</button></div>
 </dialog>
-<dialog id="ciDlg" aria-labelledby="ciTitle"><h2 id="ciTitle">Check-in details</h2><div id="ciBody"></div>
+<dialog id="ciDlg" aria-labelledby="ciTitle"><h2 id="ciTitle">Enter today's check-in</h2><div id="ciBody"></div>
   <div class="dlg-row"><button class="btn" data-act="ciClose">Cancel</button><button class="btn pri" data-act="checkin">Check in</button></div></dialog>
+ <dialog id="tpDlg" aria-labelledby="tpTitle"><h2 id="tpTitle">Pick a time</h2><div id="tpBody"></div>
+  <div class="dlg-row"><button class="btn" data-act="tpCancel">Cancel</button><button class="btn pri" data-act="tpDone">Set time</button></div></dialog>
 <input type="file" id="filePick" accept="application/json,.json" hidden>
 <script>
 'use strict';
-const APP_BUILD = '2.2 (2026.11.11)';
+const APP_BUILD = '2.3 (2026.11.11)';
 const REPO = 'sonusario/physical_fitness_progression_paths';
 
 // =============================================================================
@@ -1194,6 +1278,139 @@ const REGIONS = [
 ];
 
 // =============================================================================
+// Desk day: breaks and movement that run through a working day
+// =============================================================================
+// Focus and break lengths in minutes, and how often a longer break comes round.
+const RHYTHMS = {
+  '25/5': { f: 25, b: 5, long: 4, lb: 15, name: '25 min focus, 5 min break (Pomodoro)' },
+  '50/10': { f: 50, b: 10, long: 0, lb: 10, name: '50 min focus, 10 min break' },
+  '90/15': { f: 90, b: 15, long: 0, lb: 15, name: '90 min deep work, 15 min break' },
+  '28/2': { f: 28, b: 2, long: 3, lb: 8, name: 'Move every 30 min: 2 min breaks, a walk every 1.5 h' },
+};
+// id | name | minutes | kind | stress tags (injuries skip these) | how to do it
+const DESK = `
+eyes|20-20-20 eye break|1|micro||Look at something about 6 m (20 ft) away for 20 seconds and blink slowly a few times.
+breathe|Posture reset and slow breathing|1|micro||Sit or stand tall, shoulders down and back. Five slow breaths in through the nose, long breaths out.
+chin|Chin tucks|1|neck|neck|Slide your chin straight back to make a double chin, hold 3 s, 10 times. Undoes the forward head of screen work.
+neckside|Neck side stretch|1|neck|neck|Ear toward the shoulder, the other hand reaching for the floor, 20–30 s each side. Gentle, no bouncing.
+tspine|Seated thoracic rotations|1|upper|spine|Arms crossed on your chest, turn your upper body slowly side to side, 8 times each way, hips still.
+doorway|Doorway chest stretch|1|upper|shoulder|Forearms on a door frame at shoulder height, step through until the chest opens, 30 s.
+blades|Shoulder blade squeezes|1|upper||Squeeze the shoulder blades back and down, hold 5 s, 10 times. Band pull-aparts if you have a band.
+wrist|Wrist and forearm stretch|1|wrist|wrist|Arm straight, palm up then palm down, gently pull the fingers back, 20 s each way, each hand.
+hipflex|Standing hip flexor stretch|2|hips||Long split stance or half kneel, tuck the pelvis and squeeze the back glute, 30 s a side. Undoes hours of sitting.
+hinge|Hip hinges and glute squeezes|1|hips|spine|Hands on hips, hinge forward with a flat back and squeeze your glutes to stand tall, 10 times.
+squat|Chair squats|2|legs|knee|Sit to the chair edge and stand without your hands, 10–15 slow reps.
+calf|Calf raises|1|legs|ankle|Hold the desk, rise high on your toes and lower slowly, 15–20 reps.
+deskpush|Desk push-ups|1|upper|wrist shoulder|Hands on a sturdy desk edge, body straight, 8–15 reps.
+ankles|Ankle circles and toe raises|1|legs||Seated, circle each ankle 10 times each way, then lift your toes 15 times.
+walk|Walk|5|walk||Refill your water, take the stairs, or a lap outside. Daylight early in the day helps you sleep that night.
+snack|Exercise snack: brisk stairs or fast marching|2|snack|impact knee|One to two minutes of brisk stair climbing or fast marching on the spot, enough to breathe harder. Short bursts like this through the day add up.
+`.trim().split('\n').map(l => { const [id, name, mins, kind, tags, cue] = l.split('|'); return { id, name, mins: +mins, kind, tags: tags ? tags.split(' ') : [], cue }; });
+const DESK_EX = Object.fromEntries(DESK.map(x => [x.id, x]));
+// The order breaks rotate through: a mix of eyes, neck, upper back, hips and legs.
+const DESK_ROT = ['chin', 'hipflex', 'tspine', 'calf', 'wrist', 'squat', 'doorway', 'hinge', 'neckside', 'deskpush', 'blades', 'ankles'];
+
+// =============================================================================
+// Food groups you can leave out, and how to prepare each food
+// =============================================================================
+const FOOD_CATS = [
+  ['fish', 'Fish and seafood', ['salmon', 'tuna']],
+  ['red', 'Red meat', ['beef']],
+  ['poultry', 'Poultry', ['chicken', 'turkey']],
+  ['eggs', 'Eggs', ['eggs']],
+  ['dairy', 'Dairy', ['greek', 'milk', 'chocmilk', 'cottage', 'cheese', 'whey']],
+  ['soy', 'Soy', ['tofu', 'tempeh', 'soymilk']],
+  ['legumes', 'Beans, lentils and peas', ['lentils', 'blackbeans', 'chickpeas', 'hummus', 'peapro']],
+  ['peanut', 'Peanuts', ['pb']],
+  ['nuts', 'Tree nuts', ['almonds']],
+  ['gluten', 'Wheat and gluten', ['bread', 'bagel', 'tortilla', 'pasta', 'cereal', 'bar']],
+  ['grains', 'Rice, oats and other grains', ['oats', 'rice', 'brownrice', 'quinoa', 'ricecake']],
+  ['starch', 'Potatoes', ['potato', 'sweetpotato']],
+  ['fruit', 'Fruit', ['banana', 'apple', 'orange', 'berries', 'dates']],
+  ['sugar', 'Added sugar', ['honey', 'sportsdrink', 'chocmilk', 'bar']],
+  ['veg', 'Vegetables', ['broccoli', 'spinach', 'salad', 'mixedveg']],
+  ['fats', 'Oils and avocado', ['oil', 'avocado']],
+];
+const FOOD_CAT = Object.fromEntries(FOOD_CATS.map(c => [c[0], c]));
+// What a style itself never uses, so a swap never brings it back.
+const STYLE_EXCL = { veg: ['fish', 'red', 'poultry'], vegan: ['fish', 'red', 'poultry', 'eggs', 'dairy', 'honey'], df: ['dairy'], gf: ['gluten'] };
+// Swap candidates by role, in order of preference for light meals and for main meals.
+const SWAP = {
+  carbLight: ['oats', 'bread', 'bagel', 'banana', 'cereal', 'ricecake', 'dates', 'berries', 'apple', 'orange', 'potato', 'rice', 'sweetpotato'],
+  carbMain: ['rice', 'potato', 'quinoa', 'sweetpotato', 'pasta', 'brownrice', 'bread', 'tortilla', 'oats'],
+  protLight: ['greek', 'cottage', 'eggs', 'milk', 'soymilk', 'whey', 'peapro', 'tofu', 'turkey', 'chickpeas'],
+  protMain: ['chicken', 'turkey', 'tofu', 'tempeh', 'lentils', 'chickpeas', 'eggs', 'tuna', 'salmon', 'beef', 'blackbeans'],
+  veg: ['salad', 'mixedveg', 'broccoli', 'spinach'],
+  fat: ['oil', 'avocado', 'almonds', 'pb'],
+};
+// Minutes, how to prepare it, and whether one batch can cover the whole day.
+const PREP = {
+  oats: [5, 'Simmer with twice their volume of water or milk for 5 min, or microwave 2–3 min. Or soak overnight.'],
+  rice: [20, 'Rinse, then simmer 1 part rice to 1.5 parts water, covered, 15 min; rest 5 min. Or microwave a ready pouch 2 min.', true],
+  brownrice: [40, 'Simmer 1 part rice to 2 parts water, covered, about 40 min. Or microwave a ready pouch 2 min.', true],
+  pasta: [12, 'Boil in salted water 9–12 min, as the packet says, and drain.'],
+  quinoa: [15, 'Rinse, simmer 1 part quinoa to 2 parts water 15 min, rest 5 min.', true],
+  potato: [12, 'Prick and microwave 8–10 min, turning once (or bake 45 min at 200 °C / 400 °F).'],
+  sweetpotato: [12, 'Prick and microwave 6–8 min (or bake 40 min at 200 °C / 400 °F).'],
+  bread: [3, 'Toast if you like.'], bagel: [3, 'Slice and toast.'], tortilla: [1, 'Warm 30 s in a dry pan or microwave.'],
+  chicken: [20, 'Season, then pan-cook 6–7 min a side or bake at 200 °C / 400 °F for 20–25 min, until 74 °C / 165 °F inside.', true],
+  beef: [10, 'Brown in a hot pan 8–10 min, breaking it up, until no pink remains (71 °C / 160 °F).'],
+  salmon: [14, 'Bake 12–15 min at 200 °C / 400 °F, or pan-sear 4 min a side, to 63 °C / 145 °F.'],
+  tuna: [1, 'Drain the can.'], turkey: [0, ''],
+  eggs: [6, 'Scramble 3–4 min over medium-low heat, or boil 7–9 min.'],
+  tofu: [12, 'Press dry, cube, and pan-fry 8–10 min until golden.'],
+  tempeh: [10, 'Slice and pan-fry 4–5 min a side.'],
+  lentils: [25, 'Simmer rinsed dry lentils 20–25 min, or rinse and warm canned lentils 2 min.', true],
+  blackbeans: [2, 'Rinse canned beans and warm 2 min.'], chickpeas: [2, 'Rinse canned chickpeas; warm or roast if you like.'],
+  broccoli: [6, 'Steam or microwave with a splash of water 4–6 min.'], spinach: [2, 'Wilt in the pan 1–2 min, or serve raw.'],
+  salad: [5, 'Rinse and chop.'], mixedveg: [6, 'Microwave or stir-fry frozen vegetables 5–6 min.'],
+  whey: [1, 'Shake with water or milk.'], peapro: [1, 'Shake with water or soy milk.'], avocado: [1, 'Halve and scoop.'],
+  berries: [1, 'Rinse.'],
+};
+
+// =============================================================================
+// Medicines: general cautions where a medicine meets food, caffeine or exercise
+// =============================================================================
+// Informational only. Each note has a place: caffeine (the caffeine suggestion),
+// supp (other supplements), fuel (the day's eating), food (named foods in meals),
+// hr (heart-rate zones), impact (jumps, sprints, heavy tendon loading), long (long
+// or hot sessions), train (any training day), wake (a reminder on waking).
+const MEDS = [
+  { id: 'stim', name: 'Stimulant ADHD medicine', ex: 'Amphetamine salts, lisdexamfetamine, methylphenidate',
+    caffeine: 'Caffeine adds to a stimulant’s effect on heart rate, blood pressure, jitters and sleep. Consider skipping the pre-session caffeine, or ask your prescriber what is sensible for you.',
+    fuel: 'Stimulants blunt appetite, so the fuel targets are easy to miss. Eat by the clock rather than by hunger, and keep easy foods (milk, yogurt, bananas) on hand for when the dose wears off.',
+    long: 'Stimulants raise heat strain. Drink regularly and ease off long or hard sessions in hot weather.' },
+  { id: 'beta', name: 'Beta-blocker', ex: 'Metoprolol, propranolol, atenolol, bisoprolol',
+    hr: 'Beta-blockers hold your heart rate down, so the heart-rate zones here will read low. Train by effort (RPE, talk test) instead.' },
+  { id: 'warfarin', name: 'Warfarin', ex: 'Vitamin K antagonists',
+    food: [['spinach', 'broccoli', 'salad'], 'Keep vitamin K foods (leafy greens, broccoli) steady from week to week rather than cutting them out; sudden changes shift your INR.'],
+    supp: 'High-dose fish oil and several other supplements can add to bleeding risk. Check with your clinic before starting any.',
+    impact: 'Bleeding risk: take care with falls, contact and collision.' },
+  { id: 'maoi', name: 'MAOI antidepressant', ex: 'Phenelzine, tranylcypromine, isocarboxazid',
+    food: [['cheese', 'tempeh'], 'Aged cheese and fermented foods such as tempeh are high in tyramine, which can cause a dangerous rise in blood pressure with an MAOI.'],
+    caffeine: 'Caffeine and stimulant pre-workouts can raise blood pressure with an MAOI. Avoid stimulant pre-workouts and ask before using caffeine.' },
+  { id: 'ssri', name: 'SSRI or SNRI antidepressant', ex: 'Sertraline, fluoxetine, escitalopram, venlafaxine',
+    long: 'These can lower blood sodium, more so with large amounts of plain water. On long sessions, drink to thirst and include sodium rather than forcing fluid.' },
+  { id: 'insulin', name: 'Insulin or a sulfonylurea', ex: 'Insulin, gliclazide, glipizide, glimepiride',
+    train: 'Exercise lowers blood glucose during and for hours after. Check before, during long sessions and after; carry fast carbohydrate (dates, sports drink); and agree dose changes with your care team.',
+    fuel: 'Keep carbohydrate timing consistent around sessions. The lower-carbohydrate rest days here may need changing with your care team.' },
+  { id: 'levo', name: 'Levothyroxine', ex: 'Thyroid hormone tablets',
+    food: [['milk', 'greek', 'cottage', 'cheese', 'chocmilk', 'soymilk', 'tofu', 'cereal'], 'Calcium, iron, soy and fortified foods within about 4 hours of the dose cut how much you absorb.'],
+    wake: 'Take levothyroxine with water on waking, 30–60 min before breakfast or coffee.' },
+  { id: 'abx', name: 'Tetracycline or quinolone antibiotic', ex: 'Doxycycline, minocycline, ciprofloxacin, levofloxacin',
+    food: [['milk', 'greek', 'cottage', 'cheese', 'chocmilk', 'soymilk', 'cereal', 'tofu'], 'Dairy, calcium and fortified foods bind these antibiotics. Space them from the dose as the label says (often 2–6 hours).'],
+    supp: 'Iron, magnesium, zinc and calcium supplements also bind them; space them the same way.',
+    impact: 'Quinolones raise the risk of tendon injury, the Achilles most of all. Hold off on jumps, sprints and heavy calf work during the course and for some weeks after.' },
+  { id: 'statin', name: 'Statin', ex: 'Atorvastatin, simvastatin, rosuvastatin',
+    train: 'Report unexplained muscle pain, weakness or dark urine, especially after starting harder training; it can be a statin side effect, not normal soreness.' },
+  { id: 'lithium', name: 'Lithium or a diuretic', ex: 'Lithium; hydrochlorothiazide, furosemide',
+    long: 'Heavy sweating shifts fluid and salt balance, which these medicines are sensitive to (lithium levels can rise). Drink steadily, keep salt intake consistent, and take care in heat.' },
+  { id: 'potassium', name: 'ACE inhibitor, ARB or spironolactone', ex: 'Lisinopril, ramipril, losartan, spironolactone',
+    food: [['banana', 'potato', 'sweetpotato', 'dates', 'orange'], 'These can raise blood potassium. Ordinary fruit and potatoes are usually fine, but avoid potassium supplements and salt substitutes unless prescribed.'] },
+];
+const MED = Object.fromEntries(MEDS.map(x => [x.id, x]));
+
+// =============================================================================
 // Profile: everything the person enters. Stored in this browser only.
 // =============================================================================
 const STORE_KEY = 'fpp:profile';
@@ -1206,6 +1423,8 @@ const DEFAULTS = () => ({
   trainAge: 2, tests: {}, testLog: [], override: { E: 0, S: 0, P: 0, R: 0 }, inj: {},
   days: [0, 1, 3, 5], minutes: 60, doubles: false, sessionTime: '17:30', wake: '06:30', sleep: 8.5, meals: 4, life: 1,
   equip: 2, bar: true, diet: 'omni', mealSeed: 0, planStart: isoDate(mondayOf(new Date())), swaps: {}, checkin: null,
+  desk: true, workDays: [0, 1, 2, 3, 4], workStart: '09:00', workEnd: '17:00', rhythm: '50/10', standDesk: false,
+  avoidFoods: [], avoidCats: [], meds: [], ciLog: [], bodyLog: [], stageLog: [],
 });
 let P = load();
 function load() {
@@ -1242,8 +1461,38 @@ function sanitize(p) {
   p.mealSeed = Number.isInteger(p.mealSeed) ? p.mealSeed : 0;
   if (!/^\d\d:\d\d$/.test(p.sessionTime)) p.sessionTime = d.sessionTime;
   if (!/^\d\d:\d\d$/.test(p.wake)) p.wake = d.wake;
+  for (const k of ['workStart', 'workEnd']) if (!/^\d\d:\d\d$/.test(p[k])) p[k] = d[k];
+  if (toMin(p.workEnd) <= toMin(p.workStart)) p.workEnd = hm(toMin(p.workStart) + 60);
+  if (!RHYTHMS[p.rhythm]) p.rhythm = d.rhythm;
+  p.desk = p.desk !== false; p.standDesk = !!p.standDesk;
+  if (!Array.isArray(p.workDays)) p.workDays = d.workDays;
+  p.workDays = [...new Set(p.workDays.filter(x => Number.isInteger(x) && x >= 0 && x < 7))].sort((a, b) => a - b);
+  p.avoidFoods = Array.isArray(p.avoidFoods) ? [...new Set(p.avoidFoods.filter(x => FOOD[x]))] : [];
+  p.avoidCats = Array.isArray(p.avoidCats) ? [...new Set(p.avoidCats.filter(x => FOOD_CAT[x]))] : [];
+  p.meds = Array.isArray(p.meds) ? [...new Set(p.meds.filter(x => MED[x]))] : [];
+  const dated = (a, ok) => (Array.isArray(a) ? a : []).filter(r => r && parseDate(r.date) && ok(r)).sort((x, y) => x.date < y.date ? -1 : x.date > y.date ? 1 : 0);
+  p.ciLog = dated(p.ciLog, r => ['good', 'warn', 'bad'].includes(r.level)).slice(-400);
+  p.bodyLog = dated(p.bodyLog, r => isFinite(+r.w) && +r.w >= 30 && +r.w <= 200).slice(-400);
+  p.stageLog = dated(p.stageLog, r => ['E', 'S', 'P', 'R'].every(q => r[q] >= 1 && r[q] <= 6)).slice(-200);
+  // Older saves kept only today's check-in: carry it into the log.
+  if (p.checkin && parseDate(p.checkin.date) && !p.ciLog.some(r => r.date === p.checkin.date)) p.ciLog.push(ciRecord(p.checkin, p));
+  if (!p.bodyLog.length) p.bodyLog.push({ date: isoDate(new Date()), w: p.weight });
   return p;
 }
+// One row of check-in history: the readiness it worked out, and what went into it.
+function ciRecord(ci, p = P) {
+  const r = readiness(ci, p);
+  const row = { date: ci.date, level: r.level, score: r.score };
+  if (ci.quick) row.quick = true;
+  else for (const k of ['sleep', 'sore', 'energy', 'stress', 'rhrUp']) if (isFinite(+ci[k])) row[k] = +ci[k];
+  return row;
+}
+function logCheckin(ci) {
+  P.ciLog = P.ciLog.filter(r => r.date !== (ci?.date || isoDate(new Date())));
+  if (ci) P.ciLog.push(ciRecord(ci));
+  P.ciLog.sort((x, y) => x.date < y.date ? -1 : 1);
+}
+function upsertDated(arr, row) { const i = arr.findIndex(r => r.date === row.date); if (i >= 0) arr[i] = row; else { arr.push(row); arr.sort((x, y) => x.date < y.date ? -1 : 1); } }
 function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(P)); } catch (e) { /* storage unavailable */ } }
 
 // =============================================================================
@@ -1362,10 +1611,15 @@ function buildModel() {
   const cap = Math.min(m.stage.S, m.stage.R) + 1;
   if (!P.override.P && m.stage.P > cap) { m.info.P.held = m.stage.P; m.info.P.stage = m.stage.P = cap; m.info.P.src = 'held until strength and resilience catch up'; }
   m.bw = P.weight;
-  const start = parseDate(P.planStart) || mondayOf(new Date());
+  // Weeks run Monday to Sunday, from the week the plan starts in. Count whole days,
+  // not milliseconds, so a daylight-saving change never loses a week.
+  const start = mondayOf(parseDate(P.planStart) || new Date()), today = new Date();
   m.planStart = start;
-  m.todayWeek = Math.max(1, Math.floor((mondayOf(new Date()) - start) / 6048e5) + 1);
-  m.todayIdx = (new Date().getDay() + 6) % 7;
+  const days = Math.round((new Date(today.getFullYear(), today.getMonth(), today.getDate()) - start) / 864e5);
+  m.notStarted = days < 0;
+  m.startsIn = Math.max(0, Math.round((parseDate(P.planStart) - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 864e5));
+  m.todayWeek = Math.max(1, Math.floor(days / 7) + 1);
+  m.todayIdx = (today.getDay() + 6) % 7;
   return m;
 }
 
@@ -1953,14 +2207,14 @@ function fillCoverage(days, m, wk) {
 // =============================================================================
 // Readiness: today's check-in adjusts today's session.
 // =============================================================================
-function readiness(ci) {
+function readiness(ci, p = P) {
   if (!ci) return null;
   if (ci.quick) return { score: null, level: ci.quick, reasons: [] };
   const reasons = [];
   let score = 0;
-  const ratio = (+ci.sleep || 0) / P.sleep;
+  const ratio = (+ci.sleep || 0) / p.sleep;
   score += ratio >= 0.95 ? 25 : ratio >= 0.85 ? 18 : ratio >= 0.7 ? 10 : 3;
-  if (ratio < 0.85) reasons.push(`short sleep (${ci.sleep} h of ${P.sleep} h)`);
+  if (ratio < 0.85) reasons.push(`short sleep (${ci.sleep} h of ${p.sleep} h)`);
   score += [25, 20, 14, 7, 2][clamp(ci.sore, 1, 5) - 1];
   if (ci.sore >= 4) reasons.push('heavy soreness');
   score += [2, 7, 14, 20, 25][clamp(ci.energy, 1, 5) - 1];
@@ -2055,38 +2309,61 @@ function fuelFor(d, m) {
   const ea = (kcal - L.kcal) / ffm;
   return { kcal: Math.round(kcal), C: Math.round(C), Pr: Math.round(Pr), F: Math.round(F), cpk, ppk, water: Math.round((0.035 * kg + 0.6 * (trainMin / 60)) * 10) / 10, L, ea: Math.round(ea), base: Math.round(base) };
 }
-function sessionTimes(d) {
+function sessionTimes(d, sessions) {
   const times = [];
   const wake = toMin(P.wake);
-  d.sessions.forEach((s, i) => {
+  (sessions || d.sessions).forEach((s, i) => {
     let start = toMin(P.sessionTime);
     if (s.slot === 'AM') start = Math.min(wake + 75, 9 * 60);
     if (s.slot === 'PM') start = Math.max(toMin(P.sessionTime), Math.min(wake + 75, 9 * 60) + 6 * 60);
+    // A start before waking can't happen: move it to just after.
+    if (start < wake + 10 && start > wake - 6 * 60) start = wake + 10;
     times.push({ s, start, end: start + (s.minutes || 45) });
   });
   return times;
 }
 // A flexible meal plan around the day's sessions.
-function mealPlan(d, f) {
-  const wake = toMin(P.wake), bed = wake + 24 * 60 - Math.round(P.sleep * 60);
-  const ses = sessionTimes(d);
+function mealPlan(d, f, sessions) {
+  // Times count minutes from midnight on the day you wake; nothing is eaten before you are up.
+  const wake = toMin(P.wake), bed = wake + 24 * 60 - Math.round(P.sleep * 60), first = wake + 10;
+  const ses = sessionTimes(d, sessions);
   const ev = [];
-  ev.push({ t: wake + 30, name: 'Breakfast', w: 1.2, main: true });
-  ev.push({ t: 12 * 60 + 30, name: 'Lunch', w: 1.2, main: true });
+  // Breakfast half an hour after waking, unless a session starts within the hour
+  // after that: then it waits and becomes the recovery meal.
+  let bt = wake + 30;
+  const early = ses.find(x => bt > x.start - 60 && bt < x.end);
+  if (early) bt = early.end + 30;
+  ev.push({ t: bt, name: 'Breakfast', w: 1.2, main: true });
+  ev.push({ t: Math.max(12 * 60 + 30, bt + 180), name: 'Lunch', w: 1.2, main: true });
   ev.push({ t: Math.min(19 * 60, bed - 150), name: 'Dinner', w: 1.2, main: true });
   for (const x of ses) {
-    ev.push({ t: x.start - 75, name: 'Pre-session snack', w: 0.9, pre: true, s: x.s });
+    const gap = x.start - wake;
+    // Under 20 minutes from waking there is no time to eat first; under an hour, a small bite.
+    if (gap >= 20) ev.push({ t: Math.max(first, x.start - 75), name: gap < 75 ? 'Quick bite before training' : 'Pre-session snack', w: gap < 75 ? 0.5 : 0.9, pre: true, s: x.s });
     ev.push({ t: x.end + 30, name: 'Recovery meal or snack', w: 1.6, post: true, s: x.s });
   }
   if (P.meals >= 4) ev.push({ t: bed - 60, name: 'Pre-sleep protein', w: 0.4, sleep: true });
-  ev.sort((a, b) => a.t - b.t);
+  ev.sort((a, b) => a.t - b.t || (b.main ? 1 : 0) - (a.main ? 1 : 0));
   // Merge anything within 75 minutes of a main meal into it.
   const out = [];
   for (const e of ev) {
     const near = out.find(o => Math.abs(o.t - e.t) < 75);
-    if (near) { near.w += e.w * 0.5; near.pre = near.pre || e.pre; near.post = near.post || e.post; if (e.post) near.name = near.main ? `${near.name} (recovery meal)` : e.name; if (e.post || e.pre) near.t = e.post ? Math.max(near.t, e.t) : Math.min(near.t, e.t); continue; }
+    if (near) {
+      near.w += e.w * 0.5; near.pre = near.pre || e.pre; near.post = near.post || e.post;
+      if (e.main && !near.main) { near.name = near.post ? `${e.name} (recovery meal)` : e.name; near.main = true; }
+      else if (e.post) near.name = near.main ? `${near.name} (recovery meal)` : e.name;
+      if (e.post || e.pre) near.t = e.post ? Math.max(near.t, e.t) : Math.min(near.t, e.t);
+      continue;
+    }
     out.push({ ...e });
   }
+  // Never before waking, and never in the middle of a session.
+  for (const o of out) {
+    if (o.t < first) o.t = first;
+    const inSes = ses.find(x => o.t > x.start - 10 && o.t < x.end);
+    if (inSes && !o.post) o.t = o.pre ? Math.max(first, inSes.start - 15) : inSes.end + 20;
+  }
+  out.sort((a, b) => a.t - b.t);
   // Match the number of eating times the person wants.
   while (out.length > P.meals) {
     const drop = out.filter(o => !o.main && !o.post).sort((a, b) => a.w - b.w)[0] || out.filter(o => !o.post).sort((a, b) => a.w - b.w)[0];
@@ -2115,19 +2392,53 @@ function slotType(name) {
   if (/^Breakfast/.test(name)) return 'b';
   if (/^Lunch/.test(name)) return 'l';
   if (/^Dinner/.test(name)) return 'd';
-  if (/^Pre-session/.test(name)) return 'pre';
+  if (/^(Pre-session|Quick bite)/.test(name)) return 'pre';
   if (/^Recovery/.test(name)) return 'post';
   if (/^Pre-sleep/.test(name)) return 'sleep';
   return 's';
 }
-function buildMeals(d, f, styleId, seed) {
+// Foods left out: single foods plus whole groups.
+function blockedFoods() {
+  const b = new Set(P.avoidFoods);
+  for (const c of P.avoidCats) for (const id of FOOD_CAT[c][2]) b.add(id);
+  return b;
+}
+function styleBlocked(styleId) {
+  const b = blockedFoods();
+  for (const c of STYLE_EXCL[styleId] || []) if (FOOD_CAT[c]) FOOD_CAT[c][2].forEach(id => b.add(id)); else b.add(c);
+  return b;
+}
+// A meal option with left-out foods swapped for the nearest food that is allowed.
+function cleanOpt(opt, type, st, BLK) {
+  const light = !/^(l|d)$/.test(type);
+  const own = role => [...new Set(Object.values(st).flatMap(v => Array.isArray(v) ? v.map(o => o && o[role]).filter(Boolean) : []))];
+  const pick = (id, list) => list.find(x => x !== id && !BLK.has(x)) || null;
+  const swaps = [];
+  let carb = opt.carb, prot = opt.prot;
+  if (carb && BLK.has(carb)) { const to = pick(carb, [...(light ? SWAP.carbLight : SWAP.carbMain), ...own('carb')]); swaps.push([carb, to]); carb = to; }
+  if (prot && BLK.has(prot)) { const to = pick(prot, [...own('prot').filter(x => (light ? SWAP.protLight : SWAP.protMain).includes(x)), ...(light ? SWAP.protLight : SWAP.protMain), ...own('prot')]); swaps.push([prot, to]); prot = to; }
+  const extras = [];
+  for (const [id, u] of opt.extras) {
+    if (!BLK.has(id)) { extras.push([id, u]); continue; }
+    const to = SWAP.veg.includes(id) ? pick(id, SWAP.veg) : FOOD_CATS.find(c => c[0] === 'fruit')[2].includes(id) ? pick(id, ['banana', 'apple', 'orange', 'berries']) : null;
+    swaps.push([id, to]);
+    if (to && to !== carb && to !== prot && !extras.some(e => e[0] === to)) extras.push([to, u]);
+  }
+  return { dish: opt.dish, carb, prot, extras, swaps };
+}
+function buildMeals(d, f, styleId, seed, sessions) {
   const st = STYLES[styleId] || STYLES.omni;
-  const slots = mealPlan(d, f);
+  const BLK = styleBlocked(styleId);
+  const fatPool = list => { const a = list.filter(x => !BLK.has(x)); return a.length ? a : SWAP.fat.filter(x => !BLK.has(x)); };
+  const stFat = fatPool(st.fat), stTop = st.top.filter(x => !BLK.has(x));
+  const slots = mealPlan(d, f, sessions);
   const sumC = slots.reduce((a, x) => a + x.carbs, 0) || 1, sumP = slots.reduce((a, x) => a + x.protein, 0) || 1;
   const sumOf = items => { const t = { kcal: 0, c: 0, p: 0, f: 0, fib: 0 }; for (const [id, u] of items) for (const k in t) t[k] += FOOD[id].u[k] * u; return t; };
   const built = slots.map((slot, i) => {
     const type = slotType(slot.name), opts = st[type];
-    const opt = opts[(seed + d.idx + i) % opts.length];
+    // Prefer an option with nothing left out; otherwise swap foods in the usual one.
+    const clean = opts.filter(o => ![o.carb, o.prot, ...o.extras.map(e => e[0])].some(x => x && BLK.has(x)));
+    const opt = clean.length ? { ...clean[(seed + d.idx + i) % clean.length], swaps: [] } : cleanOpt(opts[(seed + d.idx + i) % opts.length], type, st, BLK);
     const items = new Map(opt.extras.map(([id, u]) => [id, u]));
     const tot = () => { const t = { kcal: 0, c: 0, p: 0, f: 0, fib: 0 }; for (const [id, u] of items) for (const k in t) t[k] += FOOD[id].u[k] * u; return t; };
     const t0 = tot();
@@ -2144,7 +2455,7 @@ function buildMeals(d, f, styleId, seed) {
     if (cf) items.set(cf.id, (items.get(cf.id) || 0) + a);
     if (pf) items.set(pf.id, (items.get(pf.id) || 0) + b);
     // Still short on carbohydrate: add fruit, bread or honey.
-    for (const id of st.top) {
+    for (const id of stTop) {
       const short = slot.carbs - tot().c;
       if (short < 18 || type === 'sleep') break;
       if (items.has(id)) continue;
@@ -2153,8 +2464,8 @@ function buildMeals(d, f, styleId, seed) {
     // Fat fills what is left of the slot's share.
     const share = (slot.carbs / sumC + slot.protein / sumP) / 2;
     const shortF = f.F * share - tot().f;
-    if (shortF > 6 && type !== 'pre' && type !== 'sleep') {
-      const nuts = st.fat.filter(x => x === 'almonds' || x === 'pb'), soft = nuts.length ? nuts : st.fat.filter(x => x !== 'oil'), pool = /^(b|s|post)$/.test(type) && soft.length ? soft : st.fat;
+    if (shortF > 6 && type !== 'pre' && type !== 'sleep' && stFat.length) {
+      const nuts = stFat.filter(x => x === 'almonds' || x === 'pb'), soft = nuts.length ? nuts : stFat.filter(x => x !== 'oil'), pool = /^(b|s|post)$/.test(type) && soft.length ? soft : stFat;
       const id = pool[i % pool.length];
       items.set(id, (items.get(id) || 0) + clamp(half(shortF / FOOD[id].u.f), 0.5, FOOD[id].max));
     }
@@ -2164,9 +2475,9 @@ function buildMeals(d, f, styleId, seed) {
   // what is left of the day's calories, a half portion at a time, biggest meals first.
   const day = () => built.reduce((a, x) => { const t = sumOf(x.items); a.kcal += t.kcal; a.f += t.f; return a; }, { kcal: 0, f: 0 });
   const mains = built.filter(x => /^(l|d|b)$/.test(x.type)).sort((x, y) => y.slot.carbs - x.slot.carbs);
-  for (let n = 0; n < 12 && mains.length; n++) {
+  for (let n = 0; n < 12 && mains.length && stFat.length; n++) {
     const t = day(), x = mains[n % mains.length];
-    const pool = x.type === 'b' ? st.fat.filter(id => id !== 'oil') : st.fat, id = (pool.length ? pool : st.fat)[n % (pool.length || st.fat.length)], fd = FOOD[id];
+    const pool = x.type === 'b' ? stFat.filter(id => id !== 'oil') : stFat, id = (pool.length ? pool : stFat)[n % (pool.length || stFat.length)], fd = FOOD[id];
     if (t.f + fd.u.f / 4 > f.F || t.kcal + fd.u.kcal / 4 > f.kcal) { if (n >= mains.length * 2) break; continue; }
     if ((x.items.get(id) || 0) + 0.5 > fd.max) continue;
     x.items.set(id, (x.items.get(id) || 0) + 0.5);
@@ -2174,7 +2485,7 @@ function buildMeals(d, f, styleId, seed) {
   return built.map(({ slot, type, opt, items }) => {
     for (const [id, u] of items) if (WHOLE_FOODS.has(id) && u % 1) items.set(id, Math.ceil(u));
     const t = sumOf(items);
-    return { time: slot.time, name: slot.name, type, dish: opt.dish, tip: slot.tip, items: [...items].map(([id, u]) => ({ id, u, g: Math.round(FOOD[id].g * u / 5) * 5 })),
+    return { time: slot.time, name: slot.name, type, dish: opt.dish, swaps: opt.swaps || [], tip: slot.tip, items: [...items].map(([id, u]) => ({ id, u, g: Math.round(FOOD[id].g * u / 5) * 5 })),
       kcal: Math.round(t.kcal), c: Math.round(t.c), p: Math.round(t.p), f: Math.round(t.f), fib: Math.round(t.fib), target: slot };
   });
 }
@@ -2193,6 +2504,205 @@ function microCover(meals) {
   const n = Object.fromEntries(Object.keys(MICRO_NAME).map(k => [k, 0]));
   for (const m of meals) for (const it of m.items) for (const r of FOOD[it.id].rich) n[r] += 1;
   return n;
+}
+
+// Prep steps for each meal. Foods that cook in one batch for the whole day are
+// cooked once, at the first meal that uses them, and reheated after that.
+const capFirst = t => t.charAt(0).toUpperCase() + t.slice(1);
+function mealPrep(meals) {
+  const uses = {};
+  meals.forEach(ml => ml.items.forEach(it => { if (PREP[it.id]?.[2]) (uses[it.id] = uses[it.id] || []).push(ml); }));
+  const done = new Set();
+  return meals.map(ml => {
+    const steps = [];
+    for (const it of ml.items) {
+      const pr = PREP[it.id];
+      if (!pr || !pr[1]) continue;
+      if (pr[2] && uses[it.id].length > 1) {
+        if (done.has(it.id)) { steps.push({ id: it.id, mins: 3, text: `Reheat ${foodText(it)} from this morning's batch, 2–3 min.` }); continue; }
+        done.add(it.id);
+        const u = uses[it.id].reduce((a, m2) => a + m2.items.find(x => x.id === it.id).u, 0);
+        const all = { id: it.id, u, g: Math.round(FOOD[it.id].g * u / 5) * 5 };
+        steps.push({ id: it.id, mins: pr[0], batch: true, text: `Cook today's batch, ${foodText(all)} (for ${uses[it.id].map(m2 => m2.name.replace(/ \(.*/, '').toLowerCase()).join(' and ')}). ${pr[1]}` });
+        continue;
+      }
+      steps.push({ id: it.id, mins: pr[0], text: `${capFirst(foodText(it))}. ${pr[1]}` });
+    }
+    const cook = steps.length ? Math.max(...steps.map(x => x.mins)) : 0;
+    steps.push({ mins: 2, text: `Plate up: ${ml.items.map(foodText).join(', ')}.` });
+    return { ...ml, prep: steps, prepMins: cook ? Math.min(45, cook + 3) : 2 };
+  });
+}
+
+// ---------- Medicines ----------
+const medsOn = () => P.meds.map(id => MED[id]).filter(Boolean);
+function medNotes(place) { return medsOn().filter(x => x[place]).map(x => ({ name: x.name, text: x[place] })); }
+// Medicine notes for named foods: which of the foods it touches are on the plate.
+function medFoodNotes(ids) {
+  const have = new Set(ids);
+  return medsOn().filter(x => x.food && x.food[0].some(id => have.has(id))).map(x => ({ name: x.name, text: x.food[1], foods: x.food[0].filter(id => have.has(id)) }));
+}
+function medFlagged(id) { return medsOn().some(x => x.food && x.food[0].includes(id)); }
+function sessionMedNotes(s) {
+  const ks = s.blocks.map(b => b.kind), hasHR = s.blocks.some(b => b.kind === 'E');
+  const out = [...medNotes('train')];
+  if (hasHR) out.push(...medNotes('hr'));
+  if (ks.includes('P') || ks.includes('T')) out.push(...medNotes('impact'));
+  if (s.minutes >= 75 || s.blocks.some(b => b.kind === 'E' && b.minutes >= 75)) out.push(...medNotes('long'));
+  return out;
+}
+const medHTML = list => list.map(n => `<div class="medn"><b>${esc(n.name)}:</b> ${esc(n.text)}</div>`).join('');
+
+// ---------- The whole day ----------
+// Exercises for one desk break, rotating so the day touches eyes, neck, upper
+// back, wrists, hips and legs. Injuries skip what strains them.
+function deskItems(mins, n, avoid, light) {
+  const ok = x => !x.tags.some(t => avoid.has(t));
+  const out = [];
+  let left = mins;
+  if (mins <= 2) { out.push(n % 2 ? DESK_EX.breathe : DESK_EX.eyes); left -= 1; }
+  else {
+    if (mins >= 8) { out.push(DESK_EX.walk); left -= DESK_EX.walk.mins; }
+    if (!light && n % 3 === 1 && ok(DESK_EX.snack) && left >= 3) { out.push(DESK_EX.snack); left -= DESK_EX.snack.mins; }
+  }
+  // At most three short exercises a break; spare minutes go to the walk.
+  let added = 0;
+  for (let k = n * 3, g = 0; left > 0 && added < 3 && g < DESK_ROT.length * 2; k++, g++) {
+    const x = DESK_EX[DESK_ROT[k % DESK_ROT.length]];
+    if (ok(x) && x.mins <= left && !out.includes(x)) { out.push(x); left -= x.mins; added++; }
+  }
+  const w = out.indexOf(DESK_EX.walk);
+  if (left > 0 && w >= 0) out[w] = { ...DESK_EX.walk, mins: DESK_EX.walk.mins + left };
+  else if (left > 0 && !out.includes(DESK_EX.eyes)) out.push(DESK_EX.eyes);
+  return out;
+}
+const KIND_NAME = { wake: 'Wake', med: 'Medicine', train: 'Training', prep: 'Meal prep', meal: 'Meals', work: 'Focus work', break: 'Breaks', wind: 'Wind down', sleep: 'Sleep' };
+const KIND_RANK = { wake: 0, med: 1, prep: 2, meal: 3, train: 4, break: 5, work: 6, wind: 7, sleep: 8 };
+// Every part of one day from waking to sleep, in minutes from that day's midnight.
+function dayTimeline(d, m, sessions) {
+  sessions = sessions || d.sessions;
+  const wake = toMin(P.wake), bed = wake + 1440 - Math.round(P.sleep * 60);
+  const f = fuelFor(d, m);
+  const meals = mealPrep(buildMeals(d, f, P.diet, P.mealSeed, sessions));
+  const late = t => t < wake - 60 ? t + 1440 : t;
+  const ev = [{ s: wake, e: wake, kind: 'wake', title: 'Wake up', sub: 'A glass of water and some daylight' }];
+  for (const n of medNotes('wake')) ev.push({ s: wake, e: wake + 1, kind: 'med', title: n.name, sub: n.text });
+  for (const x of sessionTimes(d, sessions)) ev.push({ s: x.start, e: x.end, kind: 'train', title: x.s.title, sub: `${x.s.minutes} min · ${x.s.hard ? 'hard' : 'easy'}`, sess: x.s });
+  for (const ml of meals) {
+    const t = late(toMin(ml.time)), dur = /^(b|l|d)$/.test(ml.type) ? 25 : 10;
+    if (ml.prepMins >= 5) ev.push({ s: t - Math.ceil(ml.prepMins / 5) * 5, e: t, kind: 'prep', title: `Prepare ${ml.name.replace(/ \(.*/, '').toLowerCase()}`, sub: ml.dish, meal: ml });
+    ev.push({ s: t, e: t + dur, kind: 'meal', title: ml.dish, sub: `${ml.name} · ${ml.kcal} kcal`, meal: ml });
+  }
+  ev.push({ s: bed - 30, e: bed, kind: 'wind', title: 'Wind down', sub: 'Screens off, lights low, room cool' });
+  ev.push({ s: bed, e: wake + 1440, kind: 'sleep', title: 'Sleep', sub: `${P.sleep} h target` });
+  // Desk work fills the gaps in working hours with focus blocks and moving breaks.
+  if (P.desk && P.workDays.includes(d.idx)) {
+    const R = RHYTHMS[P.rhythm], ws = toMin(P.workStart), we = toMin(P.workEnd);
+    const busy = ev.filter(x => ['train', 'meal', 'prep'].includes(x.kind)).map(x => [x.s - (x.kind === 'train' ? 10 : 0), x.e + (x.kind === 'train' ? 15 : 0)]).sort((a, b) => a[0] - b[0]);
+    const gaps = [];
+    let cur = ws;
+    for (const [a, b] of busy) { if (b <= cur || a >= we) continue; if (a > cur) gaps.push([cur, Math.min(a, we)]); cur = Math.max(cur, b); }
+    if (cur < we) gaps.push([cur, we]);
+    const light = sessions.some(s => s.hard);
+    let n = 0, block = 0;
+    for (const [a, b] of gaps) {
+      let t = a;
+      while (b - t >= 10) {
+        let fl = Math.min(R.f, b - t);
+        if (b - t - fl > 0 && b - t - fl < Math.min(R.b, 5)) fl = b - t;
+        ev.push({ s: t, e: t + fl, kind: 'work', title: P.standDesk ? (block % 2 ? 'Focus, standing' : 'Focus, sitting') : 'Focus block', sub: `${fl} min of work` });
+        block++; t += fl;
+        const isLong = R.long && (n + 1) % R.long === 0, bl = Math.min(isLong ? R.lb : R.b, b - t);
+        if (bl < 2) break;
+        const items = deskItems(bl, n, m.inj.avoid, light);
+        ev.push({ s: t, e: t + bl, kind: 'break', title: isLong ? 'Long break' : bl <= 2 ? 'Micro-break' : 'Move break', sub: items.map(x => x.name).join(', '), items });
+        n++; t += bl;
+      }
+    }
+  }
+  ev.sort((a, b) => a.s - b.s || KIND_RANK[a.kind] - KIND_RANK[b.kind]);
+  return { ev, meals, f, wake, bed };
+}
+// What is happening now, and what comes next.
+function nowInTimeline(tl, nowMin) {
+  const now = nowMin < tl.wake - 60 ? nowMin + 1440 : nowMin;
+  const live = tl.ev.filter(x => x.s <= now && now < Math.max(x.e, x.s + 1)).sort((a, b) => KIND_RANK[a.kind] - KIND_RANK[b.kind]);
+  const cur = live.find(x => x.kind !== 'sleep' || live.length === 1) || null;
+  const next = tl.ev.find(x => x.s > now && x.kind !== 'work') || null;
+  return { now, cur, next };
+}
+function dateOf(weekNo, idx) { const x = new Date(M.planStart); x.setDate(x.getDate() + (weekNo - 1) * 7 + idx); return x; }
+
+// The whole day as one IntervalTimer routine. The training session runs as a
+// subroutine, so it keeps its own steps and can also be run on its own.
+function dayRoutines(d, weekNo, tl) {
+  const out = [], subs = [];
+  const list = tl.ev.filter(x => x.kind !== 'sleep');
+  const push = (title, mins, icon, extra) => { if (mins >= 0.5) out.push(iv(title, mins * 60, icon, extra)); };
+  list.forEach((x, i) => {
+    const nextS = list[i + 1] ? list[i + 1].s : tl.bed;
+    const len = Math.max(x.e - x.s, 0);
+    if (x.kind === 'wake') push('Wake up: water and daylight', Math.max(1, Math.min(nextS - x.s, 15)), 'drop');
+    else if (x.kind === 'med') push(`Medicine: ${x.sub}`, 1, 'bell');
+    else if (x.kind === 'train') {
+      const r = sessionToRoutine(x.sess, routineName(x.sess, weekNo), IT_PALETTE[d.idx % IT_PALETTE.length]);
+      subs.push(r);
+      out.push({ ...iv(`Training: ${x.sess.title}`, len * 60, 'heart'), sub: { id: r.id, name: r.name, color: r.color } });
+    } else if (x.kind === 'prep') {
+      const cooks = x.meal.prep.filter(p => p.id && p.mins >= 3);
+      cooks.forEach((p, k) => push(`Prep ${x.meal.name.replace(/ \(.*/, '').toLowerCase()} ${k + 1}/${cooks.length + 1}: ${FOOD[p.id].name} (${p.mins} min)`, 1, 'repeat'));
+      push(`Prep ${x.meal.name.replace(/ \(.*/, '').toLowerCase()} ${cooks.length + 1}/${cooks.length + 1}: cook, then plate ${x.meal.dish}`, Math.max(1, len - cooks.length), 'repeat');
+    } else if (x.kind === 'meal') push(`${x.meal.name.replace(/ \(.*/, '')}: ${x.meal.dish}`, len, 'bell');
+    else if (x.kind === 'work') push(x.title, len, 'star');
+    else if (x.kind === 'break') {
+      let used = 0;
+      for (const it of x.items) { const mm = Math.min(it.mins, len - used); if (mm <= 0) break; push(`Break: ${it.name}`, mm, it.kind === 'walk' || it.kind === 'snack' ? 'heart' : it.kind === 'micro' ? 'drop' : 'wave'); used += mm; }
+      if (len - used >= 1) push('Break: water, then back to it', len - used, 'drop');
+    } else if (x.kind === 'wind') push('Wind down: screens off, lights low', len, 'moon');
+    // Fill the space before the next item.
+    const end = Math.max(x.e, x.kind === 'wake' ? x.s + Math.min(nextS - x.s, 15) : x.e);
+    if (nextS - end >= 1 && x.kind !== 'wind') push(nextS - end >= 45 ? 'Free time: move at least once an hour' : 'Free time', nextS - end, 'wave');
+  });
+  const day = { id: uid(), name: `Day plan · ${DAYS_LONG[d.idx]} W${weekNo}`.slice(0, 60), color: IT_PALETTE[(d.idx + 3) % IT_PALETTE.length], created: Date.now(), cues: { start: { kind: 'builtin', id: 'whistle' } }, intervals: out };
+  return { app: 'interval', kind: 'routines', version: 1, exported: new Date().toISOString(), picked: [day.id], routines: [day, ...subs] };
+}
+// The whole day as plain text: times, the session, meals with prep steps, and breaks.
+function dayText(d, weekNo, tl) {
+  const date = dateOf(weekNo, d.idx).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+  const L = [`DAY PLAN · ${date} · week ${weekNo}`, `Fitness Paths · ${tl.f.kcal} kcal · carbs ${tl.f.C} g · protein ${tl.f.Pr} g · fat ${tl.f.F} g`, ''];
+  for (const x of tl.ev) {
+    const span = x.e > x.s + 1 ? `${hm(x.s)}–${hm(x.e)}` : hm(x.s);
+    L.push(`${span}  ${x.kind === 'meal' ? x.meal.name + ': ' + x.title : x.title}${x.kind === 'train' ? ` (${x.sub})` : ''}`);
+    if (x.kind === 'train') for (const b of x.sess.blocks) {
+      L.push(`    ${b.title}${b.minutes ? ` · ${b.minutes} min` : ''}`);
+      if (b.items) for (const it of b.items) L.push(`      - ${itemName(it)}: ${it.test ? 'target ' + fmtVal(it.test, it.tgt) : b.kind === 'X' ? it.dose : doseText(it.d)}`);
+      else if (b.summary) L.push(`      ${b.summary}`);
+      else if (b.steps) L.push(`      ${b.steps.map(st => st.label).join(' · ')}`);
+    }
+    if (x.kind === 'prep') x.meal.prep.forEach((p, i) => L.push(`    ${i + 1}. ${p.text}`));
+    if (x.kind === 'meal') { L.push(`    ${x.meal.items.map(foodText).join(', ')}`, `    ${x.meal.kcal} kcal · carbs ${x.meal.c} g · protein ${x.meal.p} g · fat ${x.meal.f} g`); if (x.meal.prepMins < 5) x.meal.prep.forEach(p => L.push(`    ${p.text}`)); }
+    if (x.kind === 'break') x.items.forEach(it => L.push(`    - ${it.name}: ${it.cue}`));
+    if (x.kind === 'med') L.push(`    ${x.sub}`);
+  }
+  const notes = [...medNotes('fuel'), ...tl.ev.filter(x => x.kind === 'train').flatMap(x => sessionMedNotes(x.sess)), ...medFoodNotes(tl.meals.flatMap(ml => ml.items.map(it => it.id)))];
+  if (notes.length) { L.push('', 'MEDICINE NOTES (general information, not medical advice)'); [...new Map(notes.map(n => [n.text, n])).values()].forEach(n => L.push(`- ${n.name}: ${n.text}`)); }
+  L.push('', 'An educational planner, not medical advice.');
+  return L.join('\n');
+}
+// The day as calendar events (everything but sleep and focus blocks).
+function dayICS(d, weekNo, tl) {
+  const base = dateOf(weekNo, d.idx);
+  const stamp = t => { const x = new Date(base); x.setMinutes(t); return `${x.getFullYear()}${String(x.getMonth() + 1).padStart(2, '0')}${String(x.getDate()).padStart(2, '0')}T${String(x.getHours()).padStart(2, '0')}${String(x.getMinutes()).padStart(2, '0')}00`; };
+  const icsEsc = t => String(t).replace(/[\;,]/g, c => '\\' + c).replace(/\n/g, '\\n');
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Fitness Paths//Day plan//EN', 'CALSCALE:GREGORIAN'];
+  const now = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  for (const x of tl.ev) {
+    if (x.kind === 'sleep' || x.kind === 'work') continue;
+    const desc = x.kind === 'prep' ? x.meal.prep.map((p, i) => `${i + 1}. ${p.text}`).join('\n') : x.kind === 'meal' ? x.meal.items.map(foodText).join(', ') : x.kind === 'break' ? x.items.map(it => `${it.name}: ${it.cue}`).join('\n') : x.kind === 'train' ? x.sess.blocks.map(b => b.title).join('\n') : x.sub || '';
+    lines.push('BEGIN:VEVENT', `UID:${uid()}-${x.s}@fitness-paths`, `DTSTAMP:${now}`, `DTSTART:${stamp(x.s)}`, `DTEND:${stamp(Math.max(x.e, x.s + 5))}`, `SUMMARY:${icsEsc(x.kind === 'meal' ? x.meal.name.replace(/ \(.*/, '') + ': ' + x.title : x.title)}`, `DESCRIPTION:${icsEsc(desc)}`, 'END:VEVENT');
+  }
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
 }
 
 // =============================================================================
@@ -2259,7 +2769,7 @@ function fmtVal(id, v) {
 // =============================================================================
 const $ = id => document.getElementById(id);
 const FIRST_RUN = (() => { try { return !localStorage.getItem(STORE_KEY); } catch (e) { return false; } })();
-const VIEW = { tab: 'today', sub: { week: 'day', paths: 'rail', fuel: 'today', recover: 'sleep', setup: 'athlete' }, week: null, day: null, q: 'E', rail: null, macro: 'c', micro: 'iron', inj: null, reg: 'foot', sess: 0, exportWeek: null, picked: new Set() };
+const VIEW = { tab: 'today', sub: { day: 'line', week: 'day', paths: 'rail', fuel: 'today', recover: 'sleep', stats: 'checkins', setup: 'athlete' }, range: 30, tp: null, scrollNow: true, week: null, day: null, q: 'E', rail: null, macro: 'c', micro: 'iron', inj: null, reg: 'foot', sess: 0, exportWeek: null, picked: new Set() };
 let M = null, PLAN = null;
 
 function toast(msg) {
@@ -2267,8 +2777,8 @@ function toast(msg) {
   const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.append(t);
   setTimeout(() => t.remove(), 2600);
 }
-function download(name, data) {
-  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }));
+function download(name, data, type) {
+  const url = URL.createObjectURL(new Blob([typeof data === 'string' ? data : JSON.stringify(data, null, 1)], { type: type || 'application/json' }));
   const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
@@ -2277,6 +2787,26 @@ const shownW = kg => imperial() ? Math.round(kg * 2.20462 * 10) / 10 : Math.roun
 const shownH = cm => imperial() ? Math.round(cm / 2.54 * 10) / 10 : Math.round(cm * 10) / 10;
 function sel(k, opts, val) { return `<select data-k="${k}">${opts.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(val) ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>`; }
 function num(k, val, attrs = '') { return `<input type="number" inputmode="decimal" data-k="${k}" value="${val ?? ''}" ${attrs}>`; }
+// A time control: step 15 minutes either way, or tap the time for a picker.
+function clockText(v) { const [h, m] = v.split(':').map(Number); return new Date(2000, 0, 1, h, m).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+function timeField(k, v, label) { return `<span class="tp" data-tp="${k}"><button type="button" class="tps" data-tpstep="-15" aria-label="${esc(label)} 15 minutes earlier">−</button><button type="button" class="tpv" data-tpopen="${k}" aria-label="${esc(label)}: ${clockText(v)}, tap to pick a time">${clockText(v)}</button><button type="button" class="tps" data-tpstep="15" aria-label="${esc(label)} 15 minutes later">+</button></span>`; }
+function openTimePicker(k) {
+  const [h, mi] = P[k].split(':').map(Number);
+  VIEW.tp = { k, h, mi };
+  drawTimePicker();
+  $('tpDlg').showModal();
+}
+function drawTimePicker() {
+  const t = VIEW.tp, pm = t.h >= 12, h12 = t.h % 12 || 12, v = `${String(t.h).padStart(2, '0')}:${String(t.mi).padStart(2, '0')}`;
+  const label = { sessionTime: 'Usual session start', wake: 'Wake time', workStart: 'Work starts', workEnd: 'Work ends' }[t.k] || 'Time';
+  $('tpTitle').textContent = label;
+  $('tpBody').innerHTML = `<div class="tpbig" aria-live="polite">${clockText(v)}</div>
+    <div class="row" style="justify-content:space-between;margin-bottom:2px"><span class="small muted">Hour</span><span class="seg">${[['am', 'AM'], ['pm', 'PM']].map(([x, n]) => `<button data-tpampm="${x}" class="${(x === 'pm') === pm ? 'on' : ''}">${n}</button>`).join('')}</span></div>
+    <div class="tpgrid h">${[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(n => `<button data-tph="${n}" class="${n === h12 ? 'on' : ''}">${n}</button>`).join('')}</div>
+    <span class="small muted">Minutes</span>
+    <div class="tpgrid m">${Array.from({ length: 12 }, (_, i) => i * 5).map(n => `<button data-tpm="${n}" class="${n === t.mi ? 'on' : ''}">:${String(n).padStart(2, '0')}</button>`).join('')}</div>
+    <div class="tpquick">${[-60, -30, -15, 15, 30, 60].map(n => `<button class="btn sm" data-tpadd="${n}">${n > 0 ? '+' : '−'}${Math.abs(n) >= 60 ? Math.abs(n) / 60 + ' h' : Math.abs(n) + ' min'}</button>`).join('')}</div>`;
+}
 function field(label, control, hint) { return `<label class="f"><span class="l">${label}</span>${control}${hint ? `<span class="small muted">${hint}</span>` : ''}</label>`; }
 function subtabs(tab, list) { $(tab + 'Tabs').innerHTML = list.map(([id, t]) => `<button data-sub="${tab}:${id}" class="${VIEW.sub[tab] === id ? 'on' : ''}">${t}</button>`).join(''); }
 function pills(attr, list, cur) { return `<div class="pills">${list.map(([id, t, cls]) => `<button data-${attr}="${id}" class="${cls || ''} ${String(cur) === String(id) ? 'on' : ''}">${t}</button>`).join('')}</div>`; }
@@ -2317,7 +2847,7 @@ function blockHTML(b, group, open) {
   if (b.items) { body = `${b.summary ? `<div class="muted">${esc(b.summary)}</div>` : ''}<ul>${b.items.map(it => itemHTML(it, b)).join('')}</ul>`; sub = b.items.map(it => it.test ? TESTS[it.test].name : EX[it.ex].name.replace(/ \(.*/, '')).join(', '); }
   else if (b.kind === 'E') { body = `<div>${esc(b.summary)}</div>`; sub = b.summary; }
   else if (b.steps) { body = `<div class="muted">${b.steps.map(s => esc(s.label)).join(' · ')}</div>`; sub = b.steps.map(s => s.label.split(':')[0]).join(', '); }
-  return `<details class="blk ${cls}" name="${group}"${open ? ' open' : ''}><summary><span>${esc(b.title)}</span><span class="sub">${esc(sub)}</span><span class="mins">${b.minutes ? b.minutes + ' min' : ''}</span></summary><div class="bb">${body}</div></details>`;
+  return `<details class="blk ${cls}"${open ? ' open' : ''}><summary><span>${esc(b.title)}</span><span class="sub">${esc(sub)}</span><span class="mins">${b.minutes ? b.minutes + ' min' : ''}</span></summary><div class="bb">${body}</div></details>`;
 }
 function sessionCard(s, weekNo, opts = {}) {
   const key = `${weekNo}:${s.day}:${s.slot}`;
@@ -2326,9 +2856,11 @@ function sessionCard(s, weekNo, opts = {}) {
   return `<div class="card sesscard">
     <div class="sess-head"><div class="eyebrow">${esc(opts.eyebrow || '')}</div><h2>${esc(s.title)}</h2>
       <div class="row"><span class="chip">${s.minutes} min</span>${s.hard ? '<span class="chip S">hard</span>' : '<span class="chip good">easy</span>'}${opts.status || ''}</div></div>
-    <div class="sess-body">${s.blocks.map((b, i) => blockHTML(b, 'b' + key.replace(/\W/g, ''), i === openIdx)).join('')}</div>
-    <div class="sess-foot"><button class="btn sm" data-act="exportOne" data-key="${key}"${opts.adjusted ? ' data-adjusted="1"' : ''}>Send to IntervalTimer</button><span class="small muted">Tap a part to open it, and an exercise for how to do it.</span></div></div>`;
+    <div class="sess-body">${medHTML(sessionMedNotes(s))}${s.blocks.map((b, i) => blockHTML(b, 'b' + key.replace(/\W/g, ''), i === openIdx)).join('')}</div>
+    <div class="sess-foot"><button class="btn sm" data-act="exportOne" data-key="${key}"${opts.adjusted ? ' data-adjusted="1"' : ''}>Send to IntervalTimer</button>${xallBtn()}<span class="small muted">Tap a part to open it, and an exercise for how to do it.</span></div></div>`;
 }
+// Opens every collapsible part in the nearest card (or tab), or closes them all.
+const xallBtn = (label = 'Expand all') => `<button class="btn sm" data-act="xall">${label}</button>`;
 function findSession(key, adjusted) {
   const [w, d, slot] = key.split(':');
   const plan = +w === PLAN.wk.no ? PLAN : planWeek(M, +w);
@@ -2342,17 +2874,25 @@ function routineName(s, weekNo) { return `${DAYS[s.day]}${s.slot ? ' ' + s.slot 
 function renderToday() {
   const m = M, plan = todayPlan(), day = plan.days[m.todayIdx], wk = plan.wk;
   const ci = todayCheckin(), r = readiness(ci);
-  const sessions = day.sessions.map(s => r ? adjustSession(s, r.level, m) : s);
+  const sessions = m.notStarted ? [] : day.sessions.map(s => r ? adjustSession(s, r.level, m) : s);
   const lv = r?.level;
-  const f = fuelFor(day, m), meals = mealPlan(day, f);
+  const f = fuelFor(day, m), meals = mealPlan(day, f, sessions);
   const now = new Date().getHours() * 60 + new Date().getMinutes();
   const next = meals.find(x => toMin(x.time) >= now) || meals[0];
+  const tl = dayTimeline(day, m, sessions), nw = nowInTimeline(tl, now);
+  const nowTxt = nw.cur ? `<b>Now:</b> ${esc(nw.cur.kind === 'meal' ? nw.cur.meal.name.replace(/ \(.*/, '') + ', ' + nw.cur.title : nw.cur.title)}${nw.cur.e > nw.cur.s + 1 && nw.cur.kind !== 'sleep' ? ` until ${hm(nw.cur.e)}` : ''}${nw.cur.kind === 'break' ? ` · ${esc(nw.cur.sub)}` : ''}` : '<b>Now:</b> free time';
+  const nowbar = `<button class="nowbar" data-go="day:line"><i class="k k-${nw.cur?.kind || 'wake'}"></i><span class="tx">${nowTxt}${nw.next ? ` <small>· next ${hm(nw.next.s)} ${esc(nw.next.kind === 'meal' ? nw.next.meal.name.replace(/ \(.*/, '') : nw.next.title)}</small>` : ''}</span><small>Day ›</small></button>`;
   const bed = toMin(P.wake) - Math.round(P.sleep * 60);
   const gw = gateWeek(), toGate = gw - m.todayWeek;
   const L = plan.days.map(dayLoad), hours = Math.round(L.reduce((a, x) => a + x.total, 0) / 6) / 10;
   const date = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
   let main;
-  if (sessions.length) {
+  if (m.notStarted) {
+    const p1 = planWeek(m, 1), sd = parseDate(P.planStart);
+    main = `<div class="card sesscard"><div class="sess-head"><div class="eyebrow">${esc(date)}</div><h2>Your plan starts ${esc(sd.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' }))}</h2><div class="row"><span class="chip">in ${plural(m.startsIn, 'day')}</span><button class="btn sm" data-act="startNow">Start this week instead</button></div></div>
+      <div class="sess-body" style="padding:10px 14px"><p>Until then, keep moving easily: walks, an easy 20–30 minute session or two, and the desk breaks on the Day tab. Week 1 looks like this:</p>
+      <table>${p1.days.map(d2 => `<tr><td><b>${DAYS[d2.idx]}</b></td><td>${d2.sessions.length ? esc(d2.sessions.map(x => x.title).join(' and ')) : '<span class="muted">Rest</span>'}</td><td class="n">${d2.sessions.reduce((a, x) => a + x.minutes, 0) || ''}</td></tr>`).join('')}</table></div></div>`;
+  } else if (sessions.length) {
     const i = Math.min(VIEW.sess, sessions.length - 1), s = sessions[i];
     const status = lv === 'warn' ? '<span class="chip warn">made lighter</span>' : lv === 'bad' ? '<span class="chip bad">recovery instead</span>' : '';
     main = (sessions.length > 1 ? pills('sess', sessions.map((x, j) => [j, x.slot || `Session ${j + 1}`]), i) : '') + sessionCard(s, m.todayWeek, { adjusted: !!r, eyebrow: `${date} · week ${m.todayWeek}`, status });
@@ -2366,14 +2906,15 @@ function renderToday() {
   $('today').innerHTML = `<div class="today">
     <div class="ready"><span class="q">Today I feel</span>
       ${[['good', 'Ready'], ['warn', 'So-so'], ['bad', 'Rough']].map(([k, t]) => `<button class="lv ${k} ${lv === k ? 'on' : ''}" data-act="quick" data-lv="${k}">${t}</button>`).join('')}
-      <button class="iconbtn" data-act="ciOpen">Details</button>
+      <button class="btn sm" data-act="ciOpen" title="Log sleep, soreness, energy, stress and resting heart rate">✎ ${ci && !ci.quick ? 'Edit check-in data' : 'Enter check-in data'}</button>
       ${r && r.reasons.length ? `<span class="small muted">${esc(r.reasons.join(', '))}</span>` : ''}</div>
+    ${nowbar}
     <div class="sesswrap">${main}</div>
     <div class="tiles">
       <button class="tile" data-go="fuel:today"><span class="t">Fuel today</span><b>${f.kcal} kcal</b><span class="s">C ${f.C} · P ${f.Pr} · F ${f.F} g</span><span class="s">Next: ${next.time} ${esc(next.name)}</span></button>
       <button class="tile" data-go="recover:sleep"><span class="t">Sleep</span><b>${hm(bed)}</b><span class="s">lights out · ${P.sleep} h target</span><span class="s">Wind down from ${hm(bed - 30)}</span></button>
       <button class="tile" data-go="paths:rail"><span class="t">Stages</span><b>${['E', 'S', 'P', 'R'].map(q => `<span class="q-${q}">${q}${m.stage[q]}</span>`).join(' ')}</b><span class="s">${toGate ? `Gate tests in ${plural(toGate, 'week')}` : 'Gate tests this week'}</span><span class="s">${m.inj.list.length ? plural(m.inj.list.length, 'rehab path') + ' active' : 'Endurance, Strength, Power, Resilience'}</span></button>
-      <button class="tile" data-go="week:day"><span class="t">Week ${wk.no}</span><b>${wk.deload ? 'Unload' : ['Build', 'Build more', 'Peak'][wk.w - 1]}</b><span class="dots">${plan.days.map((d, i) => `<i class="${i === m.todayIdx ? 'now' : ''}" style="background:${dayColor(d)}"></i>`).join('')}</span><span class="s">${hours} h · block ${wk.block}, week ${wk.w} of 4</span></button>
+      <button class="tile" data-go="week:day"><span class="t">Week ${wk.no}</span><b>${wk.deload ? 'Unload' : ['Build', 'Build more', 'Peak'][wk.w - 1]}</b><span class="dots">${plan.days.map((d, i) => `<i class="${i === m.todayIdx ? 'now' : ''}" style="background:${dayColor(d)}"></i>`).join('')}</span><span class="s">${m.notStarted ? `Plan starts in ${plural(m.startsIn, 'day')}` : `${hours} h · block ${wk.block}, week ${wk.w} of 4`}</span></button>
     </div></div>`;
 }
 function openCheckin() {
@@ -2388,12 +2929,80 @@ function openCheckin() {
   $('ciDlg').showModal();
 }
 
+// ---------- Day: the whole day from waking to sleep ----------
+function dayCtx() {
+  const m = M, plan = PLAN, d = plan.days[VIEW.day];
+  const isToday = plan.wk.no === m.todayWeek && d.idx === m.todayIdx;
+  const r = isToday ? readiness(todayCheckin()) : null;
+  const sessions = isToday && m.notStarted ? [] : d.sessions.map(s => r ? adjustSession(s, r.level, m) : s);
+  return { m, plan, d, isToday, sessions, tl: dayTimeline(d, m, sessions) };
+}
+function evBody(x) {
+  if (x.kind === 'train') return `<ul>${x.sess.blocks.map(b => `<li><b>${esc(b.title)}</b>${b.minutes ? ` · ${b.minutes} min` : ''}${b.items ? `<br><span class="muted">${esc(b.items.map(it => `${itemName(it)} ${it.test ? '' : b.kind === 'X' ? it.dose : doseText(it.d)}`).join(' · '))}</span>` : b.summary ? `<br><span class="muted">${esc(b.summary)}</span>` : ''}</li>`).join('')}</ul>${medHTML(sessionMedNotes(x.sess))}<button class="btn sm" data-go="week:day">Open the session</button>`;
+  if (x.kind === 'meal') return `<ul>${x.meal.items.map(it => `<li>${esc(foodText(it))}${medFlagged(it.id) ? ' <span class="flag-med">⚠</span>' : ''}</li>`).join('')}</ul><div class="muted">${x.meal.kcal} kcal · carbs ${x.meal.c} g · protein ${x.meal.p} g · fat ${x.meal.f} g. ${esc(x.meal.tip)}</div>${x.meal.prepMins < 5 ? `<div class="muted">${x.meal.prep.map(p => esc(p.text)).join(' ')}</div>` : ''}${medHTML(medFoodNotes(x.meal.items.map(it => it.id)))}`;
+  if (x.kind === 'prep') return `<ol>${x.meal.prep.map(p => `<li>${esc(p.text)}</li>`).join('')}</ol>`;
+  if (x.kind === 'break') return `<ul>${x.items.map(it => `<li><b>${esc(it.name)}</b> · ${it.mins} min<br><span class="muted">${esc(it.cue)}</span></li>`).join('')}</ul>`;
+  if (x.kind === 'work') return `<p class="muted">Heads down. One task, notifications off.${P.standDesk ? ' Alternate sitting and standing each block.' : ''} Water within reach.</p>`;
+  if (x.kind === 'wake') return '<p class="muted">Same wake time every day, even after a short night. Daylight in the first hour sets your body clock.</p>';
+  if (x.kind === 'wind') return '<p class="muted">Dim the lights, put screens away and keep the room cool. No caffeine within 8 hours of bed, and finish big meals 2–3 hours before.</p>';
+  if (x.kind === 'sleep') return `<p class="muted">Lights out at ${hm(x.s)} for ${P.sleep} hours, waking at ${P.wake}. Sleep is the strongest recovery tool there is.</p>`;
+  return `<p class="muted">${esc(x.sub || '')}</p>`;
+}
+function renderDay() {
+  const sub = VIEW.sub.day;
+  subtabs('day', [['line', 'Timeline'], ['desk', 'Desk routine'], ['export', 'Export']]);
+  const { m, plan, d, isToday, tl } = dayCtx();
+  const date = dateOf(plan.wk.no, d.idx);
+  const head = `<div class="row" style="margin-bottom:6px"><b>${DAYS_LONG[d.idx]} ${shortDate(date)}</b><span class="small muted">week ${plan.wk.no}${P.desk && P.workDays.includes(d.idx) ? ' · work day' : ''}</span></div>${dayBar(plan)}`;
+  let h = '';
+  if (sub === 'line') {
+    const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+    const nw = isToday ? nowInTimeline(tl, nowMin) : null;
+    const kinds = [...new Set(tl.ev.map(x => x.kind))];
+    h = `<div class="card">${head}
+      <div class="row" style="justify-content:space-between"><div class="legend">${kinds.map(k => `<span><i class="k-${k}"></i>${KIND_NAME[k]}</span>`).join('')}</div>${xallBtn()}</div>
+      <div class="tl">${tl.ev.map(x => {
+        const cls = nw && nw.cur === x ? 'now' : nw && x.e <= nw.now && x.kind !== 'wake' ? 'past' : '';
+        const dur = x.e - x.s > 1 ? `${x.e - x.s >= 90 ? Math.round((x.e - x.s) / 6) / 10 + ' h' : x.e - x.s + ' min'}` : '';
+        return `<details class="ev ${cls}"${cls === 'now' ? ' open' : ''}><summary><time>${hm(x.s)}</time><i class="kb k-${x.kind}"></i><span class="tt">${esc(x.kind === 'meal' ? `${x.meal.name.replace(/ \(.*/, '')}: ${x.title}` : x.title)}<small>${esc(x.kind === 'meal' ? `${x.meal.kcal} kcal` : x.sub || '')}</small></span><span class="du">${dur}</span></summary><div class="eb">${evBody(x)}</div></details>`;
+      }).join('')}</div>
+      <p class="small muted" style="margin:8px 0 0">Built from your wake time, sleep target, session time, meal plan${P.desk ? ', work hours and break rhythm' : ''}. Change them under Setup → Schedule and <button class="btn sm" data-sub="day:desk">Desk routine</button>.</p></div>`;
+  } else if (sub === 'desk') {
+    const R = RHYTHMS[P.rhythm], avoid = m.inj.avoid;
+    h = `<div class="cols two"><div class="card"><h3>Desk routine</h3>
+        <label class="row small" style="margin-bottom:8px"><input type="checkbox" data-k="desk"${P.desk ? ' checked' : ''}> Plan focus blocks and moving breaks on work days</label>
+        <span class="small muted">Work days</span>
+        <div class="days" style="margin:3px 0 10px">${DAYS.map((x, i) => `<label><input type="checkbox" data-k="wday.${i}"${P.workDays.includes(i) ? ' checked' : ''}>${x}</label>`).join('')}</div>
+        <div class="grid2">${field('Work starts', timeField('workStart', P.workStart, 'Work starts'))}${field('Work ends', timeField('workEnd', P.workEnd, 'Work ends'))}</div>
+        ${field('Rhythm', sel('rhythm', Object.entries(RHYTHMS).map(([k, v]) => [k, v.name]), P.rhythm))}
+        <label class="row small" style="margin-bottom:8px"><input type="checkbox" data-k="standDesk"${P.standDesk ? ' checked' : ''}> I have a standing desk (alternate sitting and standing)</label>
+        <p class="small muted">Each ${R.f}-minute block ends with a ${R.b}-minute break${R.long ? `, and every ${R.long}th break is ${R.lb} minutes` : ''}. Breaks rotate through eyes, neck, upper back, wrists, hips and legs, and 8 minutes or more includes a walk. Meals and training take priority and work flows around them. On hard training days the breaks skip the exercise snacks.</p>
+        <p class="small muted">Breaking up long sitting with a few minutes of light activity every 30–60 minutes improves blood sugar and comfort (Dempsey 2016), and regular breaks help focus.</p></div>
+      <div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Break exercises</h3>${xallBtn()}</div>
+        <p class="small muted">Tap one for how to do it.${avoid.size ? ' Greyed ones strain an area you marked under Injuries and are left out.' : ''}</p>
+        <ul style="list-style:none;padding:0">${DESK.map(x => { const out = x.tags.some(t => avoid.has(t)); return `<li${out ? ' style="opacity:.5"' : ''}><details><summary><b>${esc(x.name)}</b> <span class="muted small">${x.mins} min${out ? ' · left out for your injury' : ''}</span></summary><div class="small muted" style="padding:0 0 6px 14px">${esc(x.cue)}</div></details></li>`; }).join('')}</ul></div></div>`;
+  } else {
+    const n = tl.ev.filter(x => x.kind !== 'sleep').length;
+    h = `<div class="card">${head}<h3>Take the whole day with you</h3>
+      <p class="small">Everything for ${DAYS_LONG[d.idx]}: wake-up, training, meal prep and meals, focus blocks and breaks, and wind-down (${plural(n, 'item')}).</p>
+      <div class="exp-list">
+        <div class="xrow"><button class="btn sm pri" data-act="dayIT">Send to IntervalTimer</button><small>One long routine that runs from waking to bedtime, with each break's exercises and each prep step as its own interval. The training session comes along as a subroutine. In <a href="https://sonusario.github.io/IntervalTimer/" target="_blank" rel="noopener">IntervalTimer</a>: Settings → Import routines.</small></div>
+        <div class="xrow"><button class="btn sm" data-act="dayTxt">Download as text</button><small>A plain-text plan with exercise doses, ingredients, prep steps and break cues, to read on any device or print.</small></div>
+        <div class="xrow"><button class="btn sm" data-act="dayIcs">Add to calendar (.ics)</button><small>Training, meal prep, meals, breaks and wind-down as calendar events with the details inside.</small></div>
+        <div class="xrow"><button class="btn sm" data-act="dayPrint">Print</button><small>Prints the timeline with everything expanded.</small></div></div></div>`;
+  }
+  $('dayPane').innerHTML = h;
+  if (sub === 'line' && VIEW.scrollNow && VIEW.tab === 'day') { VIEW.scrollNow = false; $('dayPane').querySelector('.ev.now')?.scrollIntoView({ block: 'center' }); }
+}
+
 // ---------- Week ----------
 function dayBar(plan) {
   return `<div class="daybar">${plan.days.map(d => `<button data-day="${d.idx}" class="${d.idx === VIEW.day ? 'on' : ''} ${plan.wk.no === M.todayWeek && d.idx === M.todayIdx ? 'now' : ''}"><b>${DAYS[d.idx]}</b><i style="background:${dayColor(d)}"></i><span class="muted">${d.sessions.reduce((a, s) => a + s.minutes, 0) || 'rest'}</span></button>`).join('')}</div>`;
 }
+const shortDate = x => x.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+function weekRange(no) { return `${shortDate(dateOf(no, 0))} – ${shortDate(dateOf(no, 6))}`; }
 function weekNav(wk) {
-  return `<div class="weeknav"><button class="btn sm" data-act="weekPrev" aria-label="Previous week">◀</button><h2>Week ${wk.no}</h2><button class="btn sm" data-act="weekNext" aria-label="Next week">▶</button>
+  return `<div class="weeknav"><button class="btn sm" data-act="weekPrev" aria-label="Previous week">◀</button><h2>Week ${wk.no}</h2><span class="small muted">${weekRange(wk.no)}</span><button class="btn sm" data-act="weekNext" aria-label="Next week">▶</button>
     ${wk.no !== M.todayWeek ? '<button class="btn sm" data-act="weekToday">This week</button>' : ''}<span class="chip ${wk.deload ? 'bad' : 'good'}">Block ${wk.block} · ${wk.deload ? 'unload and gate tests' : ['build', 'build more', 'peak load'][wk.w - 1]}</span></div>`;
 }
 function renderWeek() {
@@ -2402,7 +3011,7 @@ function renderWeek() {
   let h = '';
   if (sub === 'day') {
     const d = plan.days[VIEW.day];
-    const x = new Date(m.planStart); x.setDate(x.getDate() + (wk.no - 1) * 7 + d.idx);
+    const x = dateOf(wk.no, d.idx);
     const eyebrow = `${DAYS_LONG[d.idx]} ${x.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
     const i = Math.min(VIEW.sess, Math.max(0, d.sessions.length - 1));
     h = `<div style="height:100%;display:flex;flex-direction:column">${weekNav(wk)}${dayBar(plan)}
@@ -2586,7 +3195,8 @@ function renderPaths() {
 // ---------- Fuel ----------
 function renderFuel() {
   const m = M, plan = PLAN, sub = VIEW.sub.fuel;
-  subtabs('fuel', [['today', 'Day'], ['meals', 'Meal plan'], ['macros', 'Macros'], ['micros', 'Micros'], ['supps', 'Supplements']]);
+  const nAvoid = blockedFoods().size;
+  subtabs('fuel', [['today', 'Day'], ['meals', 'Meal plan'], ['avoid', `Exclude${nAvoid ? ' · ' + nAvoid : ''}`], ['macros', 'Macros'], ['micros', 'Micros'], ['supps', 'Supplements']]);
   const fuels = plan.days.map(d => fuelFor(d, m)), d = plan.days[VIEW.day], f = fuels[VIEW.day];
   const dayHead = `<div class="row" style="margin-bottom:6px"><b>Week ${plan.wk.no}</b><span class="small muted">${f.L.total ? `${DAYS_LONG[d.idx]}: ${f.L.total} min of training, about ${f.L.kcal} kcal` : `${DAYS_LONG[d.idx]}: rest day`}</span></div>${dayBar(plan)}`;
   const kc = f.C * 4 + f.Pr * 4 + f.F * 9;
@@ -2599,12 +3209,15 @@ function renderFuel() {
     h = `<div class="cols two"><div class="card">${dayHead}
         <div class="kpis"><div class="kpi"><b>${f.kcal}</b><span>kcal</span></div><div class="kpi"><b>${f.C} g</b><span>carbs · ${f.cpk} g/kg</span></div><div class="kpi"><b>${f.Pr} g</b><span>protein · ${f.ppk.toFixed(1)} g/kg</span></div><div class="kpi"><b>${f.F} g</b><span>fat</span></div><div class="kpi"><b>${f.water} L</b><span>fluid</span></div></div>
         ${bar}<p class="small muted">Carbohydrate follows the day's training, protein stays steady, fat fills the rest${P.bodyGoal === 'lean' ? ' (about a 12% deficit)' : P.bodyGoal === 'build' ? ' (about an 8% surplus)' : ''}. Resting and daily life: about ${f.base} kcal.</p>${ea}
+        ${medHTML([...medNotes('fuel'), ...(longest >= 75 ? medNotes('long') : [])])}
         ${longest >= 75 ? `<p class="note">During the ${longest} min session: ${longest >= 150 ? '60–90 g carbohydrate an hour (mixed glucose and fructose)' : '30–60 g carbohydrate an hour'}, 400–800 ml fluid an hour, and sodium if you sweat heavily.</p>` : ''}</div>
       <div class="card"><h3>When to eat</h3><table><tr><th>Time</th><th>Meal</th><th class="n">Carbs</th><th class="n">Protein</th></tr>
         ${meals.map(x => `<tr title="${esc(x.tip)}"><td>${x.time}</td><td>${esc(x.name)}</td><td class="n">${x.carbs} g</td><td class="n">${x.protein} g</td></tr>`).join('')}</table>
         <p class="small muted" style="margin:6px 0 0">Times follow your wake time, session start and meals a day. Hitting the day's totals matters more than the clock. See <b>Meal plan</b> for real food.</p></div></div>`;
   } else if (sub === 'meals') {
-    const st = STYLES[P.diet], meals = buildMeals(d, f, P.diet, P.mealSeed);
+    const st = STYLES[P.diet], meals = mealPrep(buildMeals(d, f, P.diet, P.mealSeed));
+    const skip = [...P.avoidCats.map(c => FOOD_CAT[c][1].toLowerCase()), ...P.avoidFoods.filter(id => !P.avoidCats.some(c => FOOD_CAT[c][2].includes(id))).map(id => FOOD[id].name)];
+    const mealMed = x => medHTML(medFoodNotes(x.items.map(it => it.id)));
     const T = meals.reduce((a, x) => ({ kcal: a.kcal + x.kcal, c: a.c + x.c, p: a.p + x.p, f: a.f + x.f, fib: a.fib + x.fib }), { kcal: 0, c: 0, p: 0, f: 0, fib: 0 });
     const cov = microCover(meals);
     const now = new Date().getHours() * 60 + new Date().getMinutes();
@@ -2612,15 +3225,26 @@ function renderFuel() {
     const cmp = (label, got, want, unit) => `<div class="kpi"><b>${got}${unit}</b><span>${label} · target ${want}${unit}</span></div>`;
     h = `<div class="cols wide-left"><div class="card">
         <div class="grid2">${field('Eating style', sel('diet', Object.values(STYLES).map(s => [s.id, s.name]), P.diet))}<div class="row" style="align-self:end;margin-bottom:8px"><button class="btn sm" data-act="shuffle">Shuffle meals</button><span class="small muted">${P.meals} meals a day</span></div></div>
-        <p class="small muted wide-only">${esc(st.note)}</p>${dayBar(plan)}
-        ${meals.map((x, i) => `<details class="meal" name="meal"${i === openI ? ' open' : ''}><summary><span class="tm">${x.time}</span><span class="dish">${esc(x.dish)}<small>${esc(x.name)}</small></span><span class="kc">${x.kcal} kcal</span></summary>
-          <div class="mb"><ul>${x.items.map(it => `<li>${esc(foodText(it))}</li>`).join('')}</ul><div class="muted">Carbs ${x.c} g · protein ${x.p} g · fat ${x.f} g. ${esc(x.tip)}</div></div></details>`).join('')}
+        <p class="small muted wide-only">${esc(st.note)}</p>
+        <p class="small" style="margin:0 0 6px">${skip.length ? `<b>Leaving out:</b> ${esc(skip.join(', '))}.` : '<span class="muted">Nothing left out.</span>'} <button class="btn sm" data-sub="fuel:avoid">Exclude foods</button> ${xallBtn()}</p>${dayBar(plan)}
+        ${meals.map((x, i) => `<details class="meal"${i === openI ? ' open' : ''}><summary><span class="tm">${x.time}</span><span class="dish">${esc(x.dish)}<small>${esc(x.name)}</small></span><span class="kc">${x.kcal} kcal</span></summary>
+          <div class="mb"><ul>${x.items.map(it => `<li>${esc(foodText(it))}${medFlagged(it.id) ? ' <span class="flag-med" title="See the medicine note below">⚠</span>' : ''}</li>`).join('')}</ul>
+            ${x.swaps.length ? `<div class="small muted">Swapped: ${x.swaps.map(([a, b]) => b ? `${esc(FOOD[b].name)} for ${esc(FOOD[a].name)}` : `no ${esc(FOOD[a].name)}`).join(', ')}.</div>` : ''}
+            <div class="muted">Carbs ${x.c} g · protein ${x.p} g · fat ${x.f} g. ${esc(x.tip)}</div>${mealMed(x)}
+            <details style="margin-top:4px"><summary class="small"><b>Prep steps</b> · about ${x.prepMins} min</summary><ol class="small">${x.prep.map(p => `<li>${esc(p.text)}</li>`).join('')}</ol></details></div></details>`).join('')}
         <p class="small muted narrow-only" style="margin:6px 0 0">Day total ${T.kcal} of ${f.kcal} kcal · carbs ${T.c} · protein ${T.p} · fat ${T.f} g. Nutrient coverage is under Micros.</p></div>
       <div class="card wide-only"><h3>${DAYS_LONG[d.idx]}'s plate against the target</h3>
         <div class="kpis">${cmp('kcal', T.kcal, f.kcal, '')}${cmp('carbs', T.c, f.C, ' g')}${cmp('protein', T.p, f.Pr, ' g')}${cmp('fat', T.f, f.F, ' g')}</div>
         <p class="small muted">Portions are rounded to half units, so totals land near the target, not on it. On big carbohydrate days the grains push protein over target, which is fine. Fibre: about ${T.fib} g.</p>
         <h4>Micronutrient coverage</h4><div class="cover">${Object.keys(MICRO_NAME).map(k => `<button class="chip ${cov[k] >= 2 ? 'good' : cov[k] === 1 ? '' : 'warn'}" data-micro="${k}" title="${cov[k]} rich foods today">${MICRO_NAME[k].replace(/ \(.*/, '')}</button>`).join('')}</div>
         <p class="small muted">Green means two or more foods rich in it today, grey one, amber none. Tap one for sources. ${P.diet === 'vegan' ? '<b>On a vegan diet, take a B12 supplement.</b>' : ''}</p></div></div>`;
+  } else if (sub === 'avoid') {
+    const BLK = blockedFoods();
+    h = `<div class="card"><h3>Foods to leave out</h3><p class="small muted">Leave out a whole group, or single foods. Meal plans pick options without them, or swap in the closest food that is allowed (and that suits your eating style). Tap again to bring a food back.</p>
+      <div class="row" style="gap:4px;margin-bottom:10px">${FOOD_CATS.map(([id, name]) => `<button class="chip chipbtn ${P.avoidCats.includes(id) ? 'on' : ''}" data-avoidcat="${id}" aria-pressed="${P.avoidCats.includes(id)}">${esc(name)}</button>`).join('')}</div>
+      <div class="avoid-grid">${FOOD_CATS.map(([id, name, ids]) => `<div class="grp"><b class="small">${esc(name)}</b><div>${ids.map(fid => { const byCat = P.avoidCats.some(c => FOOD_CAT[c][2].includes(fid)); return `<button class="chip chipbtn ${BLK.has(fid) ? 'on' : ''}" data-avoidfood="${fid}" aria-pressed="${BLK.has(fid)}"${byCat ? ' disabled title="Left out with its whole group"' : ''}>${esc(FOOD[fid].name)}</button>`; }).join('')}</div></div>`).join('')}</div>
+      ${BLK.size ? `<p class="small" style="margin:10px 0 0"><b>${plural(BLK.size, 'food')} left out.</b> <button class="btn sm" data-act="avoidClear">Clear all</button></p>` : ''}
+      ${['veg', 'vegan'].includes(P.diet) || P.avoidCats.filter(c => ['fish', 'red', 'poultry', 'dairy', 'eggs', 'soy', 'legumes'].includes(c)).length < 2 ? '' : '<p class="note small">Leaving out several protein groups? Check the protein totals on Meal plan, and consider the matching eating style.</p>'}</div>`;
   } else if (sub === 'macros') {
     const kg = P.weight, pm = `${Math.round(0.3 * kg)}–${Math.round(0.4 * kg)} g`;
     const maxC = Math.max(...fuels.map(x => x.C));
@@ -2668,13 +3292,14 @@ function renderFuel() {
       <p class="small muted">Targets are adult daily values (US RDA or AI) for your sex and age. The Meal plan tab shows which of these each day's food covers.</p></div>`;
   } else {
     h = `<div class="card"><h3>Supplements with good evidence</h3><table>
-      <tr><td><b>Caffeine</b></td><td class="small">3 mg/kg (about ${Math.round(3 * P.weight)} mg) 30–60 min before hard sessions and tests. Avoid within 8 h of bedtime.</td></tr>
+      <tr><td><b>Caffeine</b>${medNotes('caffeine').length ? ' <span class="flag-med">⚠</span>' : ''}</td><td class="small">3 mg/kg (about ${Math.round(3 * P.weight)} mg) 30–60 min before hard sessions and tests. Avoid within 8 h of bedtime.${medHTML(medNotes('caffeine'))}</td></tr>
       <tr><td><b>Creatine monohydrate</b></td><td class="small">3–5 g a day. Improves repeated sprints, strength and power${m.emph.E >= 60 ? '; may add 1–2 kg of water weight, so weigh it against your power-to-weight' : ''}.</td></tr>
       ${m.emph.E >= 40 ? '<tr><td><b>Dietary nitrate</b></td><td class="small">Beetroot juice with about 6–8 mmol nitrate 2–3 h before key endurance sessions.</td></tr>' : ''}
       ${m.emph.P >= 25 || ['field', 'court', 'combat', 'rower', 'middle'].includes(m.athlete.id) ? '<tr><td><b>Beta-alanine</b></td><td class="small">3–6 g a day in split doses for efforts of 1–10 minutes. Tingling is harmless.</td></tr>' : ''}
       <tr><td><b>Protein powder</b></td><td class="small">A convenience, not a need: use it when food can't reach your protein target.</td></tr>
       <tr><td><b>Vitamin D and iron</b></td><td class="small">Only if a blood test shows you are low. See Micros.</td></tr></table>
-      <p class="small muted" style="margin:6px 0 0">If you are drug-tested, use only third-party-tested products (Informed Sport, NSF Certified for Sport). Most other supplements have weak or no evidence.</p></div>`;
+      ${medNotes('supp').length ? `<h4 style="margin-top:8px">Your medicines</h4>${medHTML(medNotes('supp'))}` : ''}
+      <p class="small muted" style="margin:6px 0 0">${P.meds.length ? '' : 'Taking a regular medicine? Add it under Setup → Health for general cautions. '}If you are drug-tested, use only third-party-tested products (Informed Sport, NSF Certified for Sport). Most other supplements have weak or no evidence.</p></div>`;
   }
   $('fuelPane').innerHTML = h;
 }
@@ -2738,11 +3363,237 @@ function renderRecover() {
   $('recoverPane').innerHTML = h;
 }
 
+// ---------- Stats: charts of check-ins, tests, body and schedule ----------
+// Small SVG charts. Each mark carries data-tip for the hover tooltip, and every
+// chart with more than one series has a legend.
+// Charts draw in their real width, so text stays at its normal size.
+function chartW(full) { const pw = ($('statsPane')?.clientWidth || 640) - 30; return Math.round(Math.max(280, full || pw < 850 ? pw : (pw - 10) / 2 - 2)); }
+const dayNo = s => Math.round(parseDate(s) / 864e5);
+const fromDayNo = n => new Date(n * 864e5);
+const niceTicks = (lo, hi, n = 4) => { const span = hi - lo || 1, step0 = span / n, mag = 10 ** Math.floor(Math.log10(step0)), step = [1, 2, 2.5, 5, 10].map(x => x * mag).find(x => x >= step0); const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(Math.round(v * 100) / 100); return out; };
+function lineChart(o) {
+  const W = o.w || chartW(), H = o.h || 180, L = 40, R = 12, T = 10, B = 22;
+  const xs = o.series.flatMap(s => s.pts.map(p => p.x)), xMin = o.xMin ?? Math.min(...xs), xMax = Math.max(o.xMax ?? Math.max(...xs), xMin + 1);
+  const ys = o.series.flatMap(s => s.pts.map(p => p.y)).concat((o.refs || []).map(r => r.y));
+  let yMin = o.yMin ?? Math.min(...ys), yMax = o.yMax ?? Math.max(...ys);
+  if (yMax - yMin < 1e-9) { yMin -= 1; yMax += 1; }
+  if (o.yMin == null) { const pad = (yMax - yMin) * 0.12; yMin -= pad; yMax += pad; }
+  const X = x => L + (x - xMin) / (xMax - xMin) * (W - L - R), Y = y => T + (1 - (y - yMin) / (yMax - yMin)) * (H - T - B);
+  const ticks = o.yTicks || niceTicks(yMin, yMax);
+  let g = `<g class="grid">${ticks.map(t => `<line x1="${L}" x2="${W - R}" y1="${Y(t)}" y2="${Y(t)}"/>`).join('')}</g>`;
+  g += ticks.map(t => `<text x="${L - 6}" y="${Y(t) + 4}" text-anchor="end">${o.fmtY ? o.fmtY(t) : t}</text>`).join('');
+  g += `<line class="axis" x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}"/>`;
+  const xl = o.xLabels || [xMin, Math.round((xMin + xMax) / 2), xMax].map(x => ({ x, label: shortDate(fromDayNo(x)) }));
+  g += xl.map((l, i) => `<text x="${X(l.x)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === xl.length - 1 ? 'end' : 'middle'}">${esc(l.label)}</text>`).join('');
+  for (const r of o.refs || []) g += `<line x1="${L}" x2="${W - R}" y1="${Y(r.y)}" y2="${Y(r.y)}" stroke="${r.color || 'var(--muted)'}" stroke-width="1" stroke-dasharray="4 4"/><text class="halo" x="${L + 4}" y="${Y(r.y) - 4}">${esc(r.label)}</text>`;
+  for (const s of o.series) {
+    const pts = s.pts.slice().sort((a, b) => a.x - b.x);
+    if (s.area && pts.length > 1) g += `<path d="M${X(pts[0].x)} ${Y(yMin)} ${pts.map(p => `L${X(p.x)} ${Y(p.y)}`).join(' ')} L${X(pts[pts.length - 1].x)} ${Y(yMin)}Z" fill="${s.color}" opacity=".1"/>`;
+    if (pts.length > 1 && !s.dotsOnly) g += `<path d="${pts.map((p, i) => i ? (s.step ? `H${X(p.x)} V${Y(p.y)}` : `L${X(p.x)} ${Y(p.y)}`) : `M${X(p.x)} ${Y(p.y)}`).join(' ')}${s.step ? ` H${X(xMax)}` : ''}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"${s.dash ? ' stroke-dasharray="5 4"' : ''}/>`;
+    for (const p of pts) g += `<g data-tip="${esc(p.tip || `${shortDate(fromDayNo(p.x))}: ${p.y}`)}"><circle cx="${X(p.x)}" cy="${Y(p.y)}" r="10" class="hit"/><circle cx="${X(p.x)}" cy="${Y(p.y)}" r="4" fill="${p.hollow ? 'var(--panel)' : p.color || s.color}" stroke="${p.hollow ? p.color || s.color : 'var(--panel)'}" stroke-width="2"/></g>`;
+  }
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label || 'Chart')}">${g}</svg>`;
+}
+function barChart(o) {
+  const W = o.w || chartW(o.full), H = o.h || 170, L = 40, R = 12, T = 10, B = 22, n = o.bars.length;
+  const yMax = o.yMax ?? Math.max(1, ...o.bars.map(b => (b.parts || [{ v: b.v }]).reduce((a, x) => a + x.v, 0)), ...(o.refs || []).map(r => r.y)) * 1.08;
+  const Y = y => T + (1 - y / yMax) * (H - T - B), slot = (W - L - R) / Math.max(n, 1), bw = Math.min(24, slot * 0.7);
+  const ticks = niceTicks(0, yMax);
+  let g = `<g class="grid">${ticks.map(t => `<line x1="${L}" x2="${W - R}" y1="${Y(t)}" y2="${Y(t)}"/>`).join('')}</g>` + ticks.map(t => `<text x="${L - 6}" y="${Y(t) + 4}" text-anchor="end">${o.fmtY ? o.fmtY(t) : t}</text>`).join('');
+  o.bars.forEach((b, i) => {
+    const cx = L + slot * (i + 0.5), x = cx - bw / 2;
+    let y0 = 0;
+    const parts = b.parts || [{ v: b.v, color: b.color || o.color || 'var(--accent)' }];
+    parts.forEach((pt, k) => {
+      if (!pt.v) return;
+      const top = Y(y0 + pt.v), bot = Y(y0), last = k === parts.length - 1 || parts.slice(k + 1).every(q => !q.v);
+      const h = Math.max(0, bot - top - (y0 ? 2 : 0)), r = last ? Math.min(4, h / 2, bw / 2) : 0;
+      g += `<path d="M${x} ${top + h}V${top + r}${r ? `Q${x} ${top} ${x + r} ${top}H${x + bw - r}Q${x + bw} ${top} ${x + bw} ${top + r}` : `H${x + bw}`}V${top + h}Z" fill="${pt.color}"${b.dim ? ' opacity=".45"' : ''}/>`;
+      y0 += pt.v;
+    });
+    g += `<rect x="${cx - slot / 2}" y="${T}" width="${slot}" height="${H - T - B}" class="hit" data-tip="${esc(b.tip || '')}"/>`;
+    if (b.label && (n <= 16 || i % Math.ceil(n / 12) === 0)) g += `<text x="${cx}" y="${H - 6}" text-anchor="middle"${b.on ? ' style="fill:var(--text);font-weight:700"' : ''}>${esc(b.label)}</text>`;
+  });
+  g += `<line class="axis" x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}"/>`;
+  for (const r of o.refs || []) g += `<line x1="${L}" x2="${W - R}" y1="${Y(r.y)}" y2="${Y(r.y)}" stroke="var(--text)" stroke-width="1" stroke-dasharray="4 4"/><text x="${W - R}" y="${Y(r.y) - 4}" text-anchor="end">${esc(r.label)}</text>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label || 'Bar chart')}">${g}</svg>`;
+}
+function radarChart(axes, series, label) {
+  const S = 260, c = S / 2, Rr = 88, n = axes.length;
+  const pt = (i, f) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [c + Math.cos(a) * Rr * f, c + Math.sin(a) * Rr * f]; };
+  let g = '';
+  for (let k = 1; k <= 6; k++) g += `<polygon points="${axes.map((_, i) => pt(i, k / 6).join(',')).join(' ')}" fill="none" stroke="var(--line)" stroke-width="1"/>`;
+  axes.forEach((ax, i) => {
+    const [x, y] = pt(i, 1), [lx, ly] = pt(i, 1.2);
+    g += `<line x1="${c}" y1="${c}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${lx}" y="${ly + 4}" text-anchor="${Math.abs(lx - c) < 8 ? 'middle' : lx > c ? 'start' : 'end'}" style="font-weight:700;fill:var(--text)">${esc(ax.label)}</text>`;
+  });
+  for (const s of series) {
+    const ps = s.values.map((v, i) => pt(i, Math.max(0, v) / axes[i].max));
+    g += `<polygon points="${ps.map(p => p.join(',')).join(' ')}" fill="${s.color}" fill-opacity="${s.dash ? 0 : 0.12}" stroke="${s.color}" stroke-width="2" stroke-linejoin="round"${s.dash ? ' stroke-dasharray="5 4"' : ''}/>`;
+    ps.forEach((p, i) => { g += `<g data-tip="${esc(`${s.name}: ${axes[i].label} ${axes[i].fmt ? axes[i].fmt(s.values[i]) : s.values[i]}`)}"><circle cx="${p[0]}" cy="${p[1]}" r="10" class="hit"/><circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${s.color}" stroke="var(--panel)" stroke-width="2"/></g>`; });
+  }
+  return `<svg class="chart" viewBox="-40 -6 ${S + 80} ${S + 12}" style="max-width:380px;margin:0 auto" role="img" aria-label="${esc(label)}">${g}</svg>`;
+}
+const KCOL = { train: 'var(--E)', meal: 'var(--S)', prep: 'color-mix(in srgb, var(--S) 45%, var(--panel))', work: 'var(--line)', break: 'var(--R)', wind: 'var(--muted)', sleep: 'var(--panel-2)' };
+function ganttChart(rows, t0, t1, now) {
+  const W = chartW(true), L = 46, R = 10, T = 18, rh = 26, H = T + rows.length * rh + 6;
+  const X = t => L + (t - t0) / (t1 - t0) * (W - L - R);
+  let g = '';
+  for (let h = Math.ceil(t0 / 60) * 60; h <= t1; h += 60) { const x = X(h); g += `<line x1="${x}" x2="${x}" y1="${T - 4}" y2="${H - 6}" stroke="var(--panel-2)" stroke-width="1"/>${(h / 60) % 3 === 0 ? `<text x="${x}" y="11" text-anchor="middle">${clockText(hm(h)).replace(':00', '')}</text>` : ''}`; }
+  rows.forEach((r, i) => {
+    const y = T + i * rh;
+    g += `<text x="${L - 8}" y="${y + rh / 2 + 4}" text-anchor="end" style="${r.on ? 'fill:var(--text);font-weight:700' : ''}">${esc(r.label)}</text>`;
+    for (const sgm of r.segs) {
+      const a = Math.max(t0, sgm.s), b = Math.min(t1, sgm.e);
+      if (b - a < 1) continue;
+      const x = X(a), w = Math.max(2, X(b) - X(a) - 1.5), hh = sgm.kind === 'work' || sgm.kind === 'sleep' ? 8 : 16;
+      g += `<rect x="${x}" y="${y + (rh - hh) / 2}" width="${w}" height="${hh}" rx="${Math.min(4, w / 2)}" fill="${KCOL[sgm.kind]}" data-tip="${esc(sgm.tip)}"/>`;
+    }
+  });
+  if (now != null && now >= t0 && now <= t1) g += `<line x1="${X(now)}" x2="${X(now)}" y1="${T - 4}" y2="${H - 4}" stroke="var(--text)" stroke-width="1.5"/>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Schedule for the week">${g}</svg>`;
+}
+// A front and back body figure, each muscle group shaded by this week's sets.
+const INJ_REGION = Object.fromEntries(REGIONS.flatMap(([rid, , ids]) => ids.map(id => [id, rid])));
+const REGION_SPOT = { foot: [[36, 236], null], leg: [[49, 205], [49, 205]], knee: [[49, 178], null], hip: [[50, 122], [50, 128]], core: [[60, 95], [60, 108]], arm: [[36, 52], [36, 52]], head: [[60, 36], [60, 36]] };
+function bodySVG(back, cov, inj) {
+  const v = g => cov[g] || 0;
+  const fill = g => `color-mix(in srgb, var(--accent) ${Math.round(clamp(v(g) / 12, 0.06, 1) * 100)}%, var(--panel-2))`;
+  const m = (g, shape) => `<g data-tip="${esc(`${GROUP_NAME[g]}: ${Math.round(v(g) * 10) / 10} weighted sets this week`)}">${shape.replace(/F/g, fill(g))}</g>`;
+  const pair = (g, f) => m(g, f(1) + f(-1));
+  let s = `<g fill="var(--panel-2)" stroke="var(--line)" stroke-width="1"><circle cx="60" cy="20" r="13"/><rect x="38" y="42" width="44" height="82" rx="14"/><rect x="20" y="46" width="15" height="82" rx="7"/><rect x="85" y="46" width="15" height="82" rx="7"/><rect x="40" y="116" width="19" height="128" rx="9"/><rect x="61" y="116" width="19" height="128" rx="9"/></g>`;
+  const E = (cx, cy, rx, ry) => side => `<ellipse cx="${60 + (cx - 60) * side}" cy="${cy}" rx="${rx}" ry="${ry}" fill="F" stroke="var(--panel)" stroke-width="2"/>`;
+  s += m('neck', `<rect x="54" y="31" width="12" height="11" rx="3" fill="F" stroke="var(--panel)" stroke-width="2"/>`);
+  s += pair('delt', E(34, 52, 9, 8));
+  s += pair('fore', E(27, 108, 6, 15));
+  if (!back) {
+    s += pair('chest', E(49, 60, 11, 9));
+    s += pair('bi', E(28, 79, 6, 13));
+    s += m('core', `<rect x="48" y="71" width="24" height="44" rx="7" fill="F" stroke="var(--panel)" stroke-width="2"/>`);
+    s += pair('hipf', E(51, 121, 6, 5));
+    s += pair('quad', E(49, 152, 9, 25));
+    s += pair('add', E(57.5, 146, 3, 15));
+    s += pair('shin', E(50, 207, 5.5, 22));
+  } else {
+    s += m('uback', `<path d="M42 48 L78 48 L72 70 L48 70 Z" fill="F" stroke="var(--panel)" stroke-width="2"/>`);
+    s += pair('rc', E(45, 62, 5.5, 5));
+    s += pair('lats', E(47, 86, 8, 16));
+    s += pair('tri', E(28, 79, 6, 13));
+    s += m('lowb', `<rect x="51" y="98" width="18" height="20" rx="5" fill="F" stroke="var(--panel)" stroke-width="2"/>`);
+    s += pair('glute', E(50, 129, 10, 11));
+    s += pair('ham', E(49, 163, 9, 23));
+    s += pair('calf', E(49, 206, 7, 20));
+  }
+  // Injuries and weak areas, by region.
+  const by = {};
+  for (const i of inj) { const r = INJ_REGION[i.id]; if (r) (by[r] = by[r] || []).push(i); }
+  for (const [r, list] of Object.entries(by)) {
+    const p = REGION_SPOT[r]?.[back ? 1 : 0];
+    if (!p) continue;
+    const bad = list.some(i => i.status === 'pain');
+    s += `<g data-tip="${esc(list.map(i => `${i.name}: ${INJ_STATUS[i.status] || 'recovering'}`).join('; '))}"><circle cx="${p[0]}" cy="${p[1]}" r="12" class="hit"/> <circle cx="${p[0]}" cy="${p[1]}" r="6" fill="var(--panel)" stroke="${bad ? 'var(--bad)' : 'var(--warn)'}" stroke-width="2"/><text x="${p[0]}" y="${p[1] + 3.5}" text-anchor="middle" style="font-size:9px;font-weight:800;fill:${bad ? 'var(--bad)' : 'var(--warn)'}">!</text></g>`;
+  }
+  return `<svg viewBox="0 0 120 252" role="img" aria-label="${back ? 'Back' : 'Front'} of the body, shaded by weekly sets"><text x="60" y="251" text-anchor="middle" style="font-size:8px;fill:var(--muted)">${back ? 'Back' : 'Front'}</text>${s}</svg>`;
+}
+const LEVEL_TXT = { good: 'Ready', warn: 'So-so', bad: 'Rough' };
+const LEVEL_COL = { good: 'var(--good)', warn: 'var(--warn)', bad: 'var(--bad)' };
+const QUICK_SCORE = { good: 85, warn: 65, bad: 40 };
+function tableOf(head, rows) { return `<details class="small" style="margin-top:6px"><summary>Show as a table</summary><div style="max-height:220px;overflow:auto"><table><tr>${head.map(h => `<th>${esc(h)}</th>`).join('')}</tr>${rows.map(r => `<tr>${r.map((c, i) => `<td${i ? ' class="n"' : ''}>${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div></details>`; }
+function renderStats() {
+  const m = M, sub = VIEW.sub.stats;
+  subtabs('stats', [['checkins', 'Check-ins'], ['progress', 'Progress radar'], ['tests', 'Tests'], ['body', 'Body'], ['schedule', 'Schedule'], ['load', 'Training load']]);
+  const today = dayNo(isoDate(new Date()));
+  const rangePills = pills('range', [[14, '2 weeks'], [30, '30 days'], [90, '90 days'], [365, 'Year']], VIEW.range);
+  const from = today - VIEW.range + 1;
+  let h = '';
+  if (sub === 'checkins') {
+    const rows = P.ciLog.filter(r => dayNo(r.date) >= from);
+    if (!rows.length) h = `<div class="card">${rangePills}<h3>No check-ins in this range yet</h3><p class="small">Each day, tap Ready, So-so or Rough on Today, or <b>Enter check-in data</b> for sleep, soreness, energy, stress and resting heart rate. They build up here as charts.</p><button class="btn sm" data-go="today">Go to Today</button></div>`;
+    else {
+      const full = rows.filter(r => !r.quick), sc = rows.map(r => r.score ?? QUICK_SCORE[r.level]);
+      const avg = a => a.length ? Math.round(a.reduce((x, y) => x + y, 0) / a.length * 10) / 10 : '–';
+      let streak = 0; for (let d = today; P.ciLog.some(r => dayNo(r.date) === d); d--) streak++;
+      const score = lineChart({ label: 'Readiness score over time', xMin: from, xMax: today, yMin: 0, yMax: 100, yTicks: [0, 25, 50, 75, 100], refs: [{ y: 75, label: 'ready', color: 'var(--good)' }, { y: 55, label: 'lighter below', color: 'var(--warn)' }],
+        series: [{ name: 'Readiness', color: 'var(--accent)', area: true, pts: rows.map(r => ({ x: dayNo(r.date), y: r.score ?? QUICK_SCORE[r.level], color: LEVEL_COL[r.level], hollow: !!r.quick, tip: `${shortDate(parseDate(r.date))}: ${LEVEL_TXT[r.level]}${r.quick ? ' (one tap, estimated)' : `, ${r.score}/100`}` })) }] });
+      const sleep = full.length ? barChart({ label: 'Sleep each night', refs: [{ y: P.sleep, label: `target ${P.sleep} h` }], bars: full.map(r => ({ v: r.sleep || 0, color: (r.sleep || 0) >= P.sleep * 0.95 ? 'var(--accent)' : 'color-mix(in srgb, var(--accent) 50%, var(--panel))', label: parseDate(r.date).getDate(), tip: `${shortDate(parseDate(r.date))}: ${r.sleep} h` })), fmtY: t => t + ' h' }) : '<p class="small muted">Sleep shows up once you enter check-in data.</p>';
+      const small = (k, name, lowGood) => full.length ? `<div><b class="small">${name}</b> <span class="small muted">1–5, ${lowGood ? 'lower' : 'higher'} is better</span>${lineChart({ label: name, h: 120, xMin: from, xMax: today, yMin: 1, yMax: 5, yTicks: [1, 3, 5], series: [{ name, color: 'var(--accent)', pts: full.filter(r => r[k]).map(r => ({ x: dayNo(r.date), y: r[k], tip: `${shortDate(parseDate(r.date))}: ${name.toLowerCase()} ${r[k]} of 5` })) }] })}</div>` : '';
+      h = `<div class="card">${rangePills}<div class="kpis"><div class="kpi"><b>${rows.length}</b><span>check-ins</span></div><div class="kpi"><b>${avg(sc)}</b><span>average readiness</span></div><div class="kpi"><b>${full.length ? avg(full.map(r => r.sleep || 0)) + ' h' : '–'}</b><span>average sleep</span></div><div class="kpi"><b>${streak}</b><span>day streak</span></div></div></div>
+        <div class="charts"><div class="card"><h3>Readiness</h3><div class="legend"><span><i style="background:var(--good)"></i>Ready</span><span><i style="background:var(--warn)"></i>So-so (lighter session)</span><span><i style="background:var(--bad)"></i>Rough (recovery)</span><span><i style="background:var(--panel);border:2px solid var(--muted)"></i>One-tap, estimated</span></div>${score}
+          ${tableOf(['Date', 'How', 'Score', 'Sleep'], rows.slice().reverse().map(r => [r.date, LEVEL_TXT[r.level], r.score ?? '–', r.sleep ?? '–']))}</div>
+          <div class="card"><h3>Sleep</h3>${sleep}</div>
+          <div class="card"><h3>Soreness, energy and stress</h3>${full.length ? small('sore', 'Soreness', true) + small('energy', 'Energy', false) + small('stress', 'Stress', true) : '<p class="small muted">These show up once you enter check-in data.</p>'}</div></div>`;
+    }
+  } else if (sub === 'progress') {
+    const qs = ['E', 'S', 'P', 'R'], axes = qs.map(q => ({ label: Q[q], max: 6, fmt: v => `stage ${v} of 6` }));
+    const log = P.stageLog, first = log.find(r => dayNo(r.date) >= from - 1) || log[0];
+    const series = [{ name: 'Now', color: 'var(--accent)', values: qs.map(q => m.stage[q]) }];
+    if (first && qs.some(q => first[q] !== m.stage[q])) series.push({ name: `On ${shortDate(parseDate(first.date))}`, color: 'var(--muted)', dash: true, values: qs.map(q => first[q]) });
+    series.push({ name: 'Next gate', color: 'var(--text)', dash: true, values: qs.map(q => Math.min(6, m.stage[q] + 1)) });
+    // Every gate test you have a result for, as a share of its six gates.
+    const tests = [...new Set(qs.flatMap(q => m.info[q].ids))].filter(id => P.tests[id] > 0);
+    const short = n => { n = n.replace(/ \(.*/, ''); if (n.length <= 18) return n; const c = n.slice(0, 18); return c.slice(0, c.lastIndexOf(' ')) + '…'; };
+    const tAxes = tests.map(id => ({ label: short(TESTS[id].name), max: 6, fmt: v => `${v} of 6 gates (${fmtVal(id, P.tests[id])})` }));
+    h = `<div class="charts"><div class="card"><h3>Stages on each path</h3>${rangePills}<div class="legend">${series.map(s => `<span><i class="ln" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>${radarChart(axes, series, 'Stage on each path')}
+        <p class="small muted">Rings are stages 1 to 6. ${series.length > 2 ? 'The grey outline is where you were at the start of the range.' : 'Stage changes show up as a second outline once you move up.'}</p>
+        ${tableOf(['Path', 'Now', 'Next'], qs.map(q => [Q[q], `${m.stage[q]}. ${STAGES[m.stage[q] - 1]}`, m.stage[q] < 6 ? STAGES[m.stage[q]] : '–']))}</div>
+      <div class="card"><h3>Gate tests passed</h3>${tests.length >= 3 ? `${radarChart(tAxes, [{ name: 'Gates passed', color: 'var(--accent)', values: tests.map(id => metCount(id, P.tests[id], m)) }], 'Gates passed on each test')}<p class="small muted">How many of the six gates each latest result clears. A lopsided shape shows where to spend time.</p>`
+        : `<p class="small">Enter at least three test results under Setup → Conditioning (or log them on Paths → Gates) to see this chart.</p><button class="btn sm" data-go="setup:tests">Enter results</button>`}
+        ${log.length > 1 ? `<h4 style="margin-top:8px">Stages over time</h4>${lineChart({ label: 'Stages over time', h: 150, yMin: 1, yMax: 6, yTicks: [1, 2, 3, 4, 5, 6], xMax: today, series: qs.map(q => ({ name: Q[q], step: true, color: `var(--${q})`, pts: log.map(r => ({ x: dayNo(r.date), y: r[q], tip: `${Q[q]} stage ${r[q]} on ${shortDate(parseDate(r.date))}` })) })) })}<div class="legend">${['E', 'S', 'R', 'P'].map(q => `<span><i class="ln" style="background:var(--${q})"></i>${Q[q]}</span>`).join('')}</div>` : ''}</div></div>`;
+  } else if (sub === 'tests') {
+    const q = VIEW.q, ids = m.info[q].ids;
+    const cards = ids.map(id => {
+      const t = TESTS[id], logs = P.testLog.filter(r => r.id === id);
+      const met = P.tests[id] ? metCount(id, P.tests[id], m) : m.stage[q] - 1, tgt = target(id, Math.min(6, met + 1), m);
+      const fmtY = v => t.unit === 'time' ? fmtTime(v) : v;
+      return `<div class="card"><h3>${esc(t.name)}</h3>${logs.length ? lineChart({ label: t.name, h: 150, fmtY, refs: met < 6 ? [{ y: tgt, label: `next gate ${fmtVal(id, tgt).replace(/ \(.*/, '')}` }] : [], series: [{ name: t.name, color: `var(--${q})`, pts: logs.map(r => ({ x: dayNo(r.date), y: r.value, tip: `${shortDate(parseDate(r.date))}: ${fmtVal(id, r.value)}` })) }] }) + `<p class="small muted">${t.low ? 'Lower is better. ' : ''}${logs.length} result${logs.length > 1 ? 's' : ''} logged.</p>` : `<p class="small muted">No results logged yet. Next gate: ${t.low ? '≤' : '≥'} ${fmtVal(id, tgt)}.</p>`}</div>`;
+    }).join('');
+    h = `<div class="card">${qPills()}<p class="small muted" style="margin:0">Results you log on Paths → Gates, against the target for your next gate.</p></div><div class="charts" style="margin-top:10px">${cards}</div>`;
+  } else if (sub === 'body') {
+    const cov = coverage(PLAN.days);
+    const wl = P.bodyLog.filter(r => dayNo(r.date) >= from);
+    h = `<div class="charts"><div class="card"><h3>Muscle groups, week ${PLAN.wk.no}</h3><div class="bodyfig">${bodySVG(false, cov, m.inj.list)}${bodySVG(true, cov, m.inj.list)}</div>
+        <div class="row" style="justify-content:center;margin-top:6px"><span class="ramp">0 <b></b> 12+ weighted sets</span>${m.inj.list.length ? '<span class="small muted"><span class="flag-med">!</span> injury or weak area</span>' : ''}</div>
+        <p class="small muted">Hover or tap a muscle for its sets. Strength sets count fully, prehab three quarters and power half; small top-ups keep every group above zero.</p>
+        ${tableOf(['Muscle group', 'Sets'], GROUPS.map(([g, n]) => [n, Math.round(cov[g] * 10) / 10]))}</div>
+      <div class="card"><h3>Body weight</h3>${rangePills}${wl.length > 1 ? lineChart({ label: 'Body weight', fmtY: v => imperial() ? Math.round(v * 2.20462) : v, series: [{ name: 'Weight', color: 'var(--accent)', pts: wl.map(r => ({ x: dayNo(r.date), y: r.w, tip: `${shortDate(parseDate(r.date))}: ${shownW(r.w)} ${imperial() ? 'lb' : 'kg'}` })) }] }) : '<p class="small muted">Each time you change your weight under Setup → Body it is logged here. Two entries make a line.</p>'}
+        <div class="kpis"><div class="kpi"><b>${shownW(P.weight)} ${imperial() ? 'lb' : 'kg'}</b><span>now</span></div>${wl.length > 1 ? `<div class="kpi"><b>${(shownW(P.weight) - shownW(wl[0].w) > 0 ? '+' : '')}${Math.round((shownW(P.weight) - shownW(wl[0].w)) * 10) / 10}</b><span>since ${shortDate(parseDate(wl[0].date))}</span></div>` : ''}</div>
+        <button class="btn sm" data-go="setup:body">Update weight</button></div></div>`;
+  } else if (sub === 'schedule') {
+    const plan = PLAN, isThis = plan.wk.no === m.todayWeek;
+    const tls = plan.days.map(d => {
+      const ctx = isThis && d.idx === m.todayIdx && !m.notStarted ? (() => { const r = readiness(todayCheckin()); return d.sessions.map(s => r ? adjustSession(s, r.level, m) : s); })() : (isThis && m.notStarted ? [] : d.sessions);
+      return dayTimeline(d, m, ctx);
+    });
+    const t0 = Math.min(...tls.map(t => t.wake)) - 15, t1 = Math.max(...tls.map(t => t.bed)) + 15;
+    const rows = tls.map((t, i) => ({ label: DAYS[i], on: isThis && i === m.todayIdx, segs: t.ev.filter(x => KCOL[x.kind] && x.kind !== 'sleep').map(x => ({ s: x.s, e: Math.max(x.e, x.s + 3), kind: x.kind, tip: `${DAYS[i]} ${hm(x.s)}–${hm(x.e)}: ${x.kind === 'meal' ? x.meal.name.replace(/ \(.*/, '') + ', ' + x.title : x.title}` })) }));
+    const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+    const tot = k => Math.round(tls.reduce((a, t) => a + t.ev.filter(x => x.kind === k).reduce((b, x) => b + x.e - x.s, 0), 0) / 6) / 10;
+    h = `<div class="card">${weekNav(plan.wk)}<div class="legend">${['train', 'prep', 'meal', 'work', 'break', 'wind'].map(k => `<span><i style="background:${KCOL[k]}"></i>${KIND_NAME[k]}</span>`).join('')}</div>
+      ${ganttChart(rows, t0, t1, isThis ? (nowMin < t0 ? nowMin + 1440 : nowMin) : null)}
+      <div class="kpis" style="margin-top:8px"><div class="kpi"><b>${tot('train')} h</b><span>training</span></div><div class="kpi"><b>${tot('prep')} h</b><span>meal prep</span></div><div class="kpi"><b>${tot('work')} h</b><span>focus work</span></div><div class="kpi"><b>${tot('break')} h</b><span>moving breaks</span></div></div>
+      <p class="small muted">Waking to bedtime for each day of week ${plan.wk.no}. ${isThis ? 'The line marks now. ' : ''}Tap a day on the Day tab for the details.</p></div>`;
+  } else {
+    const last = Math.min(52, Math.max(m.todayWeek + 4, 8)), firstW = Math.max(1, last - 15);
+    const weeks = [];
+    for (let w = firstW; w <= last; w++) {
+      const pl = w === PLAN.wk.no ? PLAN : planWeek(m, w), mins = { E: 0, S: 0, R: 0, P: 0, O: 0 };
+      for (const d of pl.days) for (const s of d.sessions) for (const b of s.blocks) { const k = b.kind === 'X' ? 'R' : ['E', 'S', 'P', 'R'].includes(b.kind) ? b.kind : 'O'; mins[k] += b.minutes || 0; }
+      weeks.push({ w, mins, wk: pl.wk });
+    }
+    const QC = { E: 'var(--E)', S: 'var(--S)', R: 'var(--R)', P: 'var(--P)', O: 'var(--line)' }, QN = { ...Q, R: 'Resilience and rehab', O: 'Warm-ups, cool-downs, tests' };
+    h = `<div class="card"><h3>Planned training by week</h3><div class="legend">${['E', 'S', 'R', 'P', 'O'].map(k => `<span><i style="background:${QC[k]}"></i>${QN[k]}</span>`).join('')}</div>
+      ${barChart({ full: true, label: 'Planned hours by week and quality', fmtY: t => t + ' h', bars: weeks.map(x => ({ label: x.wk.deload ? `${x.w}U` : x.w, on: x.w === m.todayWeek, dim: x.w < m.todayWeek, parts: ['E', 'S', 'R', 'P', 'O'].map(k => ({ v: x.mins[k] / 60, color: QC[k] })), tip: `Week ${x.w} (${weekRange(x.w)})${x.wk.deload ? ', unload' : ''}: ${['E', 'S', 'R', 'P', 'O'].map(k => `${QN[k]} ${Math.round(x.mins[k])} min`).join(', ')}` })) })}
+      <p class="small muted">Weeks counted from your plan start, ${shortDate(m.planStart)}. "U" marks unload and gate-test weeks; faded bars are past weeks and the bold label is this week. Load builds over three weeks, then drops.</p>
+      ${tableOf(['Week', 'Endurance', 'Strength', 'Resilience', 'Power', 'Other'], weeks.map(x => [`${x.w}${x.wk.deload ? ' (unload)' : ''}`, ...['E', 'S', 'R', 'P', 'O'].map(k => Math.round(x.mins[k]) + ' min')]))}</div>`;
+  }
+  $('statsPane').innerHTML = h;
+}
+
 // ---------- Setup ----------
 function renderSetup() {
   const m = M, a = ATHLETE[P.athlete], e = emphasis(), sub = VIEW.sub.setup;
   const nInj = Object.keys(P.inj).length;
-  subtabs('setup', [['athlete', 'Athlete'], ['body', 'Body'], ['tests', 'Conditioning'], ['injuries', `Injuries${nInj ? ' · ' + nInj : ''}`], ['schedule', 'Schedule'], ['data', 'Data']]);
+  subtabs('setup', [['athlete', 'Athlete'], ['body', 'Body'], ['tests', 'Conditioning'], ['injuries', `Injuries${nInj ? ' · ' + nInj : ''}`], ['schedule', 'Schedule'], ['health', `Health${P.meds.length ? ' · ' + P.meds.length : ''}`], ['data', 'Data']]);
   let h = '';
   if (sub === 'athlete') {
     h = `${FIRST_RUN && !VIEW.started ? `<div class="card note good" style="margin:0 0 10px"><b>Welcome.</b> Pick your athlete type and a quick start. Everything else has sensible defaults you can refine later. <button class="btn sm pri" data-act="start">Show my plan</button></div>` : ''}
@@ -2795,16 +3646,29 @@ function renderSetup() {
         ${field(`Session length: <b>${P.minutes} min</b>`, `<input type="range" min="20" max="150" step="5" data-k="minutes" value="${P.minutes}">`)}
         <label class="row small" style="margin-bottom:10px"><input type="checkbox" data-k="doubles"${P.doubles ? ' checked' : ''}> Two sessions a day are possible</label>
         <div class="grid2">${field('Equipment', sel('equip', [[0, 'Bodyweight and a band'], [1, 'Home: dumbbells or kettlebells'], [2, 'Full gym']], P.equip))}${field('Pull-up bar', sel('bar', [['1', 'Yes'], ['0', 'No']], P.bar ? '1' : '0'))}</div></div>
-      <div class="card"><div class="grid2">${field('Usual session start', `<input type="time" data-k="sessionTime" value="${P.sessionTime}">`)}${field('Wake time', `<input type="time" data-k="wake" value="${P.wake}">`)}
+      <div class="card"><div class="grid2">${field('Wake time', timeField('wake', P.wake, 'Wake time'))}${field('Usual session start', timeField('sessionTime', P.sessionTime, 'Usual session start'))}
         ${field('Sleep target (h)', num('sleep', P.sleep, 'step="0.25" min="6" max="11"'))}${field('Meals a day', sel('meals', [3, 4, 5, 6].map(n => [n, n]), P.meals))}</div>
         ${field('Eating style', sel('diet', Object.values(STYLES).map(s => [s.id, s.name]), P.diet))}
-        ${field('Plan started (week 1 begins)', `<input type="date" data-k="planStart" value="${P.planStart}">`)}</div></div>`;
+        ${field('Plan start (week 1)', `<input type="date" data-k="planStart" value="${P.planStart}">`)}
+        <p class="small" style="margin:-4px 0 8px">${planStartText(m)} <button class="btn sm" data-act="startNow">Restart from this week</button></p>
+        <p class="small muted" style="margin:0">Desk hours and breaks are on the <button class="btn sm" data-go="day:desk">Day tab</button>.</p></div></div>`;
+  } else if (sub === 'health') {
+    h = `<div class="card"><h3>Regular medicines</h3><p class="small">Tick any you take, and the app adds general cautions where a medicine meets caffeine, food or training: on Today's session, the meal plan, supplements and the Day plan. Nothing is changed in your plan automatically.</p>
+      <div class="medlist">${MEDS.map(x => `<label><input type="checkbox" data-med="${x.id}"${P.meds.includes(x.id) ? ' checked' : ''}><span><b>${esc(x.name)}</b><small>${esc(x.ex)}</small></span></label>`).join('')}</div>
+      ${P.meds.length ? `<h4 style="margin-top:10px">Your cautions</h4>${medsOn().map(x => `<div class="medn"><b>${esc(x.name)}</b><ul class="small" style="margin:2px 0 0">${['caffeine', 'food', 'fuel', 'supp', 'hr', 'impact', 'long', 'train', 'wake'].filter(k => x[k]).map(k => `<li>${esc(k === 'food' ? x.food[1] : x[k])}</li>`).join('')}</ul></div>`).join('')}` : ''}
+      <p class="disclaimer" style="margin-top:10px">General information about common interactions, not medical advice, and not a complete list. Your pharmacist or prescriber knows your doses and other medicines: ask them before changing anything.</p></div>`;
   } else {
     h = `<div class="card"><h3>Your data</h3><p class="small muted">Everything is saved in this browser only. Back it up to move it to another device.</p>
       <div class="row"><button class="btn sm" data-act="saveProfile">Back up profile</button><button class="btn sm" data-act="loadProfile">Restore…</button><button class="btn sm" data-act="resetProfile">Start over</button><button class="btn sm" data-act="about">About and changes</button></div>
       <p class="disclaimer" style="margin-top:10px">An educational planner, not medical advice. Get a professional assessment for pain, recent injuries, heart or health conditions before hard training.</p></div>`;
   }
   $('setupPane').innerHTML = h;
+}
+// What the plan start does, in words: which week today is and when the gates fall.
+function planStartText(m) {
+  if (m.notStarted) return `Week 1 starts on ${shortDate(m.planStart)} (in ${plural(m.startsIn, 'day')}). Until then, Today shows a preview.`;
+  const wk = weekInfo(m.todayWeek), gw = gateWeek();
+  return `Weeks run Monday to Sunday from ${shortDate(m.planStart)}. Today is in <b>week ${m.todayWeek}</b> (block ${wk.block}, week ${wk.w} of 4: ${wk.deload ? 'unload and gate tests' : ['build', 'build more', 'peak load'][wk.w - 1]}). Next gate tests: ${weekRange(gw)}.`;
 }
 function renderLive() {
   const m = M, plan = todayPlan(), d = plan.days[m.todayIdx], L = PLAN.days.map(dayLoad);
@@ -2826,11 +3690,14 @@ function setPath(k, raw, el) {
     if (cur.status === 'none') delete P.inj[id]; else P.inj[id] = cur;
     return;
   }
+  if (parts[0] === 'wday') { const s = new Set(P.workDays); if (el.checked) s.add(+parts[1]); else s.delete(+parts[1]); P.workDays = [...s].sort((a, b) => a - b); return; }
+  if (k === 'desk' || k === 'standDesk') { P[k] = el.checked; return; }
+  if (k === 'planStart') { if (parseDate(raw)) { P.planStart = raw; VIEW.week = null; VIEW.exportWeek = null; VIEW.planMoved = true; } return; }
   if (parts[0] === 'day') { const s = new Set(P.days); if (el.checked) s.add(+parts[1]); else s.delete(+parts[1]); P.days = [...s].sort((a, b) => a - b); return; }
   if (k === 'doubles') { P.doubles = el.checked; return; }
   if (k === 'bar') { P.bar = raw === '1'; return; }
   if (k === 'height') { const v = n(raw); if (v) P.height = clamp(imperial() ? v * 2.54 : v, 120, 230); return; }
-  if (k === 'weight') { const v = n(raw); if (v) P.weight = clamp(imperial() ? v / 2.20462 : v, 30, 200); return; }
+  if (k === 'weight') { const v = n(raw); if (v) { P.weight = clamp(imperial() ? v / 2.20462 : v, 30, 200); upsertDated(P.bodyLog, { date: isoDate(new Date()), w: Math.round(P.weight * 10) / 10 }); } return; }
   if (['age', 'minutes', 'sleep', 'meals', 'trainAge', 'equip', 'life'].includes(k)) { const v = n(raw); if (v != null && isFinite(v)) P[k] = v; return; }
   if (['bf', 'rhr', 'hrmax'].includes(k)) { const v = n(raw); P[k] = v && v > 0 ? v : null; return; }
   P[k] = raw;
@@ -2844,7 +3711,15 @@ function renderOutputs() {
   if (VIEW.week == null) VIEW.week = M.todayWeek;
   if (VIEW.day == null) VIEW.day = M.todayIdx;
   PLAN = planWeek(M, VIEW.week);
-  renderToday(); renderWeek(); renderPaths(); renderFuel(); renderRecover(); renderLive();
+  logStages();
+  renderToday(); renderDay(); renderWeek(); renderPaths(); renderFuel(); renderRecover(); renderLive();
+  if (VIEW.tab === 'stats') renderStats();
+}
+// Keep a history of stages for the progress charts: one row per day the stages change.
+function logStages() {
+  const row = { date: isoDate(new Date()), E: M.stage.E, S: M.stage.S, P: M.stage.P, R: M.stage.R }, last = P.stageLog[P.stageLog.length - 1];
+  if (last && ['E', 'S', 'P', 'R'].every(q => last[q] === row[q])) return;
+  upsertDated(P.stageLog, row); save();
 }
 function renderAll() {
   renderOutputs();
@@ -2857,7 +3732,10 @@ function showTab(t, sub) {
   if (sub) VIEW.sub[t] = sub;
   document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === t));
+  if (t === 'day') VIEW.scrollNow = true;
   if (sub) renderAll();
+  else if (t === 'stats') renderStats();
+  else if (t === 'day') renderDay();
 }
 document.addEventListener('input', e => {
   const el = e.target.closest('[data-k]');
@@ -2869,7 +3747,13 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', e => {
   const el = e.target.closest('[data-k]');
-  if (el) { setPath(el.dataset.k, el.value, el); P = sanitize(P); save(); renderAll(); return; }
+  if (el) {
+    setPath(el.dataset.k, el.value, el); P = sanitize(P); save(); renderAll();
+    if (VIEW.planMoved) { VIEW.planMoved = false; toast(M.notStarted ? `Week 1 starts ${shortDate(M.planStart)}; Today shows a preview until then` : `Week 1 now starts ${shortDate(M.planStart)}. Today is week ${M.todayWeek}.`); }
+    return;
+  }
+  const md = e.target.closest('[data-med]');
+  if (md) { const set = new Set(P.meds); if (md.checked) set.add(md.dataset.med); else set.delete(md.dataset.med); P.meds = MEDS.map(x => x.id).filter(id => set.has(id)); save(); renderAll(); return; }
   const sw = e.target.closest('[data-swap]');
   if (sw && sw.value !== '') {
     const w = PLAN.wk.no; (P.swaps[w] = P.swaps[w] || []).push([+sw.dataset.swap, +sw.value]); save(); renderOutputs();
@@ -2893,6 +3777,22 @@ document.addEventListener('click', e => {
   const mi = t.closest('[data-micro]'); if (mi) { VIEW.micro = mi.dataset.micro; VIEW.sub.fuel = 'micros'; return renderFuel(); }
   const rg = t.closest('[data-reg]'); if (rg) { VIEW.reg = rg.dataset.reg; return renderSetup(); }
   const ij = t.closest('[data-inj]'); if (ij) { VIEW.inj = ij.dataset.inj; return renderRecover(); }
+  const rn = t.closest('[data-range]'); if (rn) { VIEW.range = +rn.dataset.range; return renderStats(); }
+  const ac = t.closest('[data-avoidcat]'); if (ac) { const c = ac.dataset.avoidcat; P.avoidCats = P.avoidCats.includes(c) ? P.avoidCats.filter(x => x !== c) : [...P.avoidCats, c]; save(); return renderAll(); }
+  const af = t.closest('[data-avoidfood]'); if (af) { const f = af.dataset.avoidfood; P.avoidFoods = P.avoidFoods.includes(f) ? P.avoidFoods.filter(x => x !== f) : [...P.avoidFoods, f]; save(); return renderAll(); }
+  // Time picker
+  const ts = t.closest('[data-tpstep]'); if (ts) { const k = ts.closest('[data-tp]').dataset.tp; setTime(k, toMin(P[k]) + +ts.dataset.tpstep); return; }
+  const to = t.closest('[data-tpopen]'); if (to) return openTimePicker(to.dataset.tpopen);
+  if (VIEW.tp) {
+    const tp = VIEW.tp, x = t.closest('[data-tph],[data-tpm],[data-tpampm],[data-tpadd]');
+    if (x) {
+      if (x.dataset.tph) tp.h = (+x.dataset.tph % 12) + (tp.h >= 12 ? 12 : 0);
+      else if (x.dataset.tpm) tp.mi = +x.dataset.tpm;
+      else if (x.dataset.tpampm) tp.h = tp.h % 12 + (x.dataset.tpampm === 'pm' ? 12 : 0);
+      else { const v = (((tp.h * 60 + tp.mi + +x.dataset.tpadd) % 1440) + 1440) % 1440; tp.h = Math.floor(v / 60); tp.mi = v % 60; }
+      return drawTimePicker();
+    }
+  }
   const b = t.closest('[data-act]'); if (!b) return;
   const act = b.dataset.act;
   if (act === 'theme') { const cur = document.documentElement.dataset.theme; const dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; setTheme(dark ? 'light' : 'dark'); }
@@ -2913,14 +3813,30 @@ document.addEventListener('click', e => {
   else if (act === 'quick') {
     const cur = todayCheckin();
     P.checkin = cur?.quick === b.dataset.lv ? null : { date: isoDate(new Date()), quick: b.dataset.lv };
-    save(); renderOutputs();
+    logCheckin(P.checkin); save(); renderOutputs();
   }
+  else if (act === 'tpCancel') { VIEW.tp = null; $('tpDlg').close(); }
+  else if (act === 'tpDone') { const tp = VIEW.tp; VIEW.tp = null; $('tpDlg').close(); if (tp) setTime(tp.k, tp.h * 60 + tp.mi); }
+  else if (act === 'xall') {
+    const scope = b.closest('.card') || b.closest('.panel'), all = [...scope.querySelectorAll('details')], open = all.some(x => !x.open);
+    all.forEach(x => { x.open = open; });
+    scope.querySelectorAll('[data-act="xall"]').forEach(x => { x.textContent = open ? 'Collapse all' : 'Expand all'; });
+  }
+  else if (act === 'startNow') { P.planStart = isoDate(mondayOf(new Date())); VIEW.week = VIEW.exportWeek = null; save(); renderAll(); toast(`Week 1 starts ${shortDate(mondayOf(new Date()))}: today is week 1`); }
+  else if (act === 'avoidClear') { P.avoidCats = []; P.avoidFoods = []; save(); renderAll(); }
+  else if (act === 'dayIT' || act === 'dayTxt' || act === 'dayIcs') {
+    const { plan, d, tl } = dayCtx(), w = plan.wk.no, tag = `${DAYS[d.idx]}-week${w}`;
+    if (act === 'dayIT') { download(`interval-day-${tag}.json`, dayRoutines(d, w, tl)); toast('Saved. In IntervalTimer: Settings → Import routines'); }
+    else if (act === 'dayTxt') download(`day-plan-${tag}.txt`, dayText(d, w, tl), 'text/plain');
+    else { download(`day-plan-${tag}.ics`, dayICS(d, w, tl), 'text/calendar'); toast('Open the file to add the events to your calendar'); }
+  }
+  else if (act === 'dayPrint') { VIEW.sub.day = 'line'; renderDay(); $('dayPane').querySelectorAll('details').forEach(x => { x.open = true; }); window.print(); }
   else if (act === 'ciOpen') openCheckin();
   else if (act === 'ciClose') $('ciDlg').close();
   else if (act === 'checkin') {
     const ci = { date: isoDate(new Date()) };
     $('ciDlg').querySelectorAll('[data-ci]').forEach(x => { ci[x.dataset.ci] = x.type === 'checkbox' ? x.checked : Number(x.value); });
-    P.checkin = ci; save(); $('ciDlg').close(); renderOutputs();
+    P.checkin = ci; logCheckin(ci); save(); $('ciDlg').close(); renderOutputs();
     const r = readiness(ci); toast(`Readiness ${r.score}/100: ${r.level === 'good' ? 'train as planned' : r.level === 'warn' ? 'session made lighter' : 'recovery today'}`);
   }
   else if (act === 'log') {
@@ -2955,8 +3871,30 @@ $('filePick').addEventListener('change', async () => {
     P = sanitize({ ...DEFAULTS(), ...data.profile }); save(); VIEW.week = VIEW.day = null; renderAll(); toast('Profile restored');
   } catch (err) { toast('That file is not a Fitness Progression Paths profile'); }
 });
+function setTime(k, mins) {
+  P[k] = hm(mins); P = sanitize(P); save(); renderAll();
+  toast(`${{ sessionTime: 'Session start', wake: 'Wake time', workStart: 'Work starts', workEnd: 'Work ends' }[k] || 'Time'}: ${clockText(P[k])}`);
+}
+// Hover and tap tooltips for chart marks.
+let tipEl = null;
+function showTip(e) {
+  const el = e.target.closest?.('[data-tip]');
+  if (!el || !el.dataset.tip) { tipEl?.remove(); tipEl = null; return; }
+  if (!tipEl) { tipEl = document.createElement('div'); tipEl.className = 'tip'; document.body.append(tipEl); }
+  tipEl.textContent = el.dataset.tip;
+  const x = e.clientX, y = e.clientY, w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+  tipEl.style.left = `${clamp(x + 12, 8, innerWidth - w - 8)}px`;
+  tipEl.style.top = `${y - h - 12 < 8 ? y + 16 : y - h - 12}px`;
+}
+document.addEventListener('pointermove', showTip);
+document.addEventListener('pointerdown', showTip);
+document.addEventListener('scroll', () => { tipEl?.remove(); tipEl = null; }, true);
 let wasNarrow = matchMedia('(max-width: 859px)').matches;
-window.addEventListener('resize', () => { const n = matchMedia('(max-width: 859px)').matches; if (n !== wasNarrow) { wasNarrow = n; renderPaths(); } });
+let resizeT = 0;
+window.addEventListener('resize', () => {
+  const n = matchMedia('(max-width: 859px)').matches; if (n !== wasNarrow) { wasNarrow = n; renderPaths(); }
+  clearTimeout(resizeT); resizeT = setTimeout(() => { if (VIEW.tab === 'stats') renderStats(); }, 150);
+});
 
 // ---------- Theme and About ----------
 function setTheme(t) {
