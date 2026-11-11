@@ -39,47 +39,71 @@
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
 a { color: var(--accent); }
-h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 8px; }
-h2 { font-size: 19px; } h3 { font-size: 16px; } h4 { font-size: 14px; }
-p { margin: 0 0 10px; }
+h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 6px; }
+h2 { font-size: 18px; } h3 { font-size: 15px; } h4 { font-size: 14px; }
+p { margin: 0 0 8px; }
+ul { margin: 0 0 8px; padding-left: 18px; }
 .muted { color: var(--muted); }
 .small { font-size: 13px; }
-header.top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
-header.top img { width: 30px; height: 30px; }
-header.top h1 { font-size: 17px; margin: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.iconbtn { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
-nav.tabs { position: sticky; top: 47px; z-index: 19; display: flex; gap: 4px; overflow-x: auto; padding: 6px 16px; background: var(--bg); border-bottom: 1px solid var(--line); scrollbar-width: thin; }
-nav.tabs button { flex: none; border: 0; background: transparent; color: var(--muted); padding: 7px 12px; border-radius: 999px; font: inherit; font-weight: 600; cursor: pointer; }
-nav.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
-.layout { max-width: 1320px; margin: 0 auto; padding: 14px 16px 60px; display: grid; gap: 16px; }
-@media (min-width: 1000px) {
-  .layout { grid-template-columns: 380px minmax(0, 1fr); align-items: start; }
-  #you { position: sticky; top: 104px; max-height: calc(100vh - 116px); overflow-y: auto; display: block !important; }
-  nav.tabs button[data-tab="you"] { display: none; }
+
+/* ---------- Shell: one screen, no page scrolling ---------- */
+.shell { height: 100vh; height: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "main" "nav"; }
+header.top { grid-area: head; display: flex; align-items: center; gap: 8px; padding: 6px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+header.top img { width: 26px; height: 26px; }
+header.top h1 { font-size: 16px; margin: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iconbtn { border: 0; background: transparent; color: var(--muted); border-radius: 8px; padding: 5px 8px; font: inherit; font-size: 13px; cursor: pointer; }
+.iconbtn:hover { background: var(--panel-2); color: var(--text); }
+nav.main { grid-area: nav; display: flex; background: var(--panel); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+nav.main button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 10px 2px 9px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border-top: 3px solid transparent; }
+nav.main button[aria-selected="true"] { color: var(--accent); border-top-color: var(--accent); }
+main { grid-area: main; min-height: 0; min-width: 0; padding: 10px 16px; max-width: 1200px; width: 100%; margin: 0 auto; }
+@media (min-width: 860px) {
+  .shell { grid-template-rows: auto minmax(0, 1fr); grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "head nav tools" "main main main"; background: var(--bg); }
+  header.top { border-bottom: 1px solid var(--line); padding-right: 24px; }
+  header.top h1 { flex: none; }
+  header.top .tools { display: none; }
+  nav.main { border-top: 0; border-bottom: 1px solid var(--line); gap: 2px; align-items: stretch; }
+  nav.main button { flex: none; padding: 0 14px; font-size: 14px; border-top: 0; border-bottom: 3px solid transparent; }
+  nav.main button[aria-selected="true"] { border-bottom-color: var(--accent); }
+  .tools.wide { grid-area: tools; display: flex; align-items: center; padding: 0 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  main { padding: 14px 20px 16px; }
 }
-.panel { display: none; }
-.panel.on { display: block; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 14px; box-shadow: var(--shadow); }
-.card > h2:first-child, .card > h3:first-child { margin-top: 0; }
-details.sec { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; box-shadow: var(--shadow); }
-details.sec > summary { cursor: pointer; padding: 11px 14px; font-weight: 700; list-style: none; display: flex; align-items: center; gap: 8px; }
-details.sec > summary::-webkit-details-marker { display: none; }
-details.sec > summary::after { content: "▸"; margin-left: auto; color: var(--muted); transition: transform .15s; }
-details.sec[open] > summary::after { transform: rotate(90deg); }
-details.sec .body { padding: 0 14px 14px; }
-label.f { display: block; margin: 0 0 10px; font-size: 13px; color: var(--muted); }
-label.f > span.l { display: block; margin-bottom: 3px; }
-input, select, textarea { font: inherit; color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; width: 100%; min-width: 0; }
-input[type="checkbox"], input[type="radio"] { width: auto; accent-color: var(--accent); }
+@media (max-width: 859px) { .tools.wide, .wide-only { display: none !important; } }
+@media (min-width: 860px) { .narrow-only { display: none !important; } }
+.panel { display: none; height: 100%; min-height: 0; flex-direction: column; gap: 8px; }
+.panel.on { display: flex; }
+.subtabs { display: flex; gap: 4px; flex: none; overflow-x: auto; scrollbar-width: none; }
+.subtabs::-webkit-scrollbar { display: none; }
+.subtabs button, .pills button { flex: none; border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.subtabs button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.pills { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.pills button { background: var(--panel-2); padding: 3px 10px; }
+.pills button.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+.pills button.E.on { background: var(--E); border-color: var(--E); color: #fff; } .pills button.S.on { background: var(--S); border-color: var(--S); color: #fff; }
+.pills button.P.on { background: var(--P); border-color: var(--P); color: #fff; } .pills button.R.on { background: var(--R); border-color: var(--R); color: #fff; }
+.pills button.flag::after { content: " •"; color: var(--warn); }
+.pane { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); }
+.card + .card { margin-top: 10px; }
+.cols { display: grid; gap: 10px; }
+@media (min-width: 860px) { .cols.two { grid-template-columns: 1fr 1fr; } .cols.wide-left { grid-template-columns: 1.5fr 1fr; } .cols > .card + .card { margin-top: 0; } .fill { height: 100%; } }
+@media (max-width: 859px) { .cols > .card + .card { margin-top: 0; } }
+
+/* ---------- Forms ---------- */
+label.f { display: block; margin: 0 0 8px; font-size: 13px; color: var(--muted); }
+label.f > span.l { display: block; margin-bottom: 2px; }
+input, select { font: inherit; color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; width: 100%; min-width: 0; }
+input[type="checkbox"] { width: auto; accent-color: var(--accent); }
 input[type="range"] { padding: 0; accent-color: var(--accent); background: transparent; border: 0; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
 .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 10px; }
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.btn { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 8px; padding: 7px 12px; font: inherit; font-weight: 600; cursor: pointer; }
+.btn { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 8px; padding: 6px 12px; font: inherit; font-weight: 600; cursor: pointer; }
 .btn.pri { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.btn.sm { padding: 4px 9px; font-size: 13px; }
+.btn.sm { padding: 3px 9px; font-size: 13px; }
 .btn:disabled { opacity: .5; cursor: default; }
 .chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
 .q-E { color: var(--E); } .q-S { color: var(--S); } .q-P { color: var(--P); } .q-R { color: var(--R); }
@@ -93,110 +117,163 @@ input[type="range"] { padding: 0; accent-color: var(--accent); background: trans
 .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 .days label { display: flex; flex-direction: column; align-items: center; font-size: 12px; padding: 4px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); cursor: pointer; }
 .days label:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); }
-.emph { display: grid; grid-template-columns: 92px 1fr 40px; gap: 4px 8px; align-items: center; font-size: 13px; }
+.emph { display: grid; grid-template-columns: 84px 1fr 40px; gap: 2px 8px; align-items: center; font-size: 13px; }
 .emph output { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
-.bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--panel-2); }
+.bar { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: var(--panel-2); }
 .bar > i { display: block; height: 100%; }
-.test-row { display: grid; grid-template-columns: 1fr 104px; gap: 6px; align-items: center; margin-bottom: 6px; font-size: 13px; }
-.test-row .tl small { display: block; color: var(--muted); font-size: 12px; }
-.inj { display: grid; grid-template-columns: 1fr 128px; gap: 6px; align-items: center; margin-bottom: 6px; font-size: 13px; }
+.test-row { display: grid; grid-template-columns: 1fr 100px; gap: 6px; align-items: center; margin-bottom: 6px; font-size: 13px; }
+.test-row small { display: block; color: var(--muted); font-size: 12px; }
+.inj-grid { display: grid; gap: 4px 14px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.inj { display: grid; grid-template-columns: 1fr 122px; gap: 6px; align-items: center; font-size: 13px; }
 .inj .ph { grid-column: 1 / -1; }
 table { border-collapse: collapse; width: 100%; font-size: 13px; }
-th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { color: var(--muted); font-weight: 600; }
-td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
-.scroll { overflow-x: auto; }
-.week { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
-.day { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; box-shadow: var(--shadow); }
-.day.today { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
-.day.rest { background: var(--panel-2); }
-.day h3 { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.day h3 .mins { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 600; }
-.sess { border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }
-.blk { margin: 6px 0; padding-left: 9px; border-left: 3px solid var(--line); }
-.blk.E { border-color: var(--E); } .blk.S { border-color: var(--S); } .blk.P { border-color: var(--P); } .blk.R { border-color: var(--R); } .blk.X { border-color: var(--bad); }
-.blk h4 { font-size: 13px; margin: 0 0 2px; display: flex; gap: 6px; align-items: baseline; }
-.blk h4 small { color: var(--muted); font-weight: 500; }
-.blk ul { margin: 0; padding-left: 0; list-style: none; font-size: 13px; }
-.blk summary { cursor: pointer; }
-.blk details > div { padding: 2px 0 4px 14px; }
-.blk li { margin: 1px 0; }
-.blk li .dose { color: var(--muted); }
-.blk li .alt { color: var(--muted); font-size: 12px; }
-.ex { cursor: help; text-decoration: underline dotted var(--muted); text-underline-offset: 3px; }
-.ladder { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
-.ladder .st { flex: 1 1 120px; border: 1px solid var(--line); border-radius: 10px; padding: 8px; background: var(--panel-2); font-size: 12px; position: relative; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.note { background: var(--panel-2); border-radius: 10px; padding: 8px 10px; font-size: 13px; margin: 6px 0; }
+.note.warn { background: var(--warn-soft); } .note.bad { background: var(--bad-soft); } .note.good { background: var(--good-soft); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 6px; margin-bottom: 8px; }
+.kpi { background: var(--panel-2); border-radius: 10px; padding: 6px 10px; }
+.kpi b { display: block; font-size: 19px; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.kpi span { font-size: 12px; color: var(--muted); }
+
+/* ---------- Today ---------- */
+.today { height: 100%; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+.today > * { min-width: 0; }
+.ready { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.ready .q { font-weight: 700; margin-right: 2px; }
+.ready button.lv { border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.ready button.lv.on.good { background: var(--good-soft); color: var(--good); border-color: var(--good); }
+.ready button.lv.on.warn { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); }
+.ready button.lv.on.bad { background: var(--bad-soft); color: var(--bad); border-color: var(--bad); }
+.sesswrap { min-height: 0; display: flex; flex-direction: column; }
+.sesscard { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.sess-head { padding: 12px 14px 8px; border-bottom: 1px solid var(--line); }
+.sess-head .eyebrow { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.sess-head h2 { font-size: 20px; margin: 2px 0 4px; }
+.sess-body { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 8px; }
+.sess-foot { padding: 8px 14px; border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+details.blk { border-left: 4px solid var(--line); border-radius: 4px; margin: 4px 0; }
+details.blk.E { border-color: var(--E); } details.blk.S { border-color: var(--S); } details.blk.P { border-color: var(--P); } details.blk.R { border-color: var(--R); } details.blk.X { border-color: var(--bad); }
+details.blk > summary { cursor: pointer; list-style: none; display: flex; gap: 8px; align-items: baseline; padding: 6px 8px; border-radius: 6px; font-weight: 700; }
+details.blk > summary::-webkit-details-marker { display: none; }
+details.blk > summary:hover { background: var(--panel-2); }
+details.blk > summary .sub { font-weight: 500; color: var(--muted); font-size: 13px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+details.blk > summary .mins { font-weight: 600; color: var(--muted); font-size: 12px; white-space: nowrap; }
+details.blk[open] > summary .sub { visibility: hidden; }
+details.blk .bb { padding: 0 8px 8px 10px; font-size: 13px; }
+details.blk ul { list-style: none; padding: 0; margin: 4px 0 0; }
+details.blk li details > summary { cursor: pointer; padding: 2px 0; }
+details.blk li .dose { color: var(--muted); }
+details.blk li details > div { padding: 0 0 4px 14px; color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.tile { text-align: left; border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 12px; padding: 8px 12px; font: inherit; cursor: pointer; box-shadow: var(--shadow); min-width: 0; }
+.tile .t { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; display: flex; justify-content: space-between; }
+.tile b { display: block; font-size: 20px; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.tile span.s { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dots { display: flex; gap: 4px; margin: 5px 0 3px; }
+.dots i { flex: 1; height: 8px; border-radius: 999px; background: var(--line); }
+.dots i.now { outline: 2px solid var(--text); outline-offset: 1px; }
+@media (min-width: 860px) {
+  .today { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .today .ready { grid-column: 2; grid-row: 1; }
+  .today .sesswrap { grid-column: 1; grid-row: 1 / span 2; }
+  .today .tiles { grid-column: 2; grid-row: 2; align-content: start; }
+  .tile { padding: 12px 14px; } .tile b { font-size: 24px; }
+}
+
+/* ---------- Week ---------- */
+.daybar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 8px; }
+.daybar button { border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 10px; padding: 4px 2px 5px; font: inherit; font-size: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+.daybar button b { font-size: 13px; }
+.daybar button i { width: 70%; height: 5px; border-radius: 999px; background: var(--line); }
+.daybar button.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.daybar button.now b::after { content: " •"; color: var(--accent); }
+.weeknav { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.weeknav h2 { margin: 0; font-size: 16px; }
+.musc { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.musc div { display: flex; justify-content: space-between; align-items: center; background: var(--panel-2); border-radius: 8px; padding: 5px 10px; font-size: 13px; }
+.exp-list label { display: flex; gap: 8px; align-items: flex-start; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.exp-list label small { display: block; color: var(--muted); }
+
+/* ---------- Paths ---------- */
+.railwrap { height: 100%; display: grid; gap: 10px; grid-template-rows: minmax(0, 1fr) auto; }
+.railwrap .dia { min-height: 0; padding: 6px; display: flex; align-items: center; justify-content: center; }
+.railwrap svg { max-width: 100%; max-height: 100%; width: 100%; height: 100%; }
+.railwrap .detail { max-height: 34vh; overflow-y: auto; }
+@media (min-width: 860px) { .railwrap { grid-template-rows: none; grid-template-columns: minmax(0, 1.9fr) minmax(260px, 1fr); } .railwrap .detail { max-height: 100%; } .railwrap { align-items: start; } .railwrap .dia { max-height: 100%; } }
+svg .stn { cursor: pointer; }
+svg .stn:focus { outline: none; }
+svg .stn:hover circle, svg .stn:focus circle { stroke-width: 4; }
+svg text { font-family: inherit; }
+svg text.halo { paint-order: stroke; stroke: var(--panel); stroke-width: 4px; stroke-linejoin: round; }
+.ladder { display: flex; gap: 5px; flex-wrap: wrap; margin: 8px 0; }
+.ladder .st { flex: 1 1 100px; border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; background: var(--panel-2); font-size: 12px; }
 .ladder .st b { display: block; font-size: 13px; }
 .ladder .st.done { opacity: .7; }
 .ladder .st.cur { background: var(--panel); border-width: 2px; }
 .ladder .st.cur.E { border-color: var(--E); } .ladder .st.cur.S { border-color: var(--S); } .ladder .st.cur.P { border-color: var(--P); } .ladder .st.cur.R { border-color: var(--R); }
-.loops { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.loops { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
 .loop { text-align: center; font-size: 13px; }
-.loop svg { width: 100%; max-width: 150px; height: auto; display: block; margin: 0 auto 4px; }
-.status { padding: 10px 12px; border-radius: 10px; font-weight: 600; margin-bottom: 10px; }
-.status.good { background: var(--good-soft); color: var(--good); }
-.status.warn { background: var(--warn-soft); color: var(--warn); }
-.status.bad { background: var(--bad-soft); color: var(--bad); }
-.note { background: var(--panel-2); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin: 8px 0; }
-.note.warn { background: var(--warn-soft); }
-.note.bad { background: var(--bad-soft); }
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 10px; }
-.kpi { background: var(--panel-2); border-radius: 10px; padding: 8px 10px; }
-.kpi b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
-.kpi span { font-size: 12px; color: var(--muted); }
-.heat td.c { text-align: center; font-variant-numeric: tabular-nums; border-radius: 4px; }
-.pill-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
-.pill-tabs button { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer; }
-.pill-tabs button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.disclaimer { font-size: 12px; color: var(--muted); }
+.loop svg { width: 100%; max-width: 140px; height: auto; display: block; margin: 0 auto 2px; }
+
+/* ---------- Fuel ---------- */
+.macrobar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; margin: 4px 0 2px; }
+.macrobar i { display: block; height: 100%; }
+.mC { background: var(--E); } .mP { background: var(--S); } .mF { background: var(--P); }
+.weekbars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; align-items: end; height: 70px; margin: 6px 0 2px; }
+.weekbars div { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; font-size: 11px; color: var(--muted); }
+.weekbars i { display: block; width: 70%; border-radius: 4px 4px 0 0; background: var(--E); opacity: .55; }
+.weekbars .on i { opacity: 1; }
+details.meal { border: 1px solid var(--line); border-radius: 10px; margin: 5px 0; background: var(--panel); }
+details.meal > summary { cursor: pointer; list-style: none; padding: 7px 10px; display: flex; gap: 8px; align-items: baseline; }
+details.meal > summary::-webkit-details-marker { display: none; }
+details.meal > summary .tm { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; }
+details.meal > summary .dish { flex: 1; min-width: 0; font-weight: 600; }
+details.meal > summary .dish small { display: block; font-weight: 500; color: var(--muted); }
+details.meal > summary .kc { font-size: 12px; color: var(--muted); white-space: nowrap; }
+details.meal .mb { padding: 0 10px 8px; font-size: 13px; }
+.cover { display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0; }
+
 dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); max-width: min(560px, calc(100vw - 32px)); padding: 18px; }
 dialog::backdrop { background: rgba(0,0,0,.45); }
-.about-log { list-style: none; padding: 0; margin: 0; font-size: 13px; max-height: 40vh; overflow-y: auto; }
+.about-log { list-style: none; padding: 0; margin: 0; font-size: 13px; max-height: 34vh; overflow-y: auto; }
 .about-log li { margin: 0 0 5px; }
 .about-log time { color: var(--muted); margin-right: 8px; font-variant-numeric: tabular-nums; }
 .dlg-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
-.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 10px; font-size: 14px; z-index: 50; }
-.update-bar { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 40; display: flex; gap: 10px; align-items: center; justify-content: space-between; background: var(--panel); border: 1px solid var(--accent); border-radius: 12px; padding: 10px 14px; }
-.foot { text-align: center; padding: 10px 16px 30px; }
-.foot button { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
-.exp-list label { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
-.exp-list label small { display: block; color: var(--muted); }
-@media (max-width: 560px) {
-  .grid3 { grid-template-columns: 1fr 1fr; }
-  .test-row { grid-template-columns: 1fr 92px; }
-}
-@media print { header.top, nav.tabs, #you, .foot, .noprint { display: none !important; } .panel { display: block !important; } }
+.toast { position: fixed; left: 50%; bottom: 70px; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 10px; font-size: 14px; z-index: 50; max-width: calc(100vw - 32px); }
+.update-bar { position: fixed; left: 16px; right: 16px; bottom: 70px; z-index: 40; display: flex; gap: 10px; align-items: center; justify-content: space-between; background: var(--panel); border: 1px solid var(--accent); border-radius: 12px; padding: 10px 14px; }
+.disclaimer { font-size: 12px; color: var(--muted); }
+.live { font-size: 13px; color: var(--muted); display: flex; gap: 6px 12px; flex-wrap: wrap; align-items: center; flex: none; }
+@media (max-width: 560px) { .grid3 { grid-template-columns: 1fr 1fr; } }
+@media print { body { overflow: visible; } .shell { display: block; height: auto; } header.top, nav.main, .subtabs, .tools { display: none !important; } .pane { overflow: visible; } }
 </style>
 </head>
 <body>
-<header class="top">
-  <img src="icon.svg" alt="">
-  <h1>Fitness Progression Paths</h1>
-  <button class="iconbtn" id="themeBtn" title="Switch light or dark theme">Theme</button>
-</header>
-<nav class="tabs" role="tablist" id="tabs">
-  <button data-tab="you" role="tab">You</button>
-  <button data-tab="paths" role="tab">Paths</button>
-  <button data-tab="week" role="tab">Week</button>
-  <button data-tab="today" role="tab">Today</button>
-  <button data-tab="fuel" role="tab">Fuel</button>
-  <button data-tab="recover" role="tab">Recover</button>
-  <button data-tab="gates" role="tab">Gates</button>
-  <button data-tab="export" role="tab">Export</button>
-</nav>
-<div class="layout">
-  <aside id="you" class="panel"></aside>
+<div class="shell">
+  <header class="top">
+    <img src="icon.svg" alt="">
+    <h1>Fitness Paths</h1>
+    <span class="tools"><button class="iconbtn" data-act="theme" title="Switch light or dark theme">Theme</button><button class="iconbtn" data-act="about">About</button></span>
+  </header>
+  <nav class="main" role="tablist" id="tabs">
+    <button data-tab="today" role="tab">Today</button>
+    <button data-tab="week" role="tab">Week</button>
+    <button data-tab="paths" role="tab">Paths</button>
+    <button data-tab="fuel" role="tab">Fuel</button>
+    <button data-tab="recover" role="tab">Recover</button>
+    <button data-tab="setup" role="tab">Setup</button>
+  </nav>
+  <span class="tools wide"><button class="iconbtn" data-act="theme" title="Switch light or dark theme">Theme</button><button class="iconbtn" data-act="about">About</button></span>
   <main>
-    <section id="paths" class="panel"></section>
-    <section id="week" class="panel"></section>
     <section id="today" class="panel"></section>
-    <section id="fuel" class="panel"></section>
-    <section id="recover" class="panel"></section>
-    <section id="gates" class="panel"></section>
-    <section id="export" class="panel"></section>
+    <section id="week" class="panel"><div class="subtabs" id="weekTabs"></div><div class="pane" id="weekPane"></div></section>
+    <section id="paths" class="panel"><div class="subtabs" id="pathsTabs"></div><div class="pane" id="pathsPane"></div></section>
+    <section id="fuel" class="panel"><div class="subtabs" id="fuelTabs"></div><div class="pane" id="fuelPane"></div></section>
+    <section id="recover" class="panel"><div class="subtabs" id="recoverTabs"></div><div class="pane" id="recoverPane"></div></section>
+    <section id="setup" class="panel"><div class="subtabs" id="setupTabs"></div><div class="live" id="setupLive"></div><div class="pane" id="setupPane"></div></section>
   </main>
 </div>
-<div class="foot"><button id="aboutBtn">About</button></div>
 
 <dialog id="aboutDlg" aria-labelledby="aboutTitle">
   <h2 id="aboutTitle">About Fitness Progression Paths</h2>
@@ -207,10 +284,12 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
   <ul class="about-log" id="aboutLog"><li class="muted">Loading changes…</li></ul>
   <div class="dlg-row"><button class="btn" id="aboutClose">Close</button></div>
 </dialog>
+<dialog id="ciDlg" aria-labelledby="ciTitle"><h2 id="ciTitle">Check-in details</h2><div id="ciBody"></div>
+  <div class="dlg-row"><button class="btn" data-act="ciClose">Cancel</button><button class="btn pri" data-act="checkin">Check in</button></div></dialog>
 <input type="file" id="filePick" accept="application/json,.json" hidden>
 <script>
 'use strict';
-const APP_BUILD = '1.0 (2026.11.10)';
+const APP_BUILD = '2.0 (2026.11.10)';
 const REPO = 'sonusario/physical_fitness_progression_paths';
 
 // =============================================================================
@@ -712,6 +791,233 @@ const DAYS_LONG = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satu
 const IT_PALETTE = ['#FFD23F', '#4DD9A6', '#5AA9FF', '#FF7A59', '#C98BFF', '#FF5C8A', '#7BE0E8', '#B8E05A'];
 
 // =============================================================================
+// Split abs (diastasis recti)
+// =============================================================================
+for (const line of `
+ta_breath|360° breathing with deep-core tension|core|none|Lie with knees bent. Breathe into the ribs and belly; as you breathe out, gently lift the pelvic floor and draw the lower belly in. No bulge down the midline.
+heel_slide|Heel slides|core hipf:.3|none|Breathe out, keep the deep-core tension, and slide one heel away along the floor and back. The belly stays flat.
+knee_fallout|Bent-knee fallouts|core add:.3|none|Knees bent, let one knee lower out to the side slowly while the pelvis stays still.
+toe_tap|Tabletop toe taps|core hipf:.4|none|Both hips and knees at 90°. Lower one foot to tap the floor and return, with no doming of the belly.
+`.trim().split('\n')) { const [id, name, g, tags, cue] = line.split('|'); addEx(id, name, g, tags === 'none' ? '' : tags, cue); }
+// Exercises that load the abdominal wall hard. They wait until doming is under control.
+for (const id of ['plank', 'll_plank', 'tempo_pushup', 'feet_pushup', 'archer_pushup']) EX[id].tags.push('abwall');
+for (const id of ['hollow', 'ab_roll', 'wall_hspu', 'w_pullup']) EX[id].tags.push('abwall', 'abwall2');
+SAFE_ALT.hpush.unshift('incline_pushup');
+
+INJURIES.push({ id: 'diastasis', name: 'Split abs (diastasis recti)', avoid: ['abwall', 'abwall2'], impact: false, custom: true,
+  phases: [
+    ['Reconnect', [['ta_breath', '2 × 10 slow breaths, daily'], ['heel_slide', '2 × 10 each side, daily'], ['knee_fallout', '2 × 10 each side']]],
+    ['Rebuild', [['dead_bug', '3 × 8 each side'], ['side_plank_k', '3 × 20 s each side'], ['toe_tap', '3 × 10 each side'], ['glute_bridge', '3 × 12']]],
+    ['Reload', [['plank', '3 × 20–40 s, no doming'], ['pallof', '3 × 10 each side'], ['sa_carry', '3 × 30 m each side'], ['curl_up', '3 × 8 × 5 s']]],
+  ],
+  ev: 'Deep-core and progressive abdominal strengthening programs reduce the gap between the abdominal muscles in trials (Thabet and Alshehri 2019), though the evidence overall is modest (Gluppe 2021 review). Curl-ups were not shown to widen the gap (Gluppe 2023). What matters is control: no doming or coning along the midline, and no breath-holding.',
+  gate: 'No doming during a plank, a curl-up and a loaded carry, and the midline feels firm (not soft) under your fingers when you lift your head.' });
+INJURY.diastasis = INJURIES[INJURIES.length - 1];
+const DR_OPTS = {
+  gap: [['narrow', 'Under 2 finger-widths'], ['mid', '2 to 3 finger-widths'], ['wide', 'Over 3 finger-widths']],
+  timing: [['none', 'Not related to pregnancy'], ['pp0', 'Postpartum, under 6 weeks'], ['pp1', 'Postpartum, 6 to 12 weeks'], ['pp2', 'Postpartum, over 12 weeks']],
+  doming: [['no', 'No'], ['some', 'Only on hard efforts'], ['yes', 'Yes, on most core work']],
+  pf: [['no', 'No'], ['yes', 'Yes (leaking, heaviness or pain)']],
+};
+// The phase follows the selections: recent birth, a wide gap or doming keep it early.
+function drPhase(v) {
+  const gap = v.gap || 'mid', timing = v.timing || 'none', doming = v.doming || 'some';
+  if (timing === 'pp0') return 1;
+  if (doming === 'yes' || gap === 'wide') return doming === 'no' ? 2 : 1;
+  if (gap === 'mid' || doming === 'some' || timing === 'pp1') return 2;
+  return 3;
+}
+
+// =============================================================================
+// Food
+// =============================================================================
+// id | name | one unit | several units | grams per unit | per 100 g: kcal, carbs, protein, fat, fibre | most units in one meal | rich in
+// A blank unit means the food is shown in grams.
+const FOOD = {};
+for (const line of `
+oats|rolled oats||| 40|379|67|13|7|10|3|iron mag zinc
+rice|cooked white rice|cup cooked white rice|cups cooked white rice|160|130|28|2.7|0.3|0.4|3|
+brownrice|cooked brown rice|cup cooked brown rice|cups cooked brown rice|195|123|25.6|2.7|1|1.6|2.5|mag
+pasta|cooked pasta|cup cooked pasta|cups cooked pasta|140|158|31|5.8|0.9|1.8|3.5|
+quinoa|cooked quinoa|cup cooked quinoa|cups cooked quinoa|185|120|21|4.4|1.9|2.8|2.5|mag iron folate
+potato|potato|medium potato|medium potatoes|170|87|20|1.9|0.1|1.8|3.5|potassium vitc
+sweetpotato|sweet potato|medium sweet potato|medium sweet potatoes|130|90|21|2|0.2|3.3|3.5|potassium vitc
+bread|whole-wheat bread|slice whole-wheat bread|slices whole-wheat bread|40|250|43|12|3.5|6|4|mag sodium
+bagel|bagel|bagel|bagels|100|270|53|10|1.6|2.3|2|sodium
+tortilla|flour tortilla|large flour tortilla|large flour tortillas|70|300|50|8|7.5|3|3|sodium
+cereal|fortified cereal|cup fortified cereal|cups fortified cereal|30|370|84|7|1|3|3|iron b12 folate zinc
+ricecake|rice cakes|rice cake|rice cakes|9|387|82|8|2.8|4|6|
+bar|granola bar|granola bar|granola bars|40|450|65|8|17|5|2|
+banana|banana|banana|bananas|120|89|23|1.1|0.3|2.6|2|potassium
+apple|apple|apple|apples|180|52|14|0.3|0.2|2.4|1|
+orange|orange|orange|oranges|140|47|12|0.9|0.1|2.4|2|vitc potassium folate
+berries|berries|cup berries|cups berries|140|50|12|0.8|0.4|3.5|2|vitc
+dates|dates|date|dates|24|280|75|2.5|0.4|8|5|potassium
+honey|honey|tbsp honey|tbsp honey|21|304|82|0.3|0|0|2|
+sportsdrink|sports drink|500 ml sports drink|bottles (500 ml) sports drink|500|26|6.4|0|0|0|2|sodium
+chicken|cooked chicken breast||| 100|165|0|31|3.6|0|2.2|zinc
+beef|cooked lean ground beef||| 100|217|0|26|12|0|2|iron zinc b12
+salmon|cooked salmon||| 100|206|0|22|12|0|2|omega3 vitd b12 potassium
+tuna|canned tuna in water|can tuna in water|cans tuna in water|120|116|0|26|1|0|1.5|b12 vitd iodine omega3
+turkey|sliced turkey breast||| 100|104|3|17|2|0|1.5|sodium
+eggs|eggs|egg|eggs|50|143|0.7|12.6|9.5|0|4|b12 vitd iodine
+greek|plain Greek yogurt|cup plain Greek yogurt|cups plain Greek yogurt|245|59|3.6|10|0.4|0|1.5|calcium b12 iodine zinc potassium
+milk|low-fat milk|cup low-fat milk|cups low-fat milk|245|50|4.8|3.3|2|0|2|calcium b12 vitd iodine
+chocmilk|low-fat chocolate milk|cup chocolate milk|cups chocolate milk|250|75|11|3.4|1.9|0.5|3|calcium b12 vitd
+cottage|low-fat cottage cheese|cup cottage cheese|cups cottage cheese|225|82|4.3|11|2.3|0|1.5|calcium b12 iodine sodium
+cheese|cheddar cheese|slice cheddar|slices cheddar|28|403|1.3|25|33|0|2|calcium b12 sodium
+whey|whey protein|scoop whey protein|scoops whey protein|30|400|8|80|6|0|1.5|b12 calcium
+peapro|pea protein|scoop pea protein|scoops pea protein|30|380|7|78|6|2|1.5|iron
+tofu|firm tofu||| 100|144|3|17|9|2|2.5|calcium iron mag
+tempeh|tempeh||| 100|192|8|20|11|5|2|iron mag zinc
+lentils|cooked lentils|cup cooked lentils|cups cooked lentils|200|116|20|9|0.4|8|2|iron folate potassium zinc
+blackbeans|black beans|cup black beans|cups black beans|172|132|24|8.9|0.5|8.7|2|iron folate mag potassium
+chickpeas|chickpeas|cup chickpeas|cups chickpeas|164|164|27|8.9|2.6|7.6|2|iron folate zinc
+soymilk|fortified soy milk|cup fortified soy milk|cups fortified soy milk|245|43|3|3|1.8|0.5|2|calcium b12 vitd
+pb|peanut butter|tbsp peanut butter|tbsp peanut butter|16|588|20|25|50|6|2|mag
+almonds|almonds|small handful almonds|small handfuls almonds|28|579|22|21|50|12.5|2|mag calcium
+oil|olive oil|tbsp olive oil|tbsp olive oil|14|884|0|0|100|0|2|
+avocado|avocado|half avocado|avocado halves|75|160|9|2|15|7|2|potassium folate
+hummus|hummus|2 tbsp hummus|servings (2 tbsp) hummus|30|166|14|8|10|6|2|
+broccoli|cooked broccoli|cup broccoli|cups broccoli|155|35|7|2.4|0.4|3.3|2|vitc folate calcium
+spinach|spinach|2 cups raw spinach|servings (2 cups) raw spinach|60|23|3.6|2.9|0.4|2.2|2|iron folate mag vitc
+salad|mixed salad|cup mixed salad|cups mixed salad|100|25|5|1.5|0.2|2|2|vitc folate
+mixedveg|mixed vegetables|cup mixed vegetables|cups mixed vegetables|160|65|13|3|0.2|4|2|vitc folate
+`.trim().split('\n')) {
+  const [id, name, one, many, g, kcal, c, p, f, fib, max, rich] = line.split('|').map(x => x.trim());
+  const k = +g / 100;
+  FOOD[id] = { id, name, one, many, g: +g, max: +max, rich: rich ? rich.split(' ') : [], u: { kcal: kcal * k, c: c * k, p: p * k, f: f * k, fib: fib * k } };
+}
+
+// Eating styles, like athlete types for the plate. Each meal line is:
+// dish name; main carbohydrate food; main protein food; fixed extras (food:units).
+const STYLES_RAW = {
+  omni: ['Everyday omnivore', 'A bit of everything, built from common supermarket foods.', {
+    b: ['Oatmeal, eggs and a banana; oats; eggs; banana:1', 'Eggs on toast with an orange; bread; eggs; orange:1', 'Cereal, milk and yogurt with berries; cereal; greek; milk:1,berries:1'],
+    l: ['Chicken and rice bowl; rice; chicken; mixedveg:1', 'Turkey sandwich and an apple; bread; turkey; apple:1,salad:1', 'Tuna pasta salad; pasta; tuna; salad:1'],
+    d: ['Salmon, potatoes and broccoli; potato; salmon; broccoli:1', 'Beef and pasta with salad; pasta; beef; salad:1', 'Chicken burrito bowl; rice; chicken; blackbeans:0.5,salad:1'],
+    s: ['Greek yogurt and a banana; banana; greek;', 'Peanut butter toast and milk; bread; milk; pb:1'],
+    pre: ['Granola bar and a banana; bar; ; banana:1', 'Toast with honey; bread; ; honey:1'],
+    post: ['Chocolate milk and a banana; banana; chocmilk;', 'Protein shake and a bagel; bagel; whey;'],
+    sleep: ['Cottage cheese; ; cottage;', 'Greek yogurt with berries; ; greek; berries:0.5'], fat: ['oil', 'avocado', 'almonds'], top: ['banana', 'bread', 'honey'] }],
+  med: ['Mediterranean', 'Olive oil, fish, legumes, whole grains, fruit and vegetables.', {
+    b: ['Greek yogurt, oats and berries; oats; greek; berries:1', 'Eggs, whole-grain toast and an orange; bread; eggs; orange:1'],
+    l: ['Quinoa and chickpea salad with tuna; quinoa; tuna; chickpeas:0.5,salad:1', 'Lentil soup with bread; bread; lentils; salad:1'],
+    d: ['Salmon, brown rice and greens; brownrice; salmon; spinach:1', 'Chicken with pasta and vegetables; pasta; chicken; mixedveg:1', 'Chickpea and vegetable stew with rice; rice; chickpeas; mixedveg:1,greek:0.5'],
+    s: ['Yogurt, an orange and almonds; orange; greek; almonds:1', 'Hummus on toast with an apple; bread; greek; hummus:1,apple:1'],
+    pre: ['Dates and a banana; dates; ; banana:1'], post: ['Yogurt, honey and a banana; banana; greek; honey:1'],
+    sleep: ['Greek yogurt; ; greek;'], fat: ['oil', 'almonds', 'avocado'], top: ['orange', 'bread', 'dates'] }],
+  hp: ['High-protein and simple', 'Lean protein at every meal with plain carbohydrate sides.', {
+    b: ['Egg scramble on toast with cottage cheese; bread; eggs; cottage:0.5', 'Protein oats with a banana; oats; whey; banana:1'],
+    l: ['Chicken, rice and vegetables; rice; chicken; mixedveg:1', 'Tuna wraps with salad; tortilla; tuna; salad:1'],
+    d: ['Lean beef, potatoes and broccoli; potato; beef; broccoli:1', 'Chicken and sweet potato with salad; sweetpotato; chicken; salad:1'],
+    s: ['Greek yogurt and berries; berries; greek;', 'Protein shake and a banana; banana; whey;'],
+    pre: ['Rice cakes with honey; ricecake; ; honey:1'], post: ['Protein shake and a bagel; bagel; whey;'],
+    sleep: ['Cottage cheese; ; cottage;'], fat: ['avocado', 'oil', 'almonds'], top: ['banana', 'ricecake', 'honey'] }],
+  veg: ['Vegetarian', 'No meat or fish. Eggs, dairy, legumes and tofu carry the protein.', {
+    b: ['Oats, yogurt and berries; oats; greek; berries:1', 'Eggs on toast with an orange; bread; eggs; orange:1'],
+    l: ['Bean and rice burrito bowl; rice; blackbeans; cheese:1,salad:1', 'Lentil pasta with salad; pasta; lentils; salad:1'],
+    d: ['Tofu stir-fry with rice; rice; tofu; mixedveg:1', 'Chickpea and spinach curry with brown rice; brownrice; chickpeas; spinach:1,greek:0.5'],
+    s: ['Yogurt and a banana; banana; greek;', 'Cottage cheese and an apple; apple; cottage;'],
+    pre: ['Granola bar and a banana; bar; ; banana:1'], post: ['Chocolate milk and a banana; banana; chocmilk;'],
+    sleep: ['Cottage cheese; ; cottage;'], fat: ['oil', 'almonds', 'avocado'], top: ['banana', 'bread', 'honey'] }],
+  vegan: ['Vegan', 'Plants only. Soy, legumes and grains together cover the amino acids.', {
+    b: ['Oats with soy milk, peanut butter and banana; oats; soymilk; pb:1,banana:1', 'Tofu scramble on toast with an orange; bread; tofu; orange:1'],
+    l: ['Lentil and rice bowl; rice; lentils; mixedveg:1', 'Chickpea and hummus wraps; tortilla; chickpeas; hummus:1,salad:1'],
+    d: ['Tofu stir-fry with rice; rice; tofu; broccoli:1', 'Tempeh with quinoa and greens; quinoa; tempeh; spinach:1', 'Black bean pasta with salad; pasta; blackbeans; salad:1'],
+    s: ['Soy shake and a banana; banana; peapro; soymilk:1'],
+    pre: ['Dates and a banana; dates; ; banana:1'], post: ['Pea-protein shake and a bagel; bagel; peapro; soymilk:1'],
+    sleep: ['Soy milk with pea protein; ; peapro; soymilk:1'], fat: ['avocado', 'almonds', 'oil'], top: ['banana', 'bread', 'dates'] }],
+  budget: ['Budget staples', 'Oats, rice, beans, eggs, canned fish and frozen vegetables.', {
+    b: ['Oatmeal with peanut butter and banana; oats; milk; pb:1,banana:1', 'Eggs on toast; bread; eggs;'],
+    l: ['Rice and beans with eggs; rice; eggs; blackbeans:0.5', 'Tuna sandwich and an apple; bread; tuna; apple:1'],
+    d: ['Lentils and rice with vegetables; rice; lentils; mixedveg:1', 'Chicken, potatoes and frozen vegetables; potato; chicken; mixedveg:1', 'Pasta with ground beef; pasta; beef; mixedveg:1'],
+    s: ['Peanut butter sandwich and milk; bread; milk; pb:1'],
+    pre: ['Toast and a banana; bread; ; banana:1'], post: ['Milk, a banana and peanut butter toast; bread; milk; banana:1,pb:0.5'],
+    sleep: ['Cottage cheese; ; cottage;'], fat: ['oil', 'pb'], top: ['banana', 'bread', 'honey'] }],
+  quick: ['Quick, little cooking', 'Assembled in minutes from ready-to-eat foods.', {
+    b: ['Cereal, milk and a banana; cereal; milk; banana:1', 'Yogurt, a granola bar and berries; bar; greek; berries:1'],
+    l: ['Turkey sandwich and an apple; bread; turkey; apple:1', 'Tuna wraps with salad; tortilla; tuna; salad:1'],
+    d: ['Microwave rice, canned tuna and vegetables; rice; tuna; mixedveg:1', 'Rotisserie chicken wraps; tortilla; chicken; salad:1'],
+    s: ['Yogurt and a banana; banana; greek;'],
+    pre: ['Granola bar and a sports drink; bar; ; sportsdrink:1'], post: ['Chocolate milk and a bagel; bagel; chocmilk;'],
+    sleep: ['Greek yogurt; ; greek;'], fat: ['almonds', 'avocado', 'pb'], top: ['banana', 'bar', 'honey'] }],
+  df: ['Dairy-free', 'No milk, yogurt or cheese. Fortified soy milk covers calcium.', {
+    b: ['Oats with soy milk, eggs and a banana; oats; eggs; soymilk:1,banana:1', 'Eggs on toast with an orange; bread; eggs; orange:1'],
+    l: ['Chicken and rice bowl; rice; chicken; mixedveg:1', 'Tuna and potato salad; potato; tuna; salad:1'],
+    d: ['Salmon, quinoa and broccoli; quinoa; salmon; broccoli:1', 'Beef stir-fry with rice; rice; beef; mixedveg:1'],
+    s: ['Turkey and hummus on toast; bread; turkey; hummus:1', 'Soy shake and a banana; banana; peapro; soymilk:1'],
+    pre: ['Dates and a banana; dates; ; banana:1'], post: ['Pea-protein shake and a bagel; bagel; peapro; soymilk:1'],
+    sleep: ['Soy milk with pea protein; ; peapro; soymilk:1'], fat: ['oil', 'avocado', 'almonds'], top: ['banana', 'bread', 'dates'] }],
+  gf: ['Gluten-free', 'No wheat, barley or rye. Rice, potatoes, quinoa and fruit carry the carbohydrate.', {
+    b: ['Eggs, potatoes and an orange; potato; eggs; orange:1', 'Yogurt, berries and rice cakes with honey; ricecake; greek; berries:1,honey:1'],
+    l: ['Chicken and rice bowl; rice; chicken; mixedveg:1', 'Tuna and quinoa salad; quinoa; tuna; salad:1'],
+    d: ['Salmon, sweet potato and broccoli; sweetpotato; salmon; broccoli:1', 'Beef and rice with beans; rice; beef; blackbeans:0.5'],
+    s: ['Yogurt and a banana; banana; greek;'],
+    pre: ['Rice cakes with honey; ricecake; ; honey:1'], post: ['Chocolate milk and a banana; banana; chocmilk;'],
+    sleep: ['Cottage cheese; ; cottage;'], fat: ['oil', 'avocado', 'almonds'], top: ['banana', 'ricecake', 'honey'] }],
+};
+const STYLES = {};
+for (const [id, [name, note, t]] of Object.entries(STYLES_RAW)) {
+  const s = { id, name, note, fat: t.fat, top: t.top };
+  for (const k of ['b', 'l', 'd', 's', 'pre', 'post', 'sleep']) s[k] = t[k].map(line => {
+    const [dish, carb, prot, extras] = line.split(';').map(x => x.trim());
+    return { dish, carb: carb || null, prot: prot || null, extras: (extras || '').split(',').filter(Boolean).map(x => { const [f, u] = x.split(':'); return [f.trim(), +u]; }) };
+  });
+  STYLES[id] = s;
+}
+
+// Micronutrients that matter most for athletes. Targets are adult daily values (US RDA or AI).
+const MICRO_NAME = { iron: 'Iron', calcium: 'Calcium', vitd: 'Vitamin D', mag: 'Magnesium', zinc: 'Zinc', b12: 'Vitamin B12', folate: 'Folate', vitc: 'Vitamin C', potassium: 'Potassium', sodium: 'Sodium', iodine: 'Iodine', omega3: 'Omega-3 (EPA and DHA)' };
+const MICROS = [
+  { id: 'iron', target: p => p.age < 19 ? (p.sex === 'f' ? '15 mg' : '11 mg') : p.sex === 'f' && p.age <= 50 ? '18 mg' : '8 mg',
+    why: 'Carries oxygen in the blood and muscles. Low iron stores cut endurance long before anaemia shows up.',
+    foods: 'Red meat, lentils, beans, chickpeas, tofu, spinach, fortified cereal.',
+    tips: 'Vitamin C at the same meal raises absorption from plant foods; coffee, tea and calcium within an hour lower it. Supplement only after a blood test (ferritin).',
+    watch: (p, m) => p.sex === 'f' && p.age <= 50 ? 'menstrual losses raise your need to 18 mg' : ['veg', 'vegan'].includes(p.diet) ? 'plant iron is absorbed less well, so aim about 1.8 times higher' : m.emph.E >= 50 ? 'endurance training increases iron losses' : '' },
+  { id: 'calcium', target: p => p.age < 19 ? '1,300 mg' : (p.sex === 'f' && p.age > 50) || p.age > 70 ? '1,200 mg' : '1,000 mg',
+    why: 'Bone strength and muscle contraction. With vitamin D and enough energy, it protects against stress fractures.',
+    foods: 'Milk, yogurt, cheese, calcium-set tofu, fortified soy milk, almonds, broccoli.',
+    tips: 'Spread it over the day; the body absorbs about 500 mg at a time.',
+    watch: (p, m) => ['vegan', 'df'].includes(p.diet) ? 'without dairy you rely on fortified foods and tofu' : p.inj.shin ? 'you flagged a shin problem, so bone health matters' : m.modes.every(x => x === 'bike' || x === 'swim') ? 'cycling and swimming do not load the bones' : '' },
+  { id: 'vitd', target: p => p.age > 70 ? '20 µg (800 IU)' : '15 µg (600 IU)',
+    why: 'Calcium absorption, bone, muscle function and immunity.',
+    foods: 'Oily fish, eggs, fortified milk and soy milk. Sunlight on the skin makes most of it.',
+    tips: 'Many athletes run low in winter or when training indoors. A blood test (25-OH vitamin D) tells you whether a supplement is worth it.',
+    watch: (p, m) => p.inj.shin ? 'low vitamin D is linked to stress injuries' : p.diet === 'vegan' ? 'few plant foods contain it' : m.modes.includes('swim') ? 'indoor training means little sun' : '' },
+  { id: 'mag', target: p => p.sex === 'f' ? (p.age <= 30 ? '310 mg' : '320 mg') : (p.age <= 30 ? '400 mg' : '420 mg'),
+    why: 'Energy production, muscle and nerve function. Lost in sweat.',
+    foods: 'Oats, brown rice, quinoa, beans, nuts, peanut butter, spinach, whole-wheat bread.',
+    tips: 'Whole grains and legumes cover it easily; refined grains do not.', watch: () => '' },
+  { id: 'zinc', target: p => p.sex === 'f' ? '8 mg' : '11 mg',
+    why: 'Tissue repair, immunity and hormone production.',
+    foods: 'Beef, chicken, yogurt, chickpeas, lentils, oats, tempeh.',
+    tips: 'Soaked or sprouted legumes and leavened bread release more zinc.',
+    watch: p => ['veg', 'vegan'].includes(p.diet) ? 'plant sources are absorbed less well' : '' },
+  { id: 'b12', target: () => '2.4 µg',
+    why: 'Red blood cells and nerves. Found naturally only in animal foods.',
+    foods: 'Meat, fish, eggs, dairy, fortified cereal and soy milk.',
+    tips: 'On a vegan diet a B12 supplement or daily fortified foods are essential, not optional.',
+    watch: p => p.diet === 'vegan' ? 'you need a supplement or fortified foods every day' : p.diet === 'veg' ? 'rely on eggs, dairy or fortified foods' : p.age >= 50 ? 'absorption falls with age' : '' },
+  { id: 'folate', target: () => '400 µg', why: 'Makes new red blood cells and repairs DNA.', foods: 'Lentils, beans, chickpeas, spinach, broccoli, oranges, avocado, fortified cereal.', tips: 'Leafy vegetables and legumes most days are enough.', watch: () => '' },
+  { id: 'vitc', target: p => p.sex === 'f' ? '75 mg' : '90 mg', why: 'Collagen for tendons and ligaments, and iron absorption.', foods: 'Oranges, berries, broccoli, potatoes, peppers, salad.',
+    tips: 'Food sources are plenty. Large antioxidant supplements (1 g or more) can blunt training adaptation.', watch: () => '' },
+  { id: 'potassium', target: p => p.sex === 'f' ? '2,600 mg' : '3,400 mg', why: 'Fluid balance, nerve signals and muscle contraction.', foods: 'Potatoes, bananas, beans, lentils, yogurt, salmon, oranges, avocado.', tips: 'Five or more servings of fruit and vegetables a day cover it.', watch: () => '' },
+  { id: 'sodium', target: () => '1,500 mg, more with heavy sweat',
+    why: 'The main electrolyte lost in sweat. Keeps blood volume up in long sessions.',
+    foods: 'Salted food, bread, cheese, cottage cheese, sports drink.',
+    tips: 'In sessions over 90 minutes or in heat, take 300–600 mg an hour. Salty sweat marks on clothes mean you lose more than most.',
+    watch: (p, m) => m.emph.E >= 50 || p.minutes >= 90 ? 'long sessions mean real sweat losses' : '' },
+  { id: 'iodine', target: () => '150 µg', why: 'Thyroid hormones, which set your metabolic rate.', foods: 'Dairy, eggs, fish, iodized salt.', tips: 'Use iodized salt at home if you eat little dairy or fish.',
+    watch: p => ['vegan', 'df'].includes(p.diet) ? 'dairy and fish are the usual sources' : '' },
+  { id: 'omega3', target: () => '250–500 mg',
+    why: 'Heart health and inflammation control; may ease muscle soreness.',
+    foods: 'Salmon, sardines, mackerel, tuna. Walnuts, flax and chia give a plant form the body converts poorly.',
+    tips: 'Two oily-fish meals a week cover it. Otherwise consider fish oil or algae oil.',
+    watch: p => ['veg', 'vegan'].includes(p.diet) ? 'no fish, so algae oil is the direct source' : '' },
+];
+
+// =============================================================================
 // Profile: everything the person enters. Stored in this browser only.
 // =============================================================================
 const STORE_KEY = 'fpp:profile';
@@ -723,7 +1029,7 @@ const DEFAULTS = () => ({
   sex: 'm', age: 30, height: 178, weight: 72, bf: null, rhr: null, hrmax: null, units: 'metric',
   trainAge: 2, tests: {}, testLog: [], override: { E: 0, S: 0, P: 0, R: 0 }, inj: {},
   days: [0, 1, 3, 5], minutes: 60, doubles: false, sessionTime: '17:30', wake: '06:30', sleep: 8.5, meals: 4, life: 1,
-  equip: 2, bar: true, planStart: isoDate(mondayOf(new Date())), swaps: {}, checkin: null,
+  equip: 2, bar: true, diet: 'omni', mealSeed: 0, planStart: isoDate(mondayOf(new Date())), swaps: {}, checkin: null,
 });
 let P = load();
 function load() {
@@ -756,6 +1062,8 @@ function sanitize(p) {
   if (!p.swaps || typeof p.swaps !== 'object') p.swaps = {};
   if (!['maintain', 'lean', 'build'].includes(p.bodyGoal)) p.bodyGoal = 'maintain';
   if (!['m', 'f'].includes(p.sex)) p.sex = 'm';
+  if (!STYLES[p.diet]) p.diet = 'omni';
+  p.mealSeed = Number.isInteger(p.mealSeed) ? p.mealSeed : 0;
   if (!/^\d\d:\d\d$/.test(p.sessionTime)) p.sessionTime = d.sessionTime;
   if (!/^\d\d:\d\d$/.test(p.wake)) p.wake = d.wake;
   return p;
@@ -844,10 +1152,17 @@ function stageInfo(q, m) {
 }
 
 function injuryState() {
-  const list = Object.entries(P.inj).map(([id, v]) => ({ ...INJURY[id], status: v.status, phase: clamp(v.phase || 1, 1, 3) }));
+  const list = Object.entries(P.inj).map(([id, v]) => ({ ...INJURY[id], status: v.status, phase: id === 'diastasis' ? drPhase(v) : clamp(v.phase || 1, 1, 3), sel: v }));
   const avoid = new Set();
   let impactPain = false, impactRehab = false;
   for (const i of list) {
+    if (i.id === 'diastasis') {
+      // Split abs: hold back hard abdominal-wall loading by phase, whatever the status.
+      if (i.phase < 3) avoid.add('abwall');
+      avoid.add('abwall2');
+      if (i.sel.pf === 'yes' || i.sel.timing === 'pp0') { avoid.add('impact'); impactPain = true; }
+      continue;
+    }
     if (i.status === 'pain' || i.status === 'rehab') i.avoid.forEach(t => avoid.add(t));
     if (i.impact && i.status === 'pain') impactPain = true;
     if (i.impact && i.status === 'rehab') impactRehab = true;
@@ -867,6 +1182,9 @@ function buildModel() {
   m.rhr = P.rhr || null;
   m.stage = {}; m.info = {};
   for (const q of ['E', 'S', 'P', 'R']) { const s = stageInfo(q, m); m.stage[q] = s.stage; m.info[q] = s; }
+  // Power waits for its foundations: no more than one stage ahead of strength and resilience.
+  const cap = Math.min(m.stage.S, m.stage.R) + 1;
+  if (!P.override.P && m.stage.P > cap) { m.info.P.held = m.stage.P; m.info.P.stage = m.stage.P = cap; m.info.P.src = 'held until strength and resilience catch up'; }
   m.bw = P.weight;
   const start = parseDate(P.planStart) || mondayOf(new Date());
   m.planStart = start;
@@ -1168,14 +1486,15 @@ function resilienceBlock(m, wk, n, extra = []) {
   const items = [...new Set(ids)].filter(id => okEx(id, m) || MOBILITY.includes(id)).map(id => { const d = resDose(id, st, wk); return d && { ex: id, d, mins: d.sets * (d.work + d.rest) / 60 }; }).filter(Boolean);
   return { kind: 'R', title: 'Resilience', items, minutes: Math.round(items.reduce((a, x) => a + x.mins, 0)), summary: 'Prehab for the injuries your sport tends to cause, plus mobility.' };
 }
+function injPhase(inj) { return inj.custom ? inj.phase : inj.status === 'weak' ? 2 : inj.status === 'pain' ? 1 : inj.phase; }
 function rehabBlock(m) {
   const items = [];
   const rank = { pain: 0, rehab: 1, weak: 2 };
   const list = m.inj.list.slice().sort((a, b) => rank[a.status] - rank[b.status]);
   const per = list.length >= 3 ? 1 : 2;
   for (const inj of list) {
-    const phase = inj.status === 'weak' ? 2 : inj.status === 'pain' ? 1 : inj.phase;
-    for (const [id, dose] of inj.phases[phase - 1][1].slice(0, per)) {
+    const phase = injPhase(inj);
+    for (const [id, dose] of inj.phases[phase - 1][1].slice(0, inj.custom ? 3 : per)) {
       if (items.some(x => x.ex === id) || items.length >= 4) continue;
       items.push({ ex: id, dose, region: inj.name, status: inj.status, phase, d: { sets: 3, reps: dose, rest: 45, work: HOLDS.has(id) ? 45 : 40, hold: HOLDS.has(id) ? 45 : 0 }, mins: 2.5 });
     }
@@ -1460,6 +1779,7 @@ function fillCoverage(days, m, wk) {
 // =============================================================================
 function readiness(ci) {
   if (!ci) return null;
+  if (ci.quick) return { score: null, level: ci.quick, reasons: [] };
   const reasons = [];
   let score = 0;
   const ratio = (+ci.sleep || 0) / P.sleep;
@@ -1613,6 +1933,92 @@ function mealPlan(d, f) {
   });
 }
 
+// Real food for each eating time, scaled to that slot's carbohydrate and protein.
+function half(x) { return Math.round(x * 2) / 2; }
+function slotType(name) {
+  if (/^Breakfast/.test(name)) return 'b';
+  if (/^Lunch/.test(name)) return 'l';
+  if (/^Dinner/.test(name)) return 'd';
+  if (/^Pre-session/.test(name)) return 'pre';
+  if (/^Recovery/.test(name)) return 'post';
+  if (/^Pre-sleep/.test(name)) return 'sleep';
+  return 's';
+}
+function buildMeals(d, f, styleId, seed) {
+  const st = STYLES[styleId] || STYLES.omni;
+  const slots = mealPlan(d, f);
+  const sumC = slots.reduce((a, x) => a + x.carbs, 0) || 1, sumP = slots.reduce((a, x) => a + x.protein, 0) || 1;
+  const sumOf = items => { const t = { kcal: 0, c: 0, p: 0, f: 0, fib: 0 }; for (const [id, u] of items) for (const k in t) t[k] += FOOD[id].u[k] * u; return t; };
+  const built = slots.map((slot, i) => {
+    const type = slotType(slot.name), opts = st[type];
+    const opt = opts[(seed + d.idx + i) % opts.length];
+    const items = new Map(opt.extras.map(([id, u]) => [id, u]));
+    const tot = () => { const t = { kcal: 0, c: 0, p: 0, f: 0, fib: 0 }; for (const [id, u] of items) for (const k in t) t[k] += FOOD[id].u[k] * u; return t; };
+    const t0 = tot();
+    const needC = Math.max(0, slot.carbs - t0.c), needP = Math.max(0, slot.protein - t0.p);
+    const cf = opt.carb && FOOD[opt.carb], pf = opt.prot && FOOD[opt.prot];
+    // Protein food first (the carbohydrate food brings some protein too), then the
+    // carbohydrate food for what is left, then protein once more. Two rounds settle it.
+    let a = 0, b = 0;
+    if (pf) b = clamp(half(needP * (cf ? 0.75 : 1) / pf.u.p), 1, pf.max);
+    for (let round = 0; round < 2; round++) {
+      if (cf) a = clamp(half((needC - b * (pf ? pf.u.c : 0)) / cf.u.c), 0.5, cf.max);
+      if (pf) b = clamp(half((needP - a * (cf ? cf.u.p : 0)) / pf.u.p), type === 'pre' ? 0.5 : 1, pf.max);
+    }
+    if (cf) items.set(cf.id, (items.get(cf.id) || 0) + a);
+    if (pf) items.set(pf.id, (items.get(pf.id) || 0) + b);
+    // Still short on carbohydrate: add fruit, bread or honey.
+    for (const id of st.top) {
+      const short = slot.carbs - tot().c;
+      if (short < 18 || type === 'sleep') break;
+      if (items.has(id)) continue;
+      items.set(id, clamp(half(short / FOOD[id].u.c), 0.5, FOOD[id].max));
+    }
+    // Fat fills what is left of the slot's share.
+    const share = (slot.carbs / sumC + slot.protein / sumP) / 2;
+    const shortF = f.F * share - tot().f;
+    if (shortF > 6 && type !== 'pre' && type !== 'sleep') {
+      const nuts = st.fat.filter(x => x === 'almonds' || x === 'pb'), soft = nuts.length ? nuts : st.fat.filter(x => x !== 'oil'), pool = /^(b|s|post)$/.test(type) && soft.length ? soft : st.fat;
+      const id = pool[i % pool.length];
+      items.set(id, (items.get(id) || 0) + clamp(half(shortF / FOOD[id].u.f), 0.5, FOOD[id].max));
+    }
+    return { slot, type, opt, items };
+  });
+  // Day pass: grains often bring more protein than planned, so fat only fills
+  // what is left of the day's calories, a half portion at a time, biggest meals first.
+  const day = () => built.reduce((a, x) => { const t = sumOf(x.items); a.kcal += t.kcal; a.f += t.f; return a; }, { kcal: 0, f: 0 });
+  const mains = built.filter(x => /^(l|d|b)$/.test(x.type)).sort((x, y) => y.slot.carbs - x.slot.carbs);
+  for (let n = 0; n < 12 && mains.length; n++) {
+    const t = day(), x = mains[n % mains.length];
+    const pool = x.type === 'b' ? st.fat.filter(id => id !== 'oil') : st.fat, id = (pool.length ? pool : st.fat)[n % (pool.length || st.fat.length)], fd = FOOD[id];
+    if (t.f + fd.u.f / 4 > f.F || t.kcal + fd.u.kcal / 4 > f.kcal) { if (n >= mains.length * 2) break; continue; }
+    if ((x.items.get(id) || 0) + 0.5 > fd.max) continue;
+    x.items.set(id, (x.items.get(id) || 0) + 0.5);
+  }
+  return built.map(({ slot, type, opt, items }) => {
+    for (const [id, u] of items) if (WHOLE_FOODS.has(id) && u % 1) items.set(id, Math.ceil(u));
+    const t = sumOf(items);
+    return { time: slot.time, name: slot.name, type, dish: opt.dish, tip: slot.tip, items: [...items].map(([id, u]) => ({ id, u, g: Math.round(FOOD[id].g * u / 5) * 5 })),
+      kcal: Math.round(t.kcal), c: Math.round(t.c), p: Math.round(t.p), f: Math.round(t.f), fib: Math.round(t.fib), target: slot };
+  });
+}
+const WHOLE_FOODS = new Set(['eggs', 'dates', 'banana', 'apple', 'orange', 'bar', 'bagel', 'ricecake', 'tortilla']);
+function foodText(it) {
+  const fd = FOOD[it.id];
+  if (!fd.one) return `${it.g} g ${fd.name}`;
+  if (/^\d/.test(fd.one) && it.u === 1) return fd.one;
+  if (/^half /.test(fd.one)) { const q = it.u / 2, w = Math.floor(q), fr = ['', '¼', '½', '¾'][Math.round((q - w) * 4)]; return `${w || ''}${fr} ${fd.one.slice(5)}${q > 1 ? 's' : ''} (${it.g} g)`; }
+  const whole = Math.floor(it.u), frac = it.u - whole ? '½' : '';
+  const n = `${whole || ''}${frac}`;
+  return `${n} ${it.u > 1 ? fd.many : fd.one}${/cup|handful|half/.test(fd.one) ? ` (${it.g} g)` : ''}`;
+}
+// How many of the day's foods are rich in each micronutrient.
+function microCover(meals) {
+  const n = Object.fromEntries(Object.keys(MICRO_NAME).map(k => [k, 0]));
+  for (const m of meals) for (const it of m.items) for (const r of FOOD[it.id].rich) n[r] += 1;
+  return n;
+}
+
 // =============================================================================
 // IntervalTimer export
 // =============================================================================
@@ -1671,9 +2077,13 @@ function fmtVal(id, v) {
 
 // =============================================================================
 // Screens
+// Design: the app opens on Today, which answers "what do I do now?" on one
+// screen. Each main tab holds one job (Week, Paths, Fuel, Recover, Setup) and
+// splits into sub-tabs, so content swaps in place instead of scrolling.
 // =============================================================================
 const $ = id => document.getElementById(id);
-const VIEW = { tab: 'paths', week: null, fuelDay: null, exportWeek: null, picked: new Set() };
+const FIRST_RUN = (() => { try { return !localStorage.getItem(STORE_KEY); } catch (e) { return false; } })();
+const VIEW = { tab: 'today', sub: { week: 'day', paths: 'rail', fuel: 'today', recover: 'sleep', setup: 'athlete' }, week: null, day: null, q: 'E', rail: null, macro: 'c', micro: 'iron', inj: null, sess: 0, exportWeek: null, picked: new Set() };
 let M = null, PLAN = null;
 
 function toast(msg) {
@@ -1686,170 +2096,15 @@ function download(name, data) {
   const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
-const qChip = q => `<span class="chip ${q}">${Q[q]}</span>`;
-
-// ---------- Units ----------
 const imperial = () => P.units === 'imperial';
-const shownW = kg => imperial() ? Math.round(kg * 2.20462 * 10) / 10 : kg;
-const shownH = cm => imperial() ? Math.round(cm / 2.54 * 10) / 10 : cm;
-
-// ---------- The "You" panel ----------
+const shownW = kg => imperial() ? Math.round(kg * 2.20462 * 10) / 10 : Math.round(kg * 10) / 10;
+const shownH = cm => imperial() ? Math.round(cm / 2.54 * 10) / 10 : Math.round(cm * 10) / 10;
 function sel(k, opts, val) { return `<select data-k="${k}">${opts.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(val) ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>`; }
 function num(k, val, attrs = '') { return `<input type="number" inputmode="decimal" data-k="${k}" value="${val ?? ''}" ${attrs}>`; }
 function field(label, control, hint) { return `<label class="f"><span class="l">${label}</span>${control}${hint ? `<span class="small muted">${hint}</span>` : ''}</label>`; }
-
-function renderYou() {
-  const a = ATHLETE[P.athlete];
-  const e = emphasis();
-  const m = M;
-  const testInput = id => {
-    const t = TESTS[id], v = P.tests[id];
-    const shown = v == null ? '' : t.unit === 'time' ? fmtTime(v) : v;
-    const ph = t.unit === 'time' ? 'mm:ss' : t.unit;
-    const met = v ? metCount(id, v, m) : null;
-    return `<div class="test-row"><div class="tl">${esc(t.name)}<small>${met == null ? 'Not entered' : met >= 6 ? 'All gates passed' : `Passed ${met} of 6 gates · next ${fmtVal(id, target(id, met + 1, m))}`}</small></div>
-      <input data-k="test.${id}" value="${esc(shown)}" placeholder="${ph}" inputmode="${t.unit === 'time' ? 'text' : 'decimal'}" aria-label="${esc(t.name)}"></div>`;
-  };
-  const qSec = q => {
-    const info = m.info[q];
-    return `<div style="margin:10px 0 4px" class="row"><b class="q-${q}">${Q[q]}</b><span class="chip ${q}">Stage ${info.stage}: ${STAGES[info.stage - 1]}</span><span class="small muted">from ${info.src}</span></div>
-      ${info.ids.map(testInput).join('')}
-      ${field('Stage', sel(`override.${q}`, [[0, `Automatic (${STAGES[info.auto - 1]})`], ...STAGES.map((s, i) => [i + 1, `${i + 1}. ${s}`])], P.override[q]))}`;
-  };
-  const injRow = inj => {
-    const v = P.inj[inj.id] || { status: 'none', phase: 1 };
-    return `<div class="inj"><span>${esc(inj.name)}</span>${sel(`inj.${inj.id}.status`, Object.entries(INJ_STATUS), v.status)}
-      ${v.status === 'rehab' ? `<div class="ph">${sel(`inj.${inj.id}.phase`, inj.phases.map((p, i) => [i + 1, `Phase ${i + 1}: ${p[0]}`]), v.phase || 1)}</div>` : ''}</div>`;
-  };
-  const openNow = [...$('you').querySelectorAll('details.sec')].map(d => d.open);
-  $('you').innerHTML = `
-  <details class="sec" open><summary>Athlete</summary><div class="body">
-    ${field('Quick start', sel('quick', QUICK.map(x => [x.id, x.name]), ''), 'Fills schedule, equipment and experience at once.')}
-    ${field('Athlete type', sel('athlete', ATHLETES.map(x => [x.id, x.name]), P.athlete))}
-    <p class="small muted">${esc(a.note)}</p>
-    <div class="emph">
-      <span class="q-E">Endurance</span><input type="range" min="0" max="100" data-k="emph.0" value="${e.E}"><output>${e.E}%</output>
-      <span class="q-S">Strength</span><input type="range" min="0" max="100" data-k="emph.1" value="${e.S}"><output>${e.S}%</output>
-      <span class="q-P">Power</span><input type="range" min="0" max="100" data-k="emph.2" value="${e.P}"><output>${e.P}%</output>
-    </div>
-    <div class="row" style="margin:6px 0 10px"><span class="small muted">${P.emph ? 'Your own balance.' : 'Balance from the preset.'}</span>${P.emph ? '<button class="btn sm" data-act="resetEmph">Use preset balance</button>' : ''}</div>
-    <div class="grid2">
-      ${field('Endurance mode', sel('mode', [['', `Preset (${a.mode === 'mixed' ? 'mixed' : MODES[a.mode]})`], ...Object.entries(MODES)], P.mode))}
-      ${field('Body size goal', sel('bodyGoal', [['maintain', 'Stay the same'], ['lean', 'Lean down slowly'], ['build', 'Add useful muscle']], P.bodyGoal))}
-    </div>
-    ${P.bodyGoal === 'build' && !a.mass ? '<p class="small note warn">Your sport rarely rewards extra mass. The plan keeps strength work heavy and low-rep anyway; muscle gain will be slow.</p>' : ''}
-  </div></details>
-
-  <details class="sec" open><summary>Body</summary><div class="body">
-    <div class="grid3">
-      ${field('Sex', sel('sex', [['m', 'Male'], ['f', 'Female']], P.sex))}
-      ${field('Age', num('age', P.age, 'min="12" max="90"'))}
-      ${field('Units', sel('units', [['metric', 'kg, cm'], ['imperial', 'lb, in']], P.units))}
-      ${field(`Height (${imperial() ? 'in' : 'cm'})`, num('height', shownH(P.height)))}
-      ${field(`Weight (${imperial() ? 'lb' : 'kg'})`, num('weight', shownW(P.weight)))}
-      ${field('Body fat %', num('bf', P.bf, 'placeholder="optional"'))}
-      ${field('Resting HR', num('rhr', P.rhr, 'placeholder="optional"'))}
-      ${field('Max HR', num('hrmax', P.hrmax, `placeholder="${Math.round(208 - 0.7 * P.age)}"`))}
-      ${field('Daily life', sel('life', [[0, 'Mostly sitting'], [1, 'On my feet'], [2, 'Physical job']], P.life))}
-    </div>
-  </div></details>
-
-  <details class="sec" open><summary>Conditioning</summary><div class="body">
-    ${field('Consistent training', sel('trainAge', TRAIN_AGES.map((t, i) => [i, t]), P.trainAge), 'Used for any quality without test results.')}
-    <p class="small muted">Enter your latest results. Each one sets your stage, and the Gates tab shows what unlocks the next.</p>
-    ${['E', 'S', 'P', 'R'].map(qSec).join('')}
-  </div></details>
-
-  <details class="sec"${Object.keys(P.inj).length ? ' open' : ''}><summary>Injuries and weak areas <span class="chip${Object.keys(P.inj).length ? ' warn' : ''}">${Object.keys(P.inj).length}</span></summary><div class="body">
-    <p class="small muted">Weak areas get extra prehab. Recovering areas get a phased rehab path and the exercises that strain them are swapped. Painful areas also lose impact work; please get them assessed.</p>
-    ${INJURIES.map(injRow).join('')}
-  </div></details>
-
-  <details class="sec" open><summary>Schedule and equipment</summary><div class="body">
-    <span class="small muted">Training days</span>
-    <div class="days" style="margin:3px 0 10px">${DAYS.map((d, i) => `<label><input type="checkbox" data-k="day.${i}"${P.days.includes(i) ? ' checked' : ''}>${d}</label>`).join('')}</div>
-    <div class="grid2">
-      ${field(`Session length: <b>${P.minutes} min</b>`, `<input type="range" min="20" max="150" step="5" data-k="minutes" value="${P.minutes}">`)}
-      ${field('Usual session start', `<input type="time" data-k="sessionTime" value="${P.sessionTime}">`)}
-      ${field('Equipment', sel('equip', [[0, 'Bodyweight and a band'], [1, 'Home: dumbbells or kettlebells'], [2, 'Full gym']], P.equip))}
-      ${field('Pull-up bar', sel('bar', [['1', 'Yes'], ['0', 'No']], P.bar ? '1' : '0'))}
-    </div>
-    <label class="row small" style="margin-bottom:10px"><input type="checkbox" data-k="doubles"${P.doubles ? ' checked' : ''}> Two sessions a day are possible</label>
-    <div class="grid3">
-      ${field('Wake time', `<input type="time" data-k="wake" value="${P.wake}">`)}
-      ${field('Sleep target (h)', num('sleep', P.sleep, 'step="0.25" min="6" max="11"'))}
-      ${field('Meals a day', sel('meals', [3, 4, 5, 6].map(n => [n, n]), P.meals))}
-    </div>
-    ${field('Plan started (week 1 begins)', `<input type="date" data-k="planStart" value="${P.planStart}">`)}
-    ${P.days.length < 2 ? '<p class="note warn">Pick at least 2 training days.</p>' : ''}
-  </div></details>
-
-  <details class="sec"><summary>Your data</summary><div class="body">
-    <p class="small muted">Saved in this browser. Back it up to move it to another device.</p>
-    <div class="row"><button class="btn sm" data-act="saveProfile">Back up profile</button><button class="btn sm" data-act="loadProfile">Restore…</button><button class="btn sm" data-act="resetProfile">Start over</button></div>
-  </div></details>
-  <p class="disclaimer">An educational planner, not medical advice. Get a professional assessment for pain, recent injuries, heart or health conditions before hard training.</p>`;
-  const secs = $('you').querySelectorAll('details.sec');
-  if (openNow.length === secs.length) secs.forEach((d, i) => { d.open = openNow[i]; });
-}
-
-function setPath(k, raw, el) {
-  const parts = k.split('.');
-  const n = v => (v === '' || v == null ? null : Number(v));
-  if (k === 'quick') {
-    const q = QUICK.find(x => x.id === raw);
-    if (q?.set) { Object.assign(P, JSON.parse(JSON.stringify(q.set))); toast(`Applied: ${q.name}`); }
-    return true;
-  }
-  if (k === 'athlete') { P.athlete = raw; P.emph = null; P.mode = ''; return true; }
-  if (parts[0] === 'emph') {
-    const e = emphasis(); const cur = [e.E, e.S, e.P];
-    cur[+parts[1]] = Number(raw);
-    P.emph = cur; return false;
-  }
-  if (parts[0] === 'test') {
-    const t = TESTS[parts[1]];
-    const v = t.unit === 'time' ? parseTime(raw) : n(raw);
-    if (v && v > 0) P.tests[parts[1]] = v; else delete P.tests[parts[1]];
-    return true;
-  }
-  if (parts[0] === 'override') { P.override[parts[1]] = Number(raw); return true; }
-  if (parts[0] === 'inj') {
-    const id = parts[1]; const cur = P.inj[id] || { status: 'none', phase: 1 };
-    if (parts[2] === 'status') cur.status = raw; else cur.phase = Number(raw);
-    if (cur.status === 'none') delete P.inj[id]; else P.inj[id] = cur;
-    return true;
-  }
-  if (parts[0] === 'day') {
-    const i = +parts[1]; const s = new Set(P.days);
-    if (el.checked) s.add(i); else s.delete(i);
-    P.days = [...s].sort((a, b) => a - b); return true;
-  }
-  if (k === 'doubles') { P.doubles = el.checked; return true; }
-  if (k === 'bar') { P.bar = raw === '1'; return true; }
-  if (k === 'height') { const v = n(raw); if (v) P.height = clamp(imperial() ? v * 2.54 : v, 120, 230); return false; }
-  if (k === 'weight') { const v = n(raw); if (v) P.weight = clamp(imperial() ? v / 2.20462 : v, 30, 200); return false; }
-  if (['age', 'minutes', 'sleep', 'meals', 'trainAge', 'equip', 'life'].includes(k)) { const v = n(raw); if (v != null && isFinite(v)) P[k] = v; return k !== 'minutes' && k !== 'age'; }
-  if (['bf', 'rhr', 'hrmax'].includes(k)) { const v = n(raw); P[k] = v && v > 0 ? v : null; return false; }
-  P[k] = raw;
-  return true;
-}
-
-// ---------- Loop diagrams ----------
-function ringSVG(segs, cur, label, colors) {
-  const n = segs.length, R = 60, cx = 75, cy = 75, gap = n > 1 ? 0.05 : 0;
-  let s = '';
-  segs.forEach((t, i) => {
-    const a0 = (i / n) * 2 * Math.PI - Math.PI / 2 + gap, a1 = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2 - gap;
-    const p = a => `${(cx + R * Math.cos(a)).toFixed(1)} ${(cy + R * Math.sin(a)).toFixed(1)}`;
-    const big = a1 - a0 > Math.PI ? 1 : 0;
-    s += `<path d="M ${p(a0)} A ${R} ${R} 0 ${big} 1 ${p(a1)}" stroke="${colors[i] || 'var(--line)'}" stroke-width="${i === cur ? 16 : 10}" fill="none" opacity="${cur < 0 || i === cur ? 1 : 0.55}"><title>${esc(t)}</title></path>`;
-    const am = (a0 + a1) / 2, lr = R + (n > 5 ? 0 : 0);
-    if (n <= 7) s += `<text x="${(cx + (lr - 25) * Math.cos(am)).toFixed(1)}" y="${(cy + (lr - 25) * Math.sin(am) + 3).toFixed(1)}" font-size="${n <= 4 ? 9 : 10}" text-anchor="middle" fill="var(--muted)">${esc(n <= 4 ? t : t.slice(0, 3))}</text>`;
-  });
-  s += `<text x="${cx}" y="${cy + 4}" font-size="12" font-weight="700" text-anchor="middle" fill="var(--text)">${esc(label)}</text>`;
-  return `<svg viewBox="0 0 150 150" role="img" aria-label="${esc(label)}">${s}</svg>`;
-}
+function subtabs(tab, list) { $(tab + 'Tabs').innerHTML = list.map(([id, t]) => `<button data-sub="${tab}:${id}" class="${VIEW.sub[tab] === id ? 'on' : ''}">${t}</button>`).join(''); }
+function pills(attr, list, cur) { return `<div class="pills">${list.map(([id, t, cls]) => `<button data-${attr}="${id}" class="${cls || ''} ${String(cur) === String(id) ? 'on' : ''}">${t}</button>`).join('')}</div>`; }
+const qPills = () => pills('q', ['E', 'S', 'P', 'R'].map(q => [q, `${Q[q]} · ${M.stage[q]}`, q]), VIEW.q);
 function dayColor(d) {
   if (!d.sessions.length) return 'var(--line)';
   const ks = d.sessions.flatMap(s => s.blocks.map(b => b.kind));
@@ -1859,59 +2114,15 @@ function dayColor(d) {
   if (ks.includes('E')) return 'color-mix(in srgb, var(--E) 55%, transparent)';
   return 'var(--R)';
 }
+const gateWeek = () => Math.ceil(M.todayWeek / 4) * 4;
+const todayPlan = () => M.todayWeek === PLAN.wk.no ? PLAN : planWeek(M, M.todayWeek);
+const todayCheckin = () => P.checkin && P.checkin.date === isoDate(new Date()) ? P.checkin : null;
 
-// ---------- Paths ----------
-function renderPaths() {
-  const m = M, a = m.athlete, e = m.emph;
-  const wk = weekInfo(VIEW.week);
-  const nextGate = Math.ceil(m.todayWeek / 4) * 4;
-  const gateDate = new Date(m.planStart); gateDate.setDate(gateDate.getDate() + (nextGate - 1) * 7 + 5);
-  const ladder = q => {
-    const info = m.info[q], st = info.stage;
-    const blocks = [1, 1, 2, 2, 3, 3][st - 1];
-    const tests = info.ids.filter(id => !(q === 'E' && id === 'easy' && info.ids.length > 1 && !P.tests.easy));
-    return `<div class="card"><div class="row"><h3 class="q-${q}" style="margin:0">${Q[q]}</h3><span class="chip ${q}">${m.band[q] === 'high' ? 'Priority' : m.band[q] === 'mid' ? 'Supporting' : 'Maintained'}</span><span class="small muted">${Q_WHAT[q]}</span></div>
-      <div class="ladder">${STAGES.map((s, i) => `<div class="st ${i + 1 < st ? 'done' : ''} ${i + 1 === st ? 'cur ' + q : ''}"><b>${i + 1}. ${s}</b>${i + 1 === st ? 'You are here' : i + 1 < st ? 'Passed' : ''}</div>`).join('')}</div>
-      <p class="small"><b>This stage:</b> ${esc(STAGE_FOCUS[q][st - 1])}</p>
-      ${info.maxed ? '<p class="small"><b>All gates passed.</b> Keep the quality with lower volume and spend the time on your weakest one.</p>' :
-        `<p class="small"><b>Gate to stage ${Math.min(6, st + 1)}:</b> ${tests.map(id => `${esc(TESTS[id].name)} ${TESTS[id].low ? '≤' : '≥'} <b>${fmtVal(id, target(id, st, m))}</b>${P.tests[id] ? ` <span class="muted">(now ${fmtVal(id, P.tests[id])})</span>` : ''}`).join(' · ')}</p>
-        <p class="small muted">Usually ${plural(blocks, 'block')} (${blocks * 4} weeks) of training. Next gate week: week ${nextGate}, around ${gateDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}.</p>`}
-    </div>`;
-  };
-  const injCards = m.inj.list.map(inj => {
-    const ph = inj.status === 'weak' ? 2 : inj.status === 'pain' ? 1 : inj.phase;
-    return `<div class="card"><div class="row"><h3 style="margin:0">${esc(inj.name)}</h3><span class="chip ${inj.status === 'pain' ? 'bad' : inj.status === 'rehab' ? 'warn' : 'R'}">${INJ_STATUS[inj.status]}</span></div>
-      <div class="ladder">${inj.phases.map((p, i) => `<div class="st ${i + 1 < ph ? 'done' : ''} ${i + 1 === ph ? 'cur R' : ''}"><b>Phase ${i + 1}: ${esc(p[0])}</b>${p[1].map(([id, d]) => `${esc(EX[id].name)}: ${esc(d)}`).join('<br>')}</div>`).join('')}</div>
-      <p class="small"><b>Move on when:</b> ${esc(inj.gate)}</p>
-      <p class="small muted">${esc(inj.ev)}</p>
-      ${inj.status === 'pain' ? '<p class="note bad">Painful now: see a physio or sports doctor. Until then the plan removes the exercises that strain this area and keeps only gentle isometrics.</p>' : ''}
-    </div>`;
-  }).join('');
-  const days = PLAN.days;
-  $('paths').innerHTML = `
-    <div class="card"><h2>${esc(a.name)}</h2><p>${esc(a.note)}</p>
-      <div class="bar" title="Training balance"><i style="width:${e.E}%;background:var(--E)"></i><i style="width:${e.S}%;background:var(--S)"></i><i style="width:${e.P}%;background:var(--P)"></i></div>
-      <p class="small muted" style="margin-top:6px"><span class="q-E">Endurance ${e.E}%</span> · <span class="q-S">Strength ${e.S}%</span> · <span class="q-P">Power ${e.P}%</span> · Mode: ${m.modes.map(x => MODES[x]).join(', ')}${m.inj.impactPain ? ` (running swapped for ${MODES[m.altMode].toLowerCase()} while it hurts)` : ''}</p>
-    </div>
-    <div class="card"><h2>Your main loops</h2>
-      <p class="small muted">Training works as loops inside loops. Each day you check in, train, eat and sleep. Each week alternates hard and easy days. Each 4-week block builds for three weeks, then unloads and tests. Passing a gate test moves you up a stage; missing it repeats the block with the same targets.</p>
-      <div class="loops">
-        <div class="loop">${ringSVG(['Check in', 'Train', 'Fuel', 'Sleep'], -1, 'Day', ['var(--R)', 'var(--S)', 'var(--P)', 'var(--E)'])}<b>Daily loop</b><br><span class="muted">Check-in on the Today tab adjusts the session.</span></div>
-        <div class="loop">${ringSVG(DAYS, VIEW.week === m.todayWeek ? m.todayIdx : -1, `Week ${VIEW.week}`, days.map(dayColor))}<b>Weekly loop</b><br><span class="muted">Hard days hard, easy days easy.</span></div>
-        <div class="loop">${ringSVG(['Build 1', 'Build 2', 'Build 3', 'Gate'], wk.w - 1, `Block ${wk.block}`, ['var(--accent)', 'var(--accent)', 'var(--accent)', 'var(--bad)'])}<b>Block loop</b><br><span class="muted">Week ${wk.w} of 4${wk.deload ? ': unload and test' : ''}.</span></div>
-        <div class="loop">${ringSVG(['E', 'S', 'P', 'R'].map(q => `${q} · ${m.stage[q]}`), -1, 'Stages', ['var(--E)', 'var(--S)', 'var(--P)', 'var(--R)'])}<b>Path loop</b><br><span class="muted">Stage → blocks → gate → next stage.</span></div>
-      </div>
-    </div>
-    ${['E', 'S', 'P', 'R'].map(ladder).join('')}
-    ${injCards ? `<h2 style="margin:18px 0 10px">Injury and weak-area paths</h2>${injCards}` : ''}
-    <p class="disclaimer">Targets are adjusted for sex${P.age > 35 ? ' and age' : ''}, and for how much your sport relies on each quality. They are sensible markers, not official standards.</p>`;
-}
-
-// ---------- Blocks and sessions ----------
+// ---------- Sessions ----------
 function itemHTML(it, b) {
   if (it.test) {
     const t = TESTS[it.test];
-    return `<li><details><summary><b>${esc(t.name)}</b> <span class="dose">target ${fmtVal(it.test, it.tgt)}</span></summary><div class="small muted">${esc(t.how)}</div></details></li>`;
+    return `<li><details><summary><b>${esc(t.name)}</b> <span class="dose">target ${fmtVal(it.test, it.tgt)}</span></summary><div>${esc(t.how)}</div></details></li>`;
   }
   const ex = EX[it.ex];
   const dose = b.kind === 'X' ? esc(it.dose) : esc(doseText(it.d));
@@ -1922,234 +2133,532 @@ function itemHTML(it, b) {
   if (it.fill) extra.push(`Added so ${esc(it.fill.toLowerCase())} get work this week`);
   if (it.region) extra.push(`${esc(it.region)}, ${it.status === 'weak' ? 'prehab' : 'phase ' + it.phase}`);
   if (it.d?.note) extra.push(esc(it.d.note));
-  return `<li><details><summary><b>${esc(ex.name)}</b> <span class="dose">${dose}</span></summary><div class="small muted">${esc(ex.cue)}${extra.length ? '<br>' + extra.join(' · ') : ''}</div></details></li>`;
+  return `<li><details><summary><b>${esc(ex.name)}</b> <span class="dose">${dose}</span></summary><div>${esc(ex.cue)}${extra.length ? '<br>' + extra.join(' · ') : ''}</div></details></li>`;
 }
-function blockHTML(b) {
-  const cls = { E: 'E', S: 'S', P: 'P', R: 'R', X: 'X', T: 'X', W: '', C: '' }[b.kind];
-  let body = '';
-  if (b.items) body = `<ul>${b.items.map(it => itemHTML(it, b)).join('')}</ul>`;
-  else if (b.kind === 'E') body = `<p class="small" style="margin:0">${esc(b.summary)}</p>`;
-  else if (b.steps) body = `<p class="small muted" style="margin:0">${b.steps.map(s => esc(s.label)).join(' · ')}</p>`;
-  return `<div class="blk ${cls}"><h4>${esc(b.kind === 'E' ? b.title : b.title)}${b.minutes ? ` <small>${b.minutes} min</small>` : ''}</h4>${b.summary && b.kind !== 'E' && b.kind !== 'W' && b.kind !== 'C' ? `<div class="small muted">${esc(b.summary)}</div>` : ''}${body}</div>`;
+function blockHTML(b, group, open) {
+  const cls = { E: 'E', S: 'S', P: 'P', R: 'R', X: 'X', T: 'X' }[b.kind] || '';
+  let body = '', sub = '';
+  if (b.items) { body = `${b.summary ? `<div class="muted">${esc(b.summary)}</div>` : ''}<ul>${b.items.map(it => itemHTML(it, b)).join('')}</ul>`; sub = b.items.map(it => it.test ? TESTS[it.test].name : EX[it.ex].name.replace(/ \(.*/, '')).join(', '); }
+  else if (b.kind === 'E') { body = `<div>${esc(b.summary)}</div>`; sub = b.summary; }
+  else if (b.steps) { body = `<div class="muted">${b.steps.map(s => esc(s.label)).join(' · ')}</div>`; sub = b.steps.map(s => s.label.split(':')[0]).join(', '); }
+  return `<details class="blk ${cls}" name="${group}"${open ? ' open' : ''}><summary><span>${esc(b.title)}</span><span class="sub">${esc(sub)}</span><span class="mins">${b.minutes ? b.minutes + ' min' : ''}</span></summary><div class="bb">${body}</div></details>`;
 }
-function sessionHTML(s, weekNo, opts = {}) {
+function sessionCard(s, weekNo, opts = {}) {
   const key = `${weekNo}:${s.day}:${s.slot}`;
-  return `<div class="sess"><div class="row"><b>${s.slot ? s.slot + ': ' : ''}${esc(s.title)}</b><span class="small muted">${s.minutes} min</span>${s.hard ? '<span class="chip S">hard</span>' : '<span class="chip">easy</span>'}</div>
-    ${s.blocks.map(blockHTML).join('')}
-    <div class="row noprint" style="margin-top:6px"><button class="btn sm" data-act="exportOne" data-key="${key}"${opts.adjusted ? ' data-adjusted="1"' : ''}>Export to IntervalTimer</button></div></div>`;
+  const main = s.blocks.findIndex(b => ['S', 'T'].includes(b.kind) || (b.kind === 'E' && b.hard));
+  const openIdx = main >= 0 ? main : Math.max(0, s.blocks.findIndex(b => ['E', 'P', 'R', 'X'].includes(b.kind)));
+  return `<div class="card sesscard">
+    <div class="sess-head"><div class="eyebrow">${esc(opts.eyebrow || '')}</div><h2>${esc(s.title)}</h2>
+      <div class="row"><span class="chip">${s.minutes} min</span>${s.hard ? '<span class="chip S">hard</span>' : '<span class="chip good">easy</span>'}${opts.status || ''}</div></div>
+    <div class="sess-body">${s.blocks.map((b, i) => blockHTML(b, 'b' + key.replace(/\W/g, ''), i === openIdx)).join('')}</div>
+    <div class="sess-foot"><button class="btn sm" data-act="exportOne" data-key="${key}"${opts.adjusted ? ' data-adjusted="1"' : ''}>Send to IntervalTimer</button><span class="small muted">Tap a part to open it, and an exercise for how to do it.</span></div></div>`;
 }
 function findSession(key, adjusted) {
   const [w, d, slot] = key.split(':');
   const plan = +w === PLAN.wk.no ? PLAN : planWeek(M, +w);
   let s = plan.days[+d].sessions.find(x => x.slot === slot);
-  if (s && adjusted) { const r = readiness(P.checkin); if (r) s = adjustSession(s, r.level, M); }
+  if (s && adjusted) { const r = readiness(todayCheckin()); if (r) s = adjustSession(s, r.level, M); }
   return s;
 }
 function routineName(s, weekNo) { return `${DAYS[s.day]}${s.slot ? ' ' + s.slot : ''} W${weekNo} · ${s.title}`; }
 
-// ---------- Week ----------
-function renderWeek() {
-  const m = M, plan = PLAN, wk = plan.wk;
-  const L = plan.days.map(dayLoad);
-  const easyMin = L.reduce((a, x) => a + x.easy, 0), hardMin = L.reduce((a, x) => a + x.hard, 0), total = L.reduce((a, x) => a + x.total, 0);
-  const cov = coverage(plan.days);
-  const hardDays = plan.days.filter(d => d.sessions.some(s => s.hard)).length;
-  const stamp = d => { const x = new Date(m.planStart); x.setDate(x.getDate() + (wk.no - 1) * 7 + d); return x.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); };
-  const dayCard = d => {
-    const today = wk.no === m.todayWeek && d.idx === m.todayIdx;
-    const mins = d.sessions.reduce((a, s) => a + s.minutes, 0);
-    const swapOpts = DAYS.map((x, i) => i === d.idx ? '' : `<option value="${i}">${x}</option>`).join('');
-    return `<div class="day ${today ? 'today' : ''} ${d.sessions.length ? '' : 'rest'}">
-      <h3>${DAYS_LONG[d.idx]} <span class="small muted">${stamp(d.idx)}</span>${today ? '<span class="chip good">Today</span>' : ''}<span class="mins">${mins ? mins + ' min' : ''}</span></h3>
-      ${d.sessions.length ? d.sessions.map(s => sessionHTML(s, wk.no)).join('') : `<p class="small muted">${d.avail ? 'Nothing scheduled.' : 'Rest day. A walk and 10 minutes of mobility are fine.'}</p>`}
-      <div class="row noprint" style="margin-top:8px"><label class="small muted row">Swap with <select data-swap="${d.idx}" style="width:auto"><option value="">…</option>${swapOpts}</select></label></div>
-    </div>`;
-  };
-  const covRows = GROUPS.map(([g, name]) => {
-    const v = Math.round(cov[g] * 10) / 10;
-    const lvl = v >= 8 ? 'good' : v >= 3 ? '' : 'warn';
-    return `<tr><td>${name}</td><td class="n"><span class="chip ${lvl}">${v}</span></td></tr>`;
-  });
-  const half = Math.ceil(covRows.length / 2);
-  $('week').innerHTML = `
-    <div class="card noprint"><div class="row">
-      <button class="btn sm" data-act="weekPrev" aria-label="Previous week">◀</button>
-      <h2 style="margin:0">Week ${wk.no}</h2>
-      <button class="btn sm" data-act="weekNext" aria-label="Next week">▶</button>
-      ${wk.no !== m.todayWeek ? '<button class="btn sm" data-act="weekToday">This week</button>' : ''}
-      <span class="chip ${wk.deload ? 'bad' : 'good'}">Block ${wk.block}, week ${wk.w} of 4: ${wk.deload ? 'unload and gate tests' : ['build', 'build more', 'peak load'][wk.w - 1]}</span>
-      <button class="btn sm" data-act="print" style="margin-left:auto">Print</button>
-    </div>
-    <p class="small muted" style="margin:8px 0 0">${wk.deload ? 'Volume drops by about a third so you arrive fresh for the gate tests, which stand in for competitions.' : 'Load rises a little each week of the block. Missed a day? Use "Swap with" to move sessions, or untick the day on the left and the week rebuilds around it.'}</p></div>
-    <div class="kpis">
-      <div class="kpi"><b>${Math.round(total / 6) / 10} h</b><span>planned training</span></div>
-      <div class="kpi"><b>${easyMin + hardMin ? Math.round(easyMin / (easyMin + hardMin) * 100) : 0}%</b><span>endurance time easy${m.band.E === 'high' ? ' (aim ~80%)' : ''}</span></div>
-      <div class="kpi"><b>${hardDays}</b><span>hard days</span></div>
-      <div class="kpi"><b>${plan.days.filter(d => !d.sessions.length).length}</b><span>full rest days</span></div>
-    </div>
-    <div class="week">${plan.days.map(dayCard).join('')}</div>
-    <div class="card" style="margin-top:14px"><h3>Every major muscle group</h3><p class="small muted">Weighted sets this week. Strength sets count fully, prehab three quarters and power half. Endurance work adds more to the legs on top.</p>
-      <div class="grid2"><table class="heat">${covRows.slice(0, half).join('')}</table><table class="heat">${covRows.slice(half).join('')}</table></div></div>`;
-}
-
 // ---------- Today ----------
 function renderToday() {
-  const m = M;
-  const plan = m.todayWeek === PLAN.wk.no ? PLAN : planWeek(m, m.todayWeek);
-  const day = plan.days[m.todayIdx];
-  const ci = P.checkin && P.checkin.date === isoDate(new Date()) ? P.checkin : null;
-  const r = readiness(ci);
-  const c = ci || { sleep: P.sleep, sore: 2, energy: 3, stress: 2, rhrUp: 0, ill: false, pain: false };
-  const scale = (k, lo, hi) => `<select data-ci="${k}">${[1, 2, 3, 4, 5].map(n => `<option value="${n}"${+c[k] === n ? ' selected' : ''}>${n}${n === 1 ? ' ' + lo : n === 5 ? ' ' + hi : ''}</option>`).join('')}</select>`;
-  const status = r ? `<div class="status ${r.level}">${r.level === 'good' ? 'Ready: train as planned.' : r.level === 'warn' ? 'Amber: train, but lighter (fewer sets, capped effort, shorter intervals).' : 'Red: recovery only today.'} Readiness ${r.score}/100${r.reasons.length ? ' · ' + r.reasons.join(', ') : ''}</div>` : '<p class="small muted">Fill in the check-in to adjust today\'s session.</p>';
+  const m = M, plan = todayPlan(), day = plan.days[m.todayIdx], wk = plan.wk;
+  const ci = todayCheckin(), r = readiness(ci);
   const sessions = day.sessions.map(s => r ? adjustSession(s, r.level, m) : s);
-  $('today').innerHTML = `
-    <div class="card"><h2>${DAYS_LONG[m.todayIdx]}, week ${m.todayWeek}</h2>
-      <div class="grid3">
-        ${field('Sleep last night (h)', `<input type="number" step="0.25" data-ci="sleep" value="${c.sleep}">`)}
-        ${field('Soreness', scale('sore', 'none', 'very'))}
-        ${field('Energy', scale('energy', 'empty', 'great'))}
-        ${field('Stress', scale('stress', 'calm', 'high'))}
-        ${field('Resting HR above normal (bpm)', `<input type="number" data-ci="rhrUp" value="${c.rhrUp || 0}">`)}
-      </div>
-      <div class="row small" style="margin-bottom:8px"><label class="row"><input type="checkbox" data-ci="ill"${c.ill ? ' checked' : ''}> Feeling ill</label><label class="row"><input type="checkbox" data-ci="pain"${c.pain ? ' checked' : ''}> New pain somewhere</label>
-        <button class="btn sm pri" data-act="checkin">Check in</button></div>
-      ${status}
-      ${ci?.pain ? '<p class="note warn">New pain: skip anything that makes it worse, and mark the area under Injuries if it lasts more than a couple of days.</p>' : ''}
-      ${ci?.ill ? '<p class="note bad">With fever, or symptoms below the neck (chest, stomach, aching muscles), rest completely. Mild head-cold symptoms only: easy movement is fine.</p>' : ''}
-    </div>
-    ${sessions.length ? sessions.map(s => `<div class="day today">${sessionHTML(s, m.todayWeek, { adjusted: !!r })}</div>`).join('') : '<div class="card"><p>No training today. Walk, stretch, eat well, and sleep.</p></div>'}`;
+  const lv = r?.level;
+  const f = fuelFor(day, m), meals = mealPlan(day, f);
+  const now = new Date().getHours() * 60 + new Date().getMinutes();
+  const next = meals.find(x => toMin(x.time) >= now) || meals[0];
+  const bed = toMin(P.wake) - Math.round(P.sleep * 60);
+  const gw = gateWeek(), toGate = gw - m.todayWeek;
+  const L = plan.days.map(dayLoad), hours = Math.round(L.reduce((a, x) => a + x.total, 0) / 6) / 10;
+  const date = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+  let main;
+  if (sessions.length) {
+    const i = Math.min(VIEW.sess, sessions.length - 1), s = sessions[i];
+    const status = lv === 'warn' ? '<span class="chip warn">made lighter</span>' : lv === 'bad' ? '<span class="chip bad">recovery instead</span>' : '';
+    main = (sessions.length > 1 ? pills('sess', sessions.map((x, j) => [j, x.slot || `Session ${j + 1}`]), i) : '') + sessionCard(s, m.todayWeek, { adjusted: !!r, eyebrow: `${date} · week ${m.todayWeek}`, status });
+  } else {
+    let nxt = null;
+    for (let k = 1; k <= 7 && !nxt; k++) { const idx = m.todayIdx + k; const p2 = idx > 6 ? planWeek(m, m.todayWeek + 1) : plan; const d2 = p2.days[idx % 7]; if (d2.sessions.length) nxt = d2; }
+    main = `<div class="card sesscard"><div class="sess-head"><div class="eyebrow">${esc(date)} · week ${m.todayWeek}</div><h2>Rest day</h2><div class="row"><span class="chip good">recover</span></div></div>
+      <div class="sess-body" style="padding:12px 14px"><p>No training today. A walk and ten minutes of mobility are fine. Eat to your targets and get your sleep.</p>
+      ${nxt ? `<p class="muted">Next up, ${DAYS_LONG[nxt.idx]}: <b>${esc(nxt.sessions.map(s => s.title).join(' and '))}</b> (${nxt.sessions.reduce((a, s) => a + s.minutes, 0)} min).</p>` : ''}</div></div>`;
+  }
+  $('today').innerHTML = `<div class="today">
+    <div class="ready"><span class="q">Today I feel</span>
+      ${[['good', 'Ready'], ['warn', 'So-so'], ['bad', 'Rough']].map(([k, t]) => `<button class="lv ${k} ${lv === k ? 'on' : ''}" data-act="quick" data-lv="${k}">${t}</button>`).join('')}
+      <button class="iconbtn" data-act="ciOpen">Details</button>
+      ${r && r.reasons.length ? `<span class="small muted">${esc(r.reasons.join(', '))}</span>` : ''}</div>
+    <div class="sesswrap">${main}</div>
+    <div class="tiles">
+      <button class="tile" data-go="fuel:today"><span class="t">Fuel today</span><b>${f.kcal} kcal</b><span class="s">C ${f.C} · P ${f.Pr} · F ${f.F} g</span><span class="s">Next: ${next.time} ${esc(next.name)}</span></button>
+      <button class="tile" data-go="recover:sleep"><span class="t">Sleep</span><b>${hm(bed)}</b><span class="s">lights out · ${P.sleep} h target</span><span class="s">Wind down from ${hm(bed - 30)}</span></button>
+      <button class="tile" data-go="paths:rail"><span class="t">Stages</span><b>${['E', 'S', 'P', 'R'].map(q => `<span class="q-${q}">${q}${m.stage[q]}</span>`).join(' ')}</b><span class="s">${toGate ? `Gate tests in ${plural(toGate, 'week')}` : 'Gate tests this week'}</span><span class="s">${m.inj.list.length ? plural(m.inj.list.length, 'rehab path') + ' active' : 'Endurance, Strength, Power, Resilience'}</span></button>
+      <button class="tile" data-go="week:day"><span class="t">Week ${wk.no}</span><b>${wk.deload ? 'Unload' : ['Build', 'Build more', 'Peak'][wk.w - 1]}</b><span class="dots">${plan.days.map((d, i) => `<i class="${i === m.todayIdx ? 'now' : ''}" style="background:${dayColor(d)}"></i>`).join('')}</span><span class="s">${hours} h · block ${wk.block}, week ${wk.w} of 4</span></button>
+    </div></div>`;
+}
+function openCheckin() {
+  const c = todayCheckin() || {};
+  const v = { sleep: c.sleep ?? P.sleep, sore: c.sore ?? 2, energy: c.energy ?? 3, stress: c.stress ?? 2, rhrUp: c.rhrUp ?? 0, ill: !!c.ill, pain: !!c.pain };
+  const scale = (k, lo, hi) => `<select data-ci="${k}">${[1, 2, 3, 4, 5].map(n => `<option value="${n}"${+v[k] === n ? ' selected' : ''}>${n}${n === 1 ? ' ' + lo : n === 5 ? ' ' + hi : ''}</option>`).join('')}</select>`;
+  $('ciBody').innerHTML = `<p class="small muted">A fuller check-in scores your readiness from sleep, soreness, energy, stress and resting heart rate, then keeps today's session, makes it lighter, or swaps it for recovery.</p>
+    <div class="grid2">${field('Sleep last night (h)', `<input type="number" step="0.25" data-ci="sleep" value="${v.sleep}">`)}${field('Resting HR above normal (bpm)', `<input type="number" data-ci="rhrUp" value="${v.rhrUp}">`)}
+    ${field('Soreness', scale('sore', 'none', 'very'))}${field('Energy', scale('energy', 'empty', 'great'))}${field('Stress', scale('stress', 'calm', 'high'))}</div>
+    <div class="row small"><label class="row"><input type="checkbox" data-ci="ill"${v.ill ? ' checked' : ''}> Feeling ill</label><label class="row"><input type="checkbox" data-ci="pain"${v.pain ? ' checked' : ''}> New pain somewhere</label></div>
+    <p class="small muted" style="margin-top:8px">With fever or symptoms below the neck, rest completely. For new pain, skip what makes it worse and add it under Setup if it lasts.</p>`;
+  $('ciDlg').showModal();
+}
+
+// ---------- Week ----------
+function dayBar(plan) {
+  return `<div class="daybar">${plan.days.map(d => `<button data-day="${d.idx}" class="${d.idx === VIEW.day ? 'on' : ''} ${plan.wk.no === M.todayWeek && d.idx === M.todayIdx ? 'now' : ''}"><b>${DAYS[d.idx]}</b><i style="background:${dayColor(d)}"></i><span class="muted">${d.sessions.reduce((a, s) => a + s.minutes, 0) || 'rest'}</span></button>`).join('')}</div>`;
+}
+function weekNav(wk) {
+  return `<div class="weeknav"><button class="btn sm" data-act="weekPrev" aria-label="Previous week">◀</button><h2>Week ${wk.no}</h2><button class="btn sm" data-act="weekNext" aria-label="Next week">▶</button>
+    ${wk.no !== M.todayWeek ? '<button class="btn sm" data-act="weekToday">This week</button>' : ''}<span class="chip ${wk.deload ? 'bad' : 'good'}">Block ${wk.block} · ${wk.deload ? 'unload and gate tests' : ['build', 'build more', 'peak load'][wk.w - 1]}</span></div>`;
+}
+function renderWeek() {
+  const m = M, plan = PLAN, wk = plan.wk, sub = VIEW.sub.week;
+  subtabs('week', [['day', 'Day'], ['overview', 'Overview'], ['muscles', 'Muscles'], ['export', 'Export']]);
+  let h = '';
+  if (sub === 'day') {
+    const d = plan.days[VIEW.day];
+    const x = new Date(m.planStart); x.setDate(x.getDate() + (wk.no - 1) * 7 + d.idx);
+    const eyebrow = `${DAYS_LONG[d.idx]} ${x.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+    const i = Math.min(VIEW.sess, Math.max(0, d.sessions.length - 1));
+    h = `<div style="height:100%;display:flex;flex-direction:column">${weekNav(wk)}${dayBar(plan)}
+      ${d.sessions.length > 1 ? pills('sess', d.sessions.map((s, j) => [j, s.slot || `Session ${j + 1}`]), i) : ''}
+      <div class="sesswrap" style="flex:1">${d.sessions.length ? sessionCard(d.sessions[i], wk.no, { eyebrow }) : `<div class="card"><div class="sess-head" style="padding:0;border:0"><div class="eyebrow">${eyebrow}</div><h2>Rest day</h2></div><p class="muted">${d.avail ? 'Nothing scheduled.' : 'Not one of your training days.'} A walk and ten minutes of mobility are fine.</p></div>`}</div></div>`;
+  } else if (sub === 'overview') {
+    const L = plan.days.map(dayLoad);
+    const easy = L.reduce((a, x) => a + x.easy, 0), hard = L.reduce((a, x) => a + x.hard, 0), total = L.reduce((a, x) => a + x.total, 0);
+    h = `${weekNav(wk)}<div class="kpis">
+        <div class="kpi"><b>${Math.round(total / 6) / 10} h</b><span>planned</span></div>
+        <div class="kpi"><b>${plan.days.filter(d => d.sessions.some(s => s.hard)).length}</b><span>hard days</span></div>
+        <div class="kpi"><b>${plan.days.filter(d => !d.sessions.length).length}</b><span>rest days</span></div>
+        <div class="kpi"><b>${easy + hard ? Math.round(easy / (easy + hard) * 100) : 0}%</b><span>endurance time easy</span></div></div>
+      <div class="card"><table><tr><th>Day</th><th>Session</th><th class="n">Time</th><th></th><th>Swap with</th></tr>
+      ${plan.days.map(d => `<tr><td><b>${DAYS[d.idx]}</b></td><td>${d.sessions.length ? d.sessions.map(s => esc((s.slot ? s.slot + ': ' : '') + s.title)).join('<br>') : '<span class="muted">Rest</span>'}</td>
+        <td class="n">${d.sessions.reduce((a, s) => a + s.minutes, 0) || ''}</td><td>${d.sessions.some(s => s.hard) ? '<span class="chip S">hard</span>' : d.sessions.length ? '<span class="chip good">easy</span>' : ''}</td>
+        <td><select data-swap="${d.idx}" style="width:auto" aria-label="Swap ${DAYS[d.idx]} with"><option value="">…</option>${DAYS.map((x, i) => i === d.idx ? '' : `<option value="${i}">${x}</option>`).join('')}</select></td></tr>`).join('')}</table>
+      <p class="small muted" style="margin:8px 0 0">${wk.deload ? 'Volume drops by about a third so you arrive fresh for the gate tests, which stand in for competitions.' : 'Load rises a little each week of the block. To move a session, swap two days. To drop a day, untick it in Setup and the week rebuilds.'} <button class="btn sm" data-act="print">Print</button></p></div>`;
+  } else if (sub === 'muscles') {
+    const cov = coverage(plan.days);
+    h = `<div class="card"><h3>Every major muscle group, week ${wk.no}</h3><p class="small muted">Weighted sets this week. Strength sets count fully, prehab three quarters and power half. Endurance work adds more to the legs on top. Small top-up exercises are added automatically when a group would get too little.</p>
+      <div class="musc">${GROUPS.map(([g, name]) => { const v = Math.round(cov[g] * 10) / 10; return `<div><span>${name}</span><span class="chip ${v >= 8 ? 'good' : v >= 3 ? '' : 'warn'}">${v}</span></div>`; }).join('')}</div></div>`;
+  } else {
+    if (VIEW.exportWeek == null) VIEW.exportWeek = wk.no;
+    const ep = VIEW.exportWeek === wk.no ? plan : planWeek(m, VIEW.exportWeek);
+    const list = ep.days.flatMap(d => d.sessions.map(s => ({ s, key: `${ep.wk.no}:${s.day}:${s.slot}` })));
+    h = `<div class="card"><h3>Export to IntervalTimer</h3>
+      <p class="small">Each session becomes a routine: timed steps for warm-ups, intervals and rests, and "tap when done" steps for sets of reps. Download the file, then in <a href="https://sonusario.github.io/IntervalTimer/" target="_blank" rel="noopener">IntervalTimer</a> choose <b>Settings → Import routines</b>. Nothing there is replaced.</p>
+      <div class="row" style="margin:6px 0"><button class="btn sm" data-act="expPrev">◀</button><b>Week ${ep.wk.no}</b><button class="btn sm" data-act="expNext">▶</button><button class="btn sm" data-act="expAll">All</button><button class="btn sm" data-act="expNone">None</button>
+        <button class="btn sm pri" data-act="expGo"${list.some(x => VIEW.picked.has(x.key)) ? '' : ' disabled'}>Download routines file</button></div>
+      <div class="exp-list">${list.map(({ s, key }) => `<label><input type="checkbox" data-pick="${key}"${VIEW.picked.has(key) ? ' checked' : ''}><span>${DAYS_LONG[s.day]}${s.slot ? ' ' + s.slot : ''}: ${esc(s.title)}<small>${s.minutes} min</small></span></label>`).join('') || '<p class="muted">No sessions this week.</p>'}</div></div>`;
+  }
+  $('weekPane').innerHTML = h;
+}
+
+// ---------- Paths: the railroad ----------
+// A directed graph. Each quality is a line of six stations joined by gates.
+// Power stations also need the strength and resilience stations before them,
+// and rehab sidings rejoin the resilience line.
+function railSVG(m, vertical) {
+  const tracks = ['E', 'S', 'P', 'R'], rehab = m.inj.list.slice(0, 2), rows = 4 + rehab.length;
+  const pos = (col, row) => vertical ? { x: 100 + row * 70, y: 34 + col * 72 } : { x: 60 + col * 94, y: 50 + row * 84 };
+  const W = vertical ? 100 + (rows - 1) * 70 + 44 : 60 + 7 * 94 + 52, H = vertical ? 34 + 7 * 72 + 34 : 50 + (rows - 1) * 84 + 44;
+  const col = q => `var(--${q})`;
+  const line = (a, b, attrs) => `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" ${attrs}/>`;
+  // A link that stops short of both stations, so arrowheads stay visible.
+  const link = (a, b, attrs, pad = 16) => { const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1; return line({ x: a.x + dx / d * pad, y: a.y + dy / d * pad }, { x: b.x - dx / d * (pad + 3), y: b.y - dy / d * (pad + 3) }, attrs); };
+  let s = `<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="context-stroke"/></marker></defs>`;
+  const start = pos(0, 1.5), end = pos(7, 1.5);
+  const cap = Math.min(m.stage.S, m.stage.R) + 1;
+  // Stage names along the way.
+  STAGES.forEach((n, i) => { const p = pos(i + 1, 0); s += vertical ? `<text x="6" y="${p.y + 4}" font-size="11" fill="var(--muted)">${n}</text>` : `<text x="${p.x}" y="14" font-size="11" text-anchor="middle" fill="var(--muted)">${n}</text>`; });
+  // Prerequisites into the power line.
+  for (let k = 1; k <= 5; k++) for (const q of ['S', 'R']) {
+    const met = m.stage[q] > k, binding = m.info.P.held && m.stage[q] === k && cap === k + 1;
+    s += link(pos(k, tracks.indexOf(q)), pos(k + 1, 2), `stroke="${binding ? 'var(--warn)' : met ? 'var(--good)' : 'var(--muted)'}" stroke-width="${binding ? 2.5 : 1.3}" ${binding ? '' : 'stroke-dasharray="3 4"'} opacity="${binding ? 1 : met ? 0.55 : 0.5}" marker-end="url(#arr)"`);
+  }
+  tracks.forEach((q, row) => {
+    const st = m.stage[q];
+    s += link(start, pos(1, row), `stroke="${col(q)}" stroke-width="2.5" marker-end="url(#arr)"`, 15);
+    for (let k = 1; k <= 6; k++) {
+      const a = pos(k, row), b = k < 6 ? pos(k + 1, row) : end, done = k < st;
+      s += link(a, b, `stroke="${done ? col(q) : 'var(--line)'}" stroke-width="${done ? 5 : 4}" stroke-linecap="round" ${k === 6 ? 'marker-end="url(#arr)"' : ''}`, k === 6 ? 15 : 13);
+      if (k < 6 || true) { const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2; if (k < 6) s += `<rect x="${mx - 4}" y="${my - 4}" width="8" height="8" transform="rotate(45 ${mx} ${my})" fill="${k === st ? 'var(--bad)' : done ? col(q) : 'var(--panel)'}" stroke="${k === st ? 'var(--bad)' : done ? col(q) : 'var(--muted)'}" stroke-width="1.5"><title>Gate out of stage ${k}</title></rect>`; }
+    }
+    const lp = pos(1, row);
+    s += vertical ? `<text class="halo" x="${lp.x}" y="${lp.y - 21}" font-size="10" font-weight="700" text-anchor="middle" fill="${col(q)}">${Q[q]}</text>` : `<text class="halo" x="${lp.x - 12}" y="${row < 2 ? lp.y - 20 : lp.y + 30}" font-size="11" font-weight="700" fill="${col(q)}">${Q[q]}</text>`;
+    for (let k = 1; k <= 6; k++) {
+      const p = pos(k, row), done = k < st, cur = k === st, on = VIEW.rail === `${q}:${k}`;
+      s += `<g class="stn" data-rail="${q}:${k}" tabindex="0" role="button" aria-label="${Q[q]} stage ${k}, ${STAGES[k - 1]}${cur ? ', you are here' : done ? ', passed' : ''}">
+        ${on ? `<circle cx="${p.x}" cy="${p.y}" r="19" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-dasharray="2 3"/>` : ''}
+        <circle cx="${p.x}" cy="${p.y}" r="${cur ? 15 : 12}" fill="${done ? col(q) : 'var(--panel)'}" stroke="${done || cur ? col(q) : 'var(--muted)'}" stroke-width="${cur ? 4 : 2}"/>
+        <text x="${p.x}" y="${p.y + 4}" font-size="12" font-weight="700" text-anchor="middle" fill="${done ? '#fff' : cur ? col(q) : 'var(--muted)'}">${k}</text></g>`;
+    }
+  });
+  rehab.forEach((inj, i) => {
+    const row = 4 + i, ph = injPhase(inj), c = inj.status === 'pain' ? 'var(--bad)' : 'var(--warn)';
+    s += link(start, pos(1, row), `stroke="${c}" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr)"`, 15);
+    for (let k = 1; k <= 3; k++) {
+      const p = pos(k, row), done = k < ph, cur = k === ph, on = VIEW.rail === `X${inj.id}:${k}`;
+      const to = k < 3 ? pos(k + 1, row) : pos(4, 3);
+      s += link(p, to, `stroke="${done ? c : 'var(--line)'}" stroke-width="${k < 3 ? 4 : 2}" ${k === 3 ? 'stroke-dasharray="5 4" marker-end="url(#arr)"' : 'stroke-linecap="round"'}`, 13);
+      s += `<g class="stn" data-rail="X${inj.id}:${k}" tabindex="0" role="button" aria-label="${esc(inj.name)} rehab phase ${k}">
+        ${on ? `<circle cx="${p.x}" cy="${p.y}" r="18" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-dasharray="2 3"/>` : ''}
+        <rect x="${p.x - (cur ? 13 : 11)}" y="${p.y - (cur ? 13 : 11)}" width="${cur ? 26 : 22}" height="${cur ? 26 : 22}" rx="6" fill="${done ? c : 'var(--panel)'}" stroke="${done || cur ? c : 'var(--muted)'}" stroke-width="${cur ? 4 : 2}"/>
+        <text x="${p.x}" y="${p.y + 4}" font-size="12" font-weight="700" text-anchor="middle" fill="${done ? '#fff' : cur ? c : 'var(--muted)'}">${k}</text></g>`;
+    }
+    const lp = pos(1, row), short = inj.name.replace(/ \(.*/, '');
+    s += vertical ? `<text class="halo" x="${lp.x}" y="${lp.y - 20}" font-size="10" font-weight="700" text-anchor="middle" fill="${c}">${esc(short.slice(0, 11))}</text>` : `<text class="halo" x="${lp.x - 12}" y="${lp.y + 29}" font-size="11" font-weight="700" fill="${c}">Rehab: ${esc(short)}</text>`;
+  });
+  s += `<circle cx="${start.x}" cy="${start.y}" r="15" fill="var(--text)"/><text x="${start.x}" y="${start.y + 4}" font-size="10" font-weight="700" text-anchor="middle" fill="var(--bg)">You</text>`;
+  s += `<circle cx="${end.x}" cy="${end.y}" r="17" fill="var(--panel)" stroke="var(--accent)" stroke-width="3"/><text x="${end.x}" y="${end.y + 4}" font-size="10" font-weight="700" text-anchor="middle" fill="var(--accent)">Elite</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Railroad diagram of your progression paths">${s}</svg>`;
+}
+function gateList(q, k, m) {
+  const info = m.info[q];
+  const tests = info.ids.filter(id => !(q === 'E' && id === 'easy' && info.ids.length > 1 && !P.tests.easy));
+  return tests.map(id => `<li>${esc(TESTS[id].name)} ${TESTS[id].low ? '≤' : '≥'} <b>${fmtVal(id, target(id, k, m))}</b>${P.tests[id] ? ` <span class="muted">(now ${fmtVal(id, P.tests[id])})</span>` : ''}</li>`).join('');
+}
+function railDetail(m) {
+  const [key, kk] = VIEW.rail.split(':'), k = +kk;
+  if (key[0] === 'X') {
+    const inj = m.inj.list.find(i => i.id === key.slice(1));
+    if (!inj) return '';
+    const ph = injPhase(inj);
+    return `<div class="row"><h3 style="margin:0">${esc(inj.name)}</h3><span class="chip ${k === ph ? 'warn' : ''}">${k < ph ? 'Done' : k === ph ? 'You are here' : 'Ahead'}</span></div>
+      <p><b>Phase ${k}: ${esc(inj.phases[k - 1][0])}</b></p><ul class="small">${inj.phases[k - 1][1].map(([id, d]) => `<li><b>${esc(EX[id].name)}</b>: ${esc(d)}</li>`).join('')}</ul>
+      <p class="small"><b>${k === 3 ? 'Rejoin the main line when' : 'Move on when'}:</b> ${k === 3 ? esc(inj.gate) : 'these feel easy, and any pain stays at 3/10 or lower and settles by the next morning.'}</p>
+      <p class="small muted">${esc(inj.ev)}</p>`;
+  }
+  const q = key, st = m.stage[q], info = m.info[q];
+  const need = q === 'P' && k > 1 ? `<p class="small"><b>Needs first:</b> Strength stage ${k - 1} and Resilience stage ${k - 1}. Jumping and sprinting hard need the muscle and tendon strength to absorb them.</p>` : '';
+  const held = q === 'P' && info.held && k === st ? `<p class="note warn">Your power tests put you at stage ${info.held}, but the plan holds power here until Strength and Resilience reach stage ${st}.</p>` : '';
+  return `<div class="row"><h3 class="q-${q}" style="margin:0">${Q[q]} · ${k}. ${STAGES[k - 1]}</h3><span class="chip ${k === st ? q : ''}">${k < st ? 'Passed' : k === st ? 'You are here' : 'Ahead'}</span></div>
+    <p class="small muted">${Q_WHAT[q]}</p><p class="small">${esc(STAGE_FOCUS[q][k - 1])}</p>${need}${held}
+    ${k < 6 ? `<p class="small" style="margin-bottom:2px"><b>Gate to stage ${k + 1}:</b></p><ul class="small">${gateList(q, k, m)}</ul>` : '<p class="small"><b>The top of the line.</b> Hold it with less volume and spend the time on your weakest quality.</p>'}
+    ${k === st && k < 6 ? `<p class="small muted">Next gate week: week ${gateWeek()}. Log results under Gates.</p>` : ''}`;
+}
+function ringSVG(segs, cur, label, colors) {
+  const n = segs.length, R = 60, cx = 75, cy = 75, gap = 0.05;
+  let s = '';
+  segs.forEach((t, i) => {
+    const a0 = (i / n) * 2 * Math.PI - Math.PI / 2 + gap, a1 = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2 - gap;
+    const p = a => `${(cx + R * Math.cos(a)).toFixed(1)} ${(cy + R * Math.sin(a)).toFixed(1)}`;
+    s += `<path d="M ${p(a0)} A ${R} ${R} 0 0 1 ${p(a1)}" stroke="${colors[i] || 'var(--line)'}" stroke-width="${i === cur ? 16 : 10}" fill="none" opacity="${cur < 0 || i === cur ? 1 : 0.55}"><title>${esc(t)}</title></path>`;
+    const am = (a0 + a1) / 2;
+    s += `<text x="${(cx + 35 * Math.cos(am)).toFixed(1)}" y="${(cy + 35 * Math.sin(am) + 3).toFixed(1)}" font-size="${n <= 4 ? 9 : 10}" text-anchor="middle" fill="var(--muted)">${esc(n <= 4 ? t : t.slice(0, 3))}</text>`;
+  });
+  return `<svg viewBox="0 0 150 150" role="img" aria-label="${esc(label)}">${s}<text x="${cx}" y="${cy + 4}" font-size="12" font-weight="700" text-anchor="middle" fill="var(--text)">${esc(label)}</text></svg>`;
+}
+function renderPaths() {
+  const m = M, sub = VIEW.sub.paths;
+  subtabs('paths', [['rail', 'Railroad'], ['stages', 'Stages'], ['gates', 'Gates'], ['loops', 'Loops']]);
+  let h = '';
+  if (sub === 'rail') {
+    if (!VIEW.rail || (VIEW.rail[0] === 'X' && !m.inj.list.some(i => 'X' + i.id === VIEW.rail.split(':')[0]))) { const q = ['E', 'S', 'P'].sort((a, b) => m.emph[b] - m.emph[a])[0]; VIEW.rail = `${q}:${m.stage[q]}`; }
+    const vertical = matchMedia('(max-width: 859px)').matches;
+    h = `<div class="railwrap"><div class="card dia">${railSVG(m, vertical)}</div>
+      <div class="card detail">${railDetail(m)}<p class="small muted" style="margin:8px 0 0">Tap any station. Thick lines are done, diamonds are gates (red is your next one), dashed arrows show what a power station needs first${m.inj.list.length ? ', and square stations are rehab phases that rejoin the Resilience line' : ''}.</p></div></div>`;
+  } else if (sub === 'stages') {
+    const q = VIEW.q, info = m.info[q], st = info.stage, blocks = [1, 1, 2, 2, 3, 3][st - 1];
+    const a = m.athlete, e = m.emph;
+    h = `<div class="card"><div class="row"><b>${esc(a.name)}</b><span class="small muted">${m.modes.map(x => MODES[x]).join(', ')}${m.inj.impactPain ? `, running swapped for ${MODES[m.altMode].toLowerCase()} for now` : ''}</span></div>
+        <div class="bar" style="margin:6px 0 4px"><i style="width:${e.E}%;background:var(--E)"></i><i style="width:${e.S}%;background:var(--S)"></i><i style="width:${e.P}%;background:var(--P)"></i></div>
+        <div class="small muted"><span class="q-E">Endurance ${e.E}%</span> · <span class="q-S">Strength ${e.S}%</span> · <span class="q-P">Power ${e.P}%</span></div></div>
+      <div class="card">${qPills()}
+        <div class="row"><span class="chip ${q}">${m.band[q] === 'high' ? 'Priority' : m.band[q] === 'mid' ? 'Supporting' : 'Maintained'}</span><span class="small muted">${Q_WHAT[q]} · stage from ${info.src}</span></div>
+        <div class="ladder">${STAGES.map((s, i) => `<div class="st ${i + 1 < st ? 'done' : ''} ${i + 1 === st ? 'cur ' + q : ''}"><b>${i + 1}. ${s}</b>${i + 1 === st ? 'You are here' : i + 1 < st ? 'Passed' : ''}</div>`).join('')}</div>
+        <p class="small"><b>This stage:</b> ${esc(STAGE_FOCUS[q][st - 1])}</p>
+        ${info.maxed ? '<p class="small"><b>All gates passed.</b> Keep the quality with lower volume and spend the time on your weakest one.</p>' : `<p class="small" style="margin-bottom:2px"><b>Gate to stage ${Math.min(6, st + 1)}:</b></p><ul class="small">${gateList(q, st, m)}</ul>
+        <p class="small muted">Usually ${plural(blocks, 'block')} (${blocks * 4} weeks). Next gate week: week ${gateWeek()}. Targets adjust for sex${P.age > 35 ? ', age' : ''} and how much your sport relies on this quality.</p>`}</div>`;
+  } else if (sub === 'gates') {
+    const q = VIEW.q, info = m.info[q];
+    const rows = info.ids.map(id => {
+      const t = TESTS[id], v = P.tests[id], met = v ? metCount(id, v, m) : m.stage[q] - 1;
+      const hist = P.testLog.filter(r => r.id === id).slice(-3).map(r => `${r.date.slice(5)}: ${fmtVal(id, r.value)}`).join(' · ');
+      return `<tr><td><details><summary><b>${esc(t.name)}</b></summary><div class="small muted">${esc(t.how)}</div></details>${hist ? `<div class="small muted">${esc(hist)}</div>` : ''}</td>
+        <td class="small">${v ? fmtVal(id, v) : '–'}</td><td class="small">${v && met >= 6 ? 'all passed' : `${t.low ? '≤' : '≥'} ${fmtVal(id, target(id, Math.min(6, met + 1), m))}`}</td>
+        <td><div class="row" style="flex-wrap:nowrap"><input data-log="${id}" placeholder="${t.unit === 'time' ? 'mm:ss' : t.unit}" style="width:78px" aria-label="New result"><button class="btn sm" data-act="log" data-id="${id}">Log</button></div></td></tr>`;
+    }).join('');
+    h = `<div class="card">${qPills()}<table><tr><th>Test (tap for how)</th><th>Latest</th><th>Next gate</th><th>New result</th></tr>${rows}</table></div>
+      <div class="card small"><b>Gate tests stand in for competitions.</b> They come in week 4 of each block (next: week ${gateWeek()}), after an unload week. Logging a result moves your stage at once and the plan adjusts.
+        <details style="margin-top:4px"><summary>How to run a gate week</summary><ul>
+        <li><b>Day 1, power and strength:</b> 15 min warm-up, jumps and sprints first (best of 3, full rest), then strength (3–5 good reps, 3–5 min rests), then resilience tests.</li>
+        <li><b>Day 2 or later, endurance:</b> treat it like a race. Easy day before, usual breakfast 2–3 h before, the warm-up you would race with.</li>
+        <li>Same conditions each time. Missed a target? Repeat the block. Missed twice? Check sleep, food and stress, then shift some balance toward that quality.</li>
+        <li>You never need a true max: 1RM ≈ weight × (1 + reps ÷ 30), so 100 kg × 5 ≈ 117 kg.</li></ul></details></div>`;
+  } else {
+    const wk = PLAN.wk;
+    h = `<div class="card"><h3>Your main loops</h3><p class="small muted">Training is loops inside loops. Each day: check in, train, fuel, sleep. Each week: hard and easy days. Each block: build for three weeks, then unload and test. Passing a gate moves you up a stage; missing it repeats the block.</p>
+      <div class="loops">
+        <div class="loop">${ringSVG(['Check in', 'Train', 'Fuel', 'Sleep'], -1, 'Day', ['var(--R)', 'var(--S)', 'var(--P)', 'var(--E)'])}<b>Daily</b><br><span class="muted">The Today tab</span></div>
+        <div class="loop">${ringSVG(DAYS, wk.no === m.todayWeek ? m.todayIdx : -1, `Week ${wk.no}`, PLAN.days.map(dayColor))}<b>Weekly</b><br><span class="muted">Hard days hard, easy days easy</span></div>
+        <div class="loop">${ringSVG(['Build 1', 'Build 2', 'Build 3', 'Gate'], wk.w - 1, `Block ${wk.block}`, ['var(--accent)', 'var(--accent)', 'var(--accent)', 'var(--bad)'])}<b>Block</b><br><span class="muted">Week ${wk.w} of 4</span></div>
+        <div class="loop">${ringSVG(['E', 'S', 'P', 'R'].map(q => `${q} · ${m.stage[q]}`), -1, 'Stages', ['var(--E)', 'var(--S)', 'var(--P)', 'var(--R)'])}<b>Path</b><br><span class="muted">Stage, blocks, gate, next stage</span></div>
+      </div></div>`;
+  }
+  $('pathsPane').innerHTML = h;
 }
 
 // ---------- Fuel ----------
 function renderFuel() {
-  const m = M, plan = PLAN;
-  if (VIEW.fuelDay == null) VIEW.fuelDay = m.todayIdx;
-  const fuels = plan.days.map(d => fuelFor(d, m));
-  const f = fuels[VIEW.fuelDay], d = plan.days[VIEW.fuelDay];
-  const meals = mealPlan(d, f);
-  const longest = Math.max(0, ...d.sessions.flatMap(s => s.blocks.filter(b => b.kind === 'E').map(b => b.minutes)));
-  const eaWarn = f.ea < 30 ? `<p class="note bad">Energy available after training is about ${f.ea} kcal per kg of lean mass, below the 30 that protects hormones, bones and performance (low energy availability, RED-S). Eat more on hard days${P.bodyGoal === 'lean' ? ' or slow the cut' : ''}.</p>` : f.ea < 40 && P.bodyGoal === 'lean' ? '<p class="note warn">Cutting on a training day leaves little spare energy. Keep the deficit on easy days.</p>' : '';
-  $('fuel').innerHTML = `
-    <div class="card"><h2>Daily fuel</h2>
-      <div class="pill-tabs">${DAYS.map((x, i) => `<button data-fday="${i}" class="${i === VIEW.fuelDay ? 'on' : ''}">${x}</button>`).join('')}</div>
-      <div class="kpis">
-        <div class="kpi"><b>${f.kcal}</b><span>kcal</span></div>
-        <div class="kpi"><b>${f.C} g</b><span>carbohydrate (${f.cpk} g/kg)</span></div>
-        <div class="kpi"><b>${f.Pr} g</b><span>protein (${f.ppk.toFixed(1)} g/kg)</span></div>
-        <div class="kpi"><b>${f.F} g</b><span>fat</span></div>
-        <div class="kpi"><b>${f.water} L</b><span>fluid, plus food</span></div>
-      </div>
-      <p class="small muted">${f.L.total ? `${f.L.total} min training, about ${f.L.kcal} kcal of it.` : 'Rest day.'} Resting and daily life: about ${f.base} kcal. Carbohydrate follows the training load (IOC and ACSM guidelines), protein stays steady, fat fills the rest${P.bodyGoal === 'lean' ? '; the deficit is about 12%' : P.bodyGoal === 'build' ? '; a small surplus of about 8%' : ''}.</p>
-      ${eaWarn}
-      <h3>When to eat</h3>
-      <table><tr><th>Time</th><th>Meal</th><th class="n">Carbs</th><th class="n">Protein</th><th>Tip</th></tr>
-        ${meals.map(x => `<tr><td>${x.time}</td><td>${esc(x.name)}</td><td class="n">${x.carbs} g</td><td class="n">${x.protein} g</td><td class="small muted">${esc(x.tip)}</td></tr>`).join('')}</table>
-      <p class="small muted" style="margin-top:6px">Times move with your wake time, session start and meals per day on the left. Meals are flexible: hitting the day's totals matters more than the exact clock time.</p>
-      ${longest >= 75 ? `<p class="note">During the ${longest} min session: ${longest >= 150 ? '60–90 g carbohydrate an hour (mixed glucose and fructose)' : '30–60 g carbohydrate an hour'}, 400–800 ml fluid an hour, and sodium if you sweat heavily.</p>` : ''}
-    </div>
-    <div class="card"><h3>The week</h3><div class="scroll"><table><tr><th>Day</th><th class="n">Training</th><th class="n">kcal</th><th class="n">Carbs</th><th class="n">Protein</th><th class="n">Fat</th></tr>
-      ${fuels.map((x, i) => `<tr><td>${DAYS[i]}</td><td class="n">${x.L.total} min</td><td class="n">${x.kcal}</td><td class="n">${x.C} g</td><td class="n">${x.Pr} g</td><td class="n">${x.F} g</td></tr>`).join('')}</table></div></div>
-    <div class="card"><h3>Supplements with good evidence</h3>
-      <table>
-        <tr><td><b>Caffeine</b></td><td class="small">3 mg/kg (about ${Math.round(3 * P.weight)} mg) 30–60 min before hard sessions and tests. Avoid within 8 h of bedtime.</td></tr>
-        <tr><td><b>Creatine monohydrate</b></td><td class="small">3–5 g a day. Improves repeated sprints, strength and power${m.emph.E >= 60 ? '; may add 1–2 kg of water weight, so weigh it against your power-to-weight' : ''}.</td></tr>
-        ${m.emph.E >= 40 ? '<tr><td><b>Dietary nitrate</b></td><td class="small">Beetroot juice with about 6–8 mmol nitrate 2–3 h before key endurance sessions.</td></tr>' : ''}
-        ${m.emph.P >= 25 || ['field', 'court', 'combat', 'rower', 'middle'].includes(m.athlete.id) ? '<tr><td><b>Beta-alanine</b></td><td class="small">3–6 g a day in split doses for efforts of 1–10 minutes. Tingling is harmless.</td></tr>' : ''}
-        <tr><td><b>Vitamin D and iron</b></td><td class="small">Only if a blood test shows you are low. Endurance athletes${P.sex === 'f' ? ', and women especially,' : ''} should check iron yearly.</td></tr>
-      </table>
-      <p class="small muted">If you are drug-tested, use only third-party-tested products (Informed Sport, NSF Certified for Sport).</p></div>`;
+  const m = M, plan = PLAN, sub = VIEW.sub.fuel;
+  subtabs('fuel', [['today', 'Day'], ['meals', 'Meal plan'], ['macros', 'Macros'], ['micros', 'Micros'], ['supps', 'Supplements']]);
+  const fuels = plan.days.map(d => fuelFor(d, m)), d = plan.days[VIEW.day], f = fuels[VIEW.day];
+  const dayHead = `<div class="row" style="margin-bottom:6px"><b>Week ${plan.wk.no}</b><span class="small muted">${f.L.total ? `${DAYS_LONG[d.idx]}: ${f.L.total} min of training, about ${f.L.kcal} kcal` : `${DAYS_LONG[d.idx]}: rest day`}</span></div>${dayBar(plan)}`;
+  const kc = f.C * 4 + f.Pr * 4 + f.F * 9;
+  const bar = `<div class="macrobar"><i class="mC" style="width:${f.C * 400 / kc}%"></i><i class="mP" style="width:${f.Pr * 400 / kc}%"></i><i class="mF" style="width:${f.F * 900 / kc}%"></i></div>`;
+  let h = '';
+  if (sub === 'today') {
+    const meals = mealPlan(d, f);
+    const longest = Math.max(0, ...d.sessions.flatMap(s => s.blocks.filter(b => b.kind === 'E').map(b => b.minutes)));
+    const ea = f.ea < 30 ? `<p class="note bad">Energy left after training is about ${f.ea} kcal per kg of lean mass, under the 30 that protects hormones, bones and performance (low energy availability, RED-S). Eat more on hard days${P.bodyGoal === 'lean' ? ' or slow the cut' : ''}.</p>` : '';
+    h = `<div class="cols two"><div class="card">${dayHead}
+        <div class="kpis"><div class="kpi"><b>${f.kcal}</b><span>kcal</span></div><div class="kpi"><b>${f.C} g</b><span>carbs · ${f.cpk} g/kg</span></div><div class="kpi"><b>${f.Pr} g</b><span>protein · ${f.ppk.toFixed(1)} g/kg</span></div><div class="kpi"><b>${f.F} g</b><span>fat</span></div><div class="kpi"><b>${f.water} L</b><span>fluid</span></div></div>
+        ${bar}<p class="small muted">Carbohydrate follows the day's training, protein stays steady, fat fills the rest${P.bodyGoal === 'lean' ? ' (about a 12% deficit)' : P.bodyGoal === 'build' ? ' (about an 8% surplus)' : ''}. Resting and daily life: about ${f.base} kcal.</p>${ea}
+        ${longest >= 75 ? `<p class="note">During the ${longest} min session: ${longest >= 150 ? '60–90 g carbohydrate an hour (mixed glucose and fructose)' : '30–60 g carbohydrate an hour'}, 400–800 ml fluid an hour, and sodium if you sweat heavily.</p>` : ''}</div>
+      <div class="card"><h3>When to eat</h3><table><tr><th>Time</th><th>Meal</th><th class="n">Carbs</th><th class="n">Protein</th></tr>
+        ${meals.map(x => `<tr title="${esc(x.tip)}"><td>${x.time}</td><td>${esc(x.name)}</td><td class="n">${x.carbs} g</td><td class="n">${x.protein} g</td></tr>`).join('')}</table>
+        <p class="small muted" style="margin:6px 0 0">Times follow your wake time, session start and meals a day. Hitting the day's totals matters more than the clock. See <b>Meal plan</b> for real food.</p></div></div>`;
+  } else if (sub === 'meals') {
+    const st = STYLES[P.diet], meals = buildMeals(d, f, P.diet, P.mealSeed);
+    const T = meals.reduce((a, x) => ({ kcal: a.kcal + x.kcal, c: a.c + x.c, p: a.p + x.p, f: a.f + x.f, fib: a.fib + x.fib }), { kcal: 0, c: 0, p: 0, f: 0, fib: 0 });
+    const cov = microCover(meals);
+    const now = new Date().getHours() * 60 + new Date().getMinutes();
+    const openI = plan.wk.no === m.todayWeek && d.idx === m.todayIdx ? Math.max(0, meals.findIndex(x => toMin(x.time) >= now)) : 0;
+    const cmp = (label, got, want, unit) => `<div class="kpi"><b>${got}${unit}</b><span>${label} · target ${want}${unit}</span></div>`;
+    h = `<div class="cols wide-left"><div class="card">
+        <div class="grid2">${field('Eating style', sel('diet', Object.values(STYLES).map(s => [s.id, s.name]), P.diet))}<div class="row" style="align-self:end;margin-bottom:8px"><button class="btn sm" data-act="shuffle">Shuffle meals</button><span class="small muted">${P.meals} meals a day</span></div></div>
+        <p class="small muted wide-only">${esc(st.note)}</p>${dayBar(plan)}
+        ${meals.map((x, i) => `<details class="meal" name="meal"${i === openI ? ' open' : ''}><summary><span class="tm">${x.time}</span><span class="dish">${esc(x.dish)}<small>${esc(x.name)}</small></span><span class="kc">${x.kcal} kcal</span></summary>
+          <div class="mb"><ul>${x.items.map(it => `<li>${esc(foodText(it))}</li>`).join('')}</ul><div class="muted">Carbs ${x.c} g · protein ${x.p} g · fat ${x.f} g. ${esc(x.tip)}</div></div></details>`).join('')}
+        <p class="small muted narrow-only" style="margin:6px 0 0">Day total ${T.kcal} of ${f.kcal} kcal · carbs ${T.c} · protein ${T.p} · fat ${T.f} g. Nutrient coverage is under Micros.</p></div>
+      <div class="card wide-only"><h3>${DAYS_LONG[d.idx]}'s plate against the target</h3>
+        <div class="kpis">${cmp('kcal', T.kcal, f.kcal, '')}${cmp('carbs', T.c, f.C, ' g')}${cmp('protein', T.p, f.Pr, ' g')}${cmp('fat', T.f, f.F, ' g')}</div>
+        <p class="small muted">Portions are rounded to half units, so totals land near the target, not on it. On big carbohydrate days the grains push protein over target, which is fine. Fibre: about ${T.fib} g.</p>
+        <h4>Micronutrient coverage</h4><div class="cover">${Object.keys(MICRO_NAME).map(k => `<button class="chip ${cov[k] >= 2 ? 'good' : cov[k] === 1 ? '' : 'warn'}" data-micro="${k}" title="${cov[k]} rich foods today">${MICRO_NAME[k].replace(/ \(.*/, '')}</button>`).join('')}</div>
+        <p class="small muted">Green means two or more foods rich in it today, grey one, amber none. Tap one for sources. ${P.diet === 'vegan' ? '<b>On a vegan diet, take a B12 supplement.</b>' : ''}</p></div></div>`;
+  } else if (sub === 'macros') {
+    const kg = P.weight, pm = `${Math.round(0.3 * kg)}–${Math.round(0.4 * kg)} g`;
+    const maxC = Math.max(...fuels.map(x => x.C));
+    const weekBars = `<div class="weekbars">${fuels.map((x, i) => `<div class="${i === VIEW.day ? 'on' : ''}"><i style="height:${Math.round(x.C / maxC * 100)}%"></i>${DAYS[i]}</div>`).join('')}</div>`;
+    const plant = ['veg', 'vegan'].includes(P.diet);
+    const body = {
+      c: `<div class="kpis"><div class="kpi"><b>${f.C} g</b><span>${DAYS_LONG[d.idx]} · ${f.cpk} g/kg</span></div><div class="kpi"><b>${Math.round(f.C * 400 / kc)}%</b><span>of calories</span></div></div>${weekBars}
+        <p class="small"><b>What it does.</b> Carbohydrate is the fuel for hard work. Muscle and liver stores last roughly 90 minutes of hard effort, so the target rises and falls with each day's training: 3–5 g/kg on light days, 5–7 on moderate days, 6–10 on heavy days.</p>
+        <ul class="small"><li><b>Before:</b> 1–4 g/kg in the 1–4 hours before a hard or long session (${Math.round(kg)}–${Math.round(kg * 2)} g for a meal 1–2 hours out).</li>
+        <li><b>During:</b> nothing needed under 75 minutes; 30–60 g an hour after that; up to 90 g an hour beyond 2.5 hours.</li>
+        <li><b>After:</b> if you train again within 8 hours, about ${Math.round(kg)} g an hour for the first few hours. Otherwise normal meals do the job.</li>
+        <li><b>Which kind:</b> whole grains, potatoes, fruit and legumes at most meals for fibre and micronutrients; faster choices (white rice, bread, bananas, sports drink) right around sessions, when the gut wants easy food.</li></ul>
+        <p class="small muted">Best sources: oats, rice, pasta, potatoes, bread, fruit, beans and lentils.</p>`,
+      p: `<div class="kpis"><div class="kpi"><b>${f.Pr} g</b><span>every day · ${f.ppk.toFixed(1)} g/kg</span></div><div class="kpi"><b>${pm}</b><span>per meal</span></div><div class="kpi"><b>${P.meals}</b><span>meals a day</span></div></div>
+        <p class="small"><b>What it does.</b> Protein repairs and remodels muscle, tendon and bone, and holds on to muscle while you lean down. Athletes do best at 1.4–2.0 g/kg, toward the top end in a calorie deficit${P.age >= 50 ? ' and with age' : ''}.</p>
+        <ul class="small"><li><b>Spread it:</b> ${pm} (0.3–0.4 g/kg) at each of ${P.meals} meals works better than one large dose.</li>
+        <li><b>After training:</b> one of those doses within a couple of hours.</li>
+        <li><b>Before sleep:</b> 30–40 g of slow protein (yogurt, cottage cheese, milk) supports overnight repair.</li>
+        <li><b>Quality:</b> animal proteins and soy are complete and rich in leucine. ${plant ? 'On your plant-based style, eat about 10–20% more and mix legumes with grains across the day.' : 'Plant-based eaters need about 10–20% more, mixing legumes with grains.'}</li></ul>
+        <p class="small muted">Best sources: chicken, fish, lean beef, eggs, Greek yogurt, milk, cottage cheese, tofu, tempeh, lentils, beans, whey or pea protein.</p>`,
+      f: `<div class="kpis"><div class="kpi"><b>${f.F} g</b><span>${DAYS_LONG[d.idx]}</span></div><div class="kpi"><b>${Math.round(f.F * 900 / kc)}%</b><span>of calories</span></div><div class="kpi"><b>${Math.round(0.8 * kg)} g</b><span>your floor (0.8 g/kg)</span></div></div>
+        <p class="small"><b>What it does.</b> Fat makes hormones, carries vitamins A, D, E and K, and fuels easy aerobic work. It is what is left after carbohydrate and protein are set, but never below the floor: very low fat intake hurts hormones and recovery.</p>
+        <ul class="small"><li><b>Mostly unsaturated:</b> olive oil, nuts, seeds, avocado and oily fish.</li>
+        <li><b>Omega-3:</b> two oily-fish meals a week, or fish or algae oil.</li>
+        <li><b>Timing:</b> keep fat low in the meal before a session, because it slows digestion.</li>
+        <li><b>Go easy on:</b> fried food and processed meat, which add calories without much else.</li></ul>
+        <p class="small muted">Best sources: olive oil, almonds, peanut butter, avocado, salmon, eggs.</p>`,
+      x: `<div class="kpis"><div class="kpi"><b>${Math.round(f.kcal * 14 / 1000)} g</b><span>fibre a day</span></div><div class="kpi"><b>${f.water} L</b><span>fluid on ${DAYS[d.idx]}</span></div><div class="kpi"><b>${Math.round(kg * 6)} ml</b><span>2–4 h before a session</span></div></div>
+        <p class="small"><b>Fibre</b> feeds the gut and steadies energy: about 14 g for every 1,000 kcal. Get it from whole grains, legumes, fruit and vegetables, but keep it low in the meal before hard sessions and races.</p>
+        <ul class="small"><li><b>Daily fluid:</b> about 35 ml per kg, plus what you sweat. Pale-yellow urine means you are on track.</li>
+        <li><b>During:</b> 400–800 ml an hour, by thirst. Add sodium (300–600 mg an hour) past 90 minutes or in heat.</li>
+        <li><b>After:</b> weigh yourself before and after a long session. Drink 1.25–1.5 L for each kg lost, with some salt.</li>
+        <li><b>Alcohol</b> slows recovery and disturbs sleep; keep it away from hard days.</li></ul>`,
+    }[VIEW.macro];
+    h = `<div class="card">${dayHead}${pills('macro', [['c', 'Carbohydrate'], ['p', 'Protein'], ['f', 'Fat'], ['x', 'Fibre and fluid']], VIEW.macro)}${body}</div>`;
+  } else if (sub === 'micros') {
+    const flags = MICROS.map(x => [x, x.watch(P, m)]);
+    const mi = MICROS.find(x => x.id === VIEW.micro) || MICROS[0], why = mi.watch(P, m);
+    const watch = flags.filter(([, w]) => w).map(([x]) => MICRO_NAME[x.id].replace(/ \(.*/, ''));
+    h = `<div class="card"><p class="small">${watch.length ? `<b>Worth watching for you:</b> ${watch.join(', ')}.` : 'Nothing stands out for your profile.'} <span class="muted">A varied diet covers most of these. Supplement only to fix a gap you have confirmed.</span></p>
+      ${pills('micro', flags.map(([x, w]) => [x.id, MICRO_NAME[x.id].replace(/ \(.*/, ''), w ? 'flag' : '']), mi.id)}
+      <div class="row"><h3 style="margin:0">${MICRO_NAME[mi.id]}</h3><span class="chip">${mi.target(P)} a day</span>${why ? `<span class="chip warn">watch</span>` : ''}</div>
+      ${why ? `<p class="note warn">For you: ${esc(why)}.</p>` : ''}
+      <p class="small" style="margin-top:6px"><b>Why it matters.</b> ${esc(mi.why)}</p><p class="small"><b>Best foods.</b> ${esc(mi.foods)}</p><p class="small"><b>Tips.</b> ${esc(mi.tips)}</p>
+      <p class="small muted">Targets are adult daily values (US RDA or AI) for your sex and age. The Meal plan tab shows which of these each day's food covers.</p></div>`;
+  } else {
+    h = `<div class="card"><h3>Supplements with good evidence</h3><table>
+      <tr><td><b>Caffeine</b></td><td class="small">3 mg/kg (about ${Math.round(3 * P.weight)} mg) 30–60 min before hard sessions and tests. Avoid within 8 h of bedtime.</td></tr>
+      <tr><td><b>Creatine monohydrate</b></td><td class="small">3–5 g a day. Improves repeated sprints, strength and power${m.emph.E >= 60 ? '; may add 1–2 kg of water weight, so weigh it against your power-to-weight' : ''}.</td></tr>
+      ${m.emph.E >= 40 ? '<tr><td><b>Dietary nitrate</b></td><td class="small">Beetroot juice with about 6–8 mmol nitrate 2–3 h before key endurance sessions.</td></tr>' : ''}
+      ${m.emph.P >= 25 || ['field', 'court', 'combat', 'rower', 'middle'].includes(m.athlete.id) ? '<tr><td><b>Beta-alanine</b></td><td class="small">3–6 g a day in split doses for efforts of 1–10 minutes. Tingling is harmless.</td></tr>' : ''}
+      <tr><td><b>Protein powder</b></td><td class="small">A convenience, not a need: use it when food can't reach your protein target.</td></tr>
+      <tr><td><b>Vitamin D and iron</b></td><td class="small">Only if a blood test shows you are low. See Micros.</td></tr></table>
+      <p class="small muted" style="margin:6px 0 0">If you are drug-tested, use only third-party-tested products (Informed Sport, NSF Certified for Sport). Most other supplements have weak or no evidence.</p></div>`;
+  }
+  $('fuelPane').innerHTML = h;
 }
 
 // ---------- Recover ----------
+function injuryCard(inj) {
+  const ph = injPhase(inj);
+  let extra = '';
+  if (inj.id === 'diastasis') {
+    const v = inj.sel;
+    extra = `${v.timing === 'pp0' ? '<p class="note bad">Under 6 weeks after birth: keep to walking, breathing and gentle pelvic-floor work until your provider clears you. The plan removes impact for now; ease off the hard sessions too.</p>' : ''}
+      ${v.pf === 'yes' ? '<p class="note warn">Leaking, heaviness or pelvic pain: see a pelvic health physiotherapist. The plan swaps running and jumping for low-impact work meanwhile.</p>' : ''}
+      <p class="small"><b>Rules while it heals:</b> breathe out on the effort, never hold your breath; stop or regress any exercise that makes the midline dome or cone; roll to your side to get up. ${ph < 3 ? 'Planks, rollouts and hollow holds stay out of your sessions for now.' : 'Rollouts and hollow holds return last.'}</p>`;
+  }
+  return `<div class="row"><h3 style="margin:0">${esc(inj.name)}</h3><span class="chip ${inj.status === 'pain' ? 'bad' : inj.status === 'rehab' ? 'warn' : 'R'}">${inj.custom ? 'Phase ' + ph : INJ_STATUS[inj.status]}</span></div>
+    <div class="ladder">${inj.phases.map((p, i) => `<div class="st ${i + 1 < ph ? 'done' : ''} ${i + 1 === ph ? 'cur R' : ''}"><b>Phase ${i + 1}: ${esc(p[0])}</b>${p[1].map(([id, d]) => `${esc(EX[id].name)}: ${esc(d)}`).join('<br>')}</div>`).join('')}</div>
+    ${extra}<p class="small"><b>Move on when:</b> ${esc(inj.gate)}</p><p class="small muted">${esc(inj.ev)}</p>
+    ${inj.status === 'pain' ? '<p class="note bad">Painful now: see a physio or sports doctor. Until then the plan removes what strains this area and keeps gentle isometrics.</p>' : ''}`;
+}
 function renderRecover() {
-  const m = M;
-  const wake = toMin(P.wake), bed = wake - Math.round(P.sleep * 60);
-  const hardDays = PLAN.days.filter(d => d.sessions.some(s => s.hard)).map(d => DAYS[d.idx]);
-  const rec = m.inj.list.length ? m.inj.list.map(i => `<li><b>${esc(i.name)}</b> (${INJ_STATUS[i.status].toLowerCase()}): ${esc(i.phases[(i.status === 'weak' ? 2 : i.status === 'pain' ? 1 : i.phase) - 1][0])}. ${esc(i.gate)}</li>`).join('') : '';
-  $('recover').innerHTML = `
-    <div class="card"><h2>Sleep</h2>
-      <div class="kpis"><div class="kpi"><b>${hm(bed - 30)}</b><span>start winding down</span></div><div class="kpi"><b>${hm(bed)}</b><span>lights out</span></div><div class="kpi"><b>${P.wake}</b><span>wake</span></div><div class="kpi"><b>${P.sleep} h</b><span>target</span></div></div>
-      <ul class="small">
-        <li>Athletes do best on 8–10 hours; extending sleep improved sprint times and accuracy in college athletes (Mah 2011).${P.sleep < 8 ? ' <b>Your target is under 8 hours. Consider raising it.</b>' : ''}</li>
-        <li>Keep the same wake time every day, even after a bad night. Morning daylight helps set the clock.</li>
-        <li>Cool, dark, quiet room. No caffeine within 8 hours of bed, and finish big meals 2–3 hours before.</li>
-        <li>On double days or after short nights: a 20–30 minute nap before 3 pm, or a full 90 minute nap.</li>
-      </ul></div>
-    <div class="card"><h2>Recovery built into the plan</h2>
-      <ul class="small">
-        <li><b>Hard and easy days alternate.</b> Hard days this week: ${hardDays.join(', ') || 'none'}. Easy days stay truly easy (Z1 and Z2), which is what makes the hard days work.</li>
-        <li><b>Every 4th week unloads</b> by about a third and ends with gate tests. If you feel run down before then, take the unload week early.</li>
-        <li><b>Readiness check</b> on the Today tab turns a planned session lighter or into recovery when sleep, soreness, mood or resting heart rate say so.</li>
-        <li><b>Strength and endurance on the same day:</b> put the one that matters more first, or split them by 6 hours or more if you can.</li>
-      </ul></div>
-    <div class="card"><h2>Recovery methods, ranked by evidence</h2>
-      <table>
-        <tr><td><b>Sleep</b></td><td class="small">The strongest recovery tool there is.</td></tr>
-        <tr><td><b>Food and fluid</b></td><td class="small">Protein and carbohydrate after training, fluid to replace sweat (about 1.25–1.5 L for every kg lost).</td></tr>
-        <tr><td><b>Easy days and unload weeks</b></td><td class="small">Planned above.</td></tr>
-        <tr><td><b>Massage, foam rolling, compression</b></td><td class="small">Small benefits for soreness and how you feel. Fine if you enjoy them.</td></tr>
-        <tr><td><b>Cold water immersion</b></td><td class="small">Helps when sessions or competitions come close together, but within about 4 hours after strength work it blunts strength gains (Roberts 2015). Keep it away from strength days.</td></tr>
-        <tr><td><b>Stretching</b></td><td class="small">Does not prevent soreness. Use it for range of motion, after sessions or on rest days.</td></tr>
-      </table></div>
-    ${rec ? `<div class="card"><h2>Injury remediation</h2><ul class="small">${rec}</ul>
-      <p class="small"><b>Pain-monitoring rule:</b> during rehab exercise, pain up to 3/10 (5/10 for tendons) is acceptable if it settles within 24 hours and doesn't build week to week. If it does, drop back a phase.</p>
-      <p class="small muted">See the Paths tab for each phase in full.</p></div>` : ''}
-    <div class="card"><h2>Warning signs</h2><ul class="small">
-      <li>Resting heart rate up 5–8 bpm for several mornings, poor sleep, low mood or a stall in performance: take 3–5 easy days.</li>
+  const m = M, sub = VIEW.sub.recover;
+  subtabs('recover', [['sleep', 'Sleep'], ['plan', 'Built in'], ['methods', 'Methods'], ['rehab', `Rehab${m.inj.list.length ? ' · ' + m.inj.list.length : ''}`], ['signs', 'Warning signs']]);
+  const bed = toMin(P.wake) - Math.round(P.sleep * 60);
+  let h = '';
+  if (sub === 'sleep') {
+    h = `<div class="card"><div class="kpis"><div class="kpi"><b>${hm(bed - 30)}</b><span>wind down</span></div><div class="kpi"><b>${hm(bed)}</b><span>lights out</span></div><div class="kpi"><b>${P.wake}</b><span>wake</span></div><div class="kpi"><b>${P.sleep} h</b><span>target</span></div></div>
+      <ul class="small"><li>Athletes do best on 8–10 hours; extending sleep improved sprint times and accuracy in college athletes (Mah 2011).${P.sleep < 8 ? ' <b>Your target is under 8 hours. Consider raising it in Setup.</b>' : ''}</li>
+      <li>Keep the same wake time every day, even after a bad night. Morning daylight sets the clock.</li>
+      <li>Cool, dark, quiet room. No caffeine within 8 hours of bed; finish big meals 2–3 hours before.</li>
+      <li>On double days or after a short night: a 20–30 minute nap before 3 pm, or a full 90 minutes.</li></ul></div>`;
+  } else if (sub === 'plan') {
+    const hardDays = PLAN.days.filter(d => d.sessions.some(s => s.hard)).map(d => DAYS[d.idx]);
+    h = `<div class="card"><h3>Recovery built into the plan</h3><ul class="small">
+      <li><b>Hard and easy days alternate.</b> Hard days in week ${PLAN.wk.no}: ${hardDays.join(', ') || 'none'}. Easy days stay truly easy, which is what makes the hard days work.</li>
+      <li><b>Every 4th week unloads</b> by about a third and ends with gate tests. Feeling run down sooner? Take the unload week early.</li>
+      <li><b>The check-in</b> on Today turns a planned session lighter, or into recovery, when you say so.</li>
+      <li><b>Strength and endurance on one day:</b> the one that matters more goes first, or split them by 6 hours if you can.</li></ul></div>`;
+  } else if (sub === 'methods') {
+    h = `<div class="card"><h3>Recovery methods, ranked by evidence</h3><table>
+      <tr><td><b>Sleep</b></td><td class="small">The strongest recovery tool there is.</td></tr>
+      <tr><td><b>Food and fluid</b></td><td class="small">Protein and carbohydrate after training; 1.25–1.5 L of fluid for every kg of sweat lost.</td></tr>
+      <tr><td><b>Easy days, unload weeks</b></td><td class="small">Already in your plan.</td></tr>
+      <tr><td><b>Massage, foam rolling, compression</b></td><td class="small">Small benefits for soreness and how you feel. Fine if you enjoy them.</td></tr>
+      <tr><td><b>Cold water immersion</b></td><td class="small">Helps when sessions or events come close together, but within about 4 hours after strength work it blunts strength gains (Roberts 2015).</td></tr>
+      <tr><td><b>Stretching</b></td><td class="small">Does not prevent soreness. Use it for range of motion, after sessions or on rest days.</td></tr></table></div>`;
+  } else if (sub === 'rehab') {
+    if (!m.inj.list.length) h = `<div class="card"><h3>No injuries or weak areas set</h3><p class="small">Mark any under Setup and each gets a phased path here: what to do now, when to move on, and when it is safe to return. Exercises that strain the area are swapped out of your sessions automatically.</p><button class="btn sm" data-go="setup:injuries">Open Setup</button></div>`;
+    else {
+      const inj = m.inj.list.find(i => i.id === VIEW.inj) || m.inj.list[0];
+      h = `<div class="card">${m.inj.list.length > 1 ? pills('inj', m.inj.list.map(i => [i.id, i.name.replace(/ \(.*/, '')]), inj.id) : ''}${injuryCard(inj)}
+        <p class="small muted"><b>Pain rule:</b> up to 3/10 during rehab exercise (5/10 for tendons) is fine if it settles within 24 hours and doesn't build week to week. If it does, drop back a phase.</p></div>`;
+    }
+  } else {
+    h = `<div class="card"><h3>Warning signs</h3><ul class="small">
+      <li>Resting heart rate up 5–8 bpm for several mornings, poor sleep, low mood or stalled performance: take 3–5 easy days.</li>
       <li>Pain that changes how you move, pain on one spot of a bone, or pain at night: stop that activity and get it checked.</li>
       <li>Missed or irregular periods, frequent illness or stress fractures can mean low energy availability: eat more and talk to a doctor.</li>
-      <li>Chest pain, fainting or unusual breathlessness: stop and seek medical care.</li></ul></div>`;
+      <li>Chest pain, fainting or unusual breathlessness: stop and seek medical care.</li></ul>
+      <p class="disclaimer">An educational planner, not medical advice.</p></div>`;
+  }
+  $('recoverPane').innerHTML = h;
 }
 
-// ---------- Gates ----------
-function renderGates() {
-  const m = M;
-  const nextGate = Math.ceil(m.todayWeek / 4) * 4;
-  const rows = q => {
-    const info = m.info[q];
-    return info.ids.map(id => {
-      const t = TESTS[id], v = P.tests[id];
-      const met = v ? metCount(id, v, m) : m.stage[q] - 1;
-      const tg = target(id, Math.min(6, met + 1), m);
-      const hist = P.testLog.filter(r => r.id === id).slice(-4).map(r => `${r.date.slice(5)}: ${fmtVal(id, r.value)}`).join(' · ');
-      return `<tr><td><details><summary><b>${esc(t.name)}</b></summary><div class="small muted">${esc(t.how)}</div></details>${hist ? `<div class="small muted">${esc(hist)}</div>` : ''}</td>
-        <td class="small">${v ? fmtVal(id, v) : '–'}</td>
-        <td class="small">${met >= 6 ? 'all passed' : `${t.low ? '≤' : '≥'} ${fmtVal(id, tg)}`}</td>
-        <td><div class="row" style="flex-wrap:nowrap"><input data-log="${id}" placeholder="${t.unit === 'time' ? 'mm:ss' : t.unit}" style="width:86px"><button class="btn sm" data-act="log" data-id="${id}">Log</button></div></td></tr>`;
-    }).join('');
-  };
-  $('gates').innerHTML = `
-    <div class="card"><h2>Gate tests</h2>
-      <p>Gate tests stand in for competitions. They come at the end of every 4-week block (next: <b>week ${nextGate}</b>), after an unload week so you arrive fresh. Logging a result moves your stage straight away, and the whole plan adjusts.</p>
-      <ul class="small">
-        <li><b>Day 1, power and strength:</b> 15 min warm-up, then jumps and sprints (best of 3, full rest), then the strength tests (work up over 3–4 sets, 3–5 min rest), then resilience tests last.</li>
-        <li><b>Day 2 or later, endurance:</b> treat it like a race. Easy day before, usual breakfast 2–3 h before, caffeine if you use it, the same warm-up you would race with.</li>
-        <li>Same conditions each time (surface, time of day, equipment) so results compare fairly.</li>
-        <li>Missed a target? Repeat the block. Missed it twice? Check sleep, food and stress, then shift a little balance toward that quality on the left.</li>
-      </ul></div>
-    ${['E', 'S', 'P', 'R'].map(q => `<div class="card"><div class="row"><h3 class="q-${q}" style="margin:0">${Q[q]}</h3><span class="chip ${q}">Stage ${m.stage[q]}: ${STAGES[m.stage[q] - 1]}</span></div>
-      <div class="scroll"><table><tr><th>Test</th><th>Latest</th><th>Next gate</th><th>New result</th></tr>${rows(q)}</table></div></div>`).join('')}
-    <div class="card"><h3>Estimating a 1RM safely</h3><p class="small">You never need a true max. Work up to a weight you can lift for 3–5 good reps and use 1RM ≈ weight × (1 + reps ÷ 30). For example, 100 kg × 5 ≈ 117 kg.</p></div>`;
+// ---------- Setup ----------
+function renderSetup() {
+  const m = M, a = ATHLETE[P.athlete], e = emphasis(), sub = VIEW.sub.setup;
+  const nInj = Object.keys(P.inj).length;
+  subtabs('setup', [['athlete', 'Athlete'], ['body', 'Body'], ['tests', 'Conditioning'], ['injuries', `Injuries${nInj ? ' · ' + nInj : ''}`], ['abs', `Split abs${P.inj.diastasis ? ' · on' : ''}`], ['schedule', 'Schedule'], ['data', 'Data']]);
+  let h = '';
+  if (sub === 'athlete') {
+    h = `${FIRST_RUN && !VIEW.started ? `<div class="card note good" style="margin:0 0 10px"><b>Welcome.</b> Pick your athlete type and a quick start. Everything else has sensible defaults you can refine later. <button class="btn sm pri" data-act="start">Show my plan</button></div>` : ''}
+      <div class="cols two"><div class="card">
+        ${field('Athlete type', sel('athlete', ATHLETES.map(x => [x.id, x.name]), P.athlete))}<p class="small muted">${esc(a.note)}</p>
+        ${field('Quick start', sel('quick', QUICK.map(x => [x.id, x.name]), ''), 'Sets schedule, equipment and experience in one go.')}
+        <div class="grid2">${field('Endurance mode', sel('mode', [['', `Preset (${a.mode === 'mixed' ? 'mixed' : MODES[a.mode]})`], ...Object.entries(MODES)], P.mode))}
+        ${field('Body size goal', sel('bodyGoal', [['maintain', 'Stay the same'], ['lean', 'Lean down slowly'], ['build', 'Add useful muscle']], P.bodyGoal))}</div>
+        ${P.bodyGoal === 'build' && !a.mass ? '<p class="small note warn">Your sport rarely rewards extra mass. Strength work stays heavy and low-rep, so muscle gain will be slow.</p>' : ''}</div>
+      <div class="card"><h3>Training balance</h3>
+        <div class="emph"><span class="q-E">Endurance</span><input type="range" min="0" max="100" data-k="emph.0" value="${e.E}"><output>${e.E}%</output>
+          <span class="q-S">Strength</span><input type="range" min="0" max="100" data-k="emph.1" value="${e.S}"><output>${e.S}%</output>
+          <span class="q-P">Power</span><input type="range" min="0" max="100" data-k="emph.2" value="${e.P}"><output>${e.P}%</output></div>
+        <div class="row" style="margin-top:6px"><span class="small muted">${P.emph ? 'Your own balance.' : 'From the athlete preset.'} 40% or more makes a quality a priority; under 20% it is only maintained.</span>${P.emph ? '<button class="btn sm" data-act="resetEmph">Use preset</button>' : ''}</div></div></div>`;
+  } else if (sub === 'body') {
+    h = `<div class="card"><div class="grid3">
+      ${field('Sex', sel('sex', [['m', 'Male'], ['f', 'Female']], P.sex))}${field('Age', num('age', P.age, 'min="12" max="90"'))}${field('Units', sel('units', [['metric', 'kg, cm'], ['imperial', 'lb, in']], P.units))}
+      ${field(`Height (${imperial() ? 'in' : 'cm'})`, num('height', shownH(P.height)))}${field(`Weight (${imperial() ? 'lb' : 'kg'})`, num('weight', shownW(P.weight)))}${field('Body fat %', num('bf', P.bf, 'placeholder="optional"'))}
+      ${field('Resting HR', num('rhr', P.rhr, 'placeholder="optional"'))}${field('Max HR', num('hrmax', P.hrmax, `placeholder="${Math.round(208 - 0.7 * P.age)}"`))}${field('Daily life', sel('life', [[0, 'Mostly sitting'], [1, 'On my feet'], [2, 'Physical job']], P.life))}</div>
+      <p class="small muted">These set your heart-rate zones, calorie and macro targets, and gate targets (strength per kg of body weight, jumps per cm of height).</p></div>`;
+  } else if (sub === 'tests') {
+    const q = VIEW.q, info = m.info[q];
+    const row = id => {
+      const t = TESTS[id], v = P.tests[id], shown = v == null ? '' : t.unit === 'time' ? fmtTime(v) : v, met = v ? metCount(id, v, m) : null;
+      return `<div class="test-row"><div>${esc(t.name)}<small>${met == null ? 'Not entered' : met >= 6 ? 'All gates passed' : `Passed ${met} of 6 gates · next ${fmtVal(id, target(id, met + 1, m))}`}</small></div>
+        <input data-k="test.${id}" value="${esc(shown)}" placeholder="${t.unit === 'time' ? 'mm:ss' : t.unit}" inputmode="${t.unit === 'time' ? 'text' : 'decimal'}" aria-label="${esc(t.name)}"></div>`;
+    };
+    h = `<div class="cols two"><div class="card">${field('Consistent training', sel('trainAge', TRAIN_AGES.map((t, i) => [i, t]), P.trainAge), 'Sets your stage for any quality without test results.')}
+        <p class="small muted">Enter test results if you have them. Each one places you on its path more exactly; none are required.</p></div>
+      <div class="card">${qPills()}<div class="row" style="margin-bottom:6px"><span class="chip ${q}">Stage ${info.stage}: ${STAGES[info.stage - 1]}</span><span class="small muted">from ${info.src}</span></div>
+        ${info.ids.map(row).join('')}
+        ${field('Stage', sel(`override.${q}`, [[0, `Automatic (${STAGES[info.auto - 1]})`], ...STAGES.map((s, i) => [i + 1, `${i + 1}. ${s}`])], P.override[q]))}</div></div>`;
+  } else if (sub === 'injuries') {
+    const row = inj => { const v = P.inj[inj.id] || { status: 'none', phase: 1 }; return `<div class="inj"><span>${esc(inj.name)}</span>${sel(`inj.${inj.id}.status`, Object.entries(INJ_STATUS), v.status)}
+      ${v.status === 'rehab' ? `<div class="ph">${sel(`inj.${inj.id}.phase`, inj.phases.map((p, i) => [i + 1, `Phase ${i + 1}: ${p[0]}`]), v.phase || 1)}</div>` : ''}</div>`; };
+    const dr = P.inj.diastasis;
+    h = `<div class="card"><p class="small muted"><b>Weak</b> adds prehab. <b>Recovering</b> adds a phased rehab path and swaps out what strains the area. <b>Painful now</b> also removes impact; please get it assessed.</p>
+        <div class="inj-grid">${INJURIES.filter(i => !i.custom).map(row).join('')}</div></div>`;
+  } else if (sub === 'abs') {
+    const dr = P.inj.diastasis;
+    h = `<div class="card"><h3>Split abs (diastasis recti)</h3>
+        <p class="small muted">A gap or soft ridge down the middle of the abdomen, common after pregnancy and also seen with heavy straining or weight changes. To check: lie on your back with knees bent, lift your head, and feel above and below the navel for how many fingers fit between the muscles.</p>
+        ${field('Do you have it?', sel('inj.diastasis.status', [['none', 'No'], ['rehab', 'Yes, include remediation']], dr ? 'rehab' : 'none'))}
+        ${dr ? `<div class="grid2">${field('Gap width', sel('inj.diastasis.gap', DR_OPTS.gap, dr.gap || 'mid'))}${field('Timing', sel('inj.diastasis.timing', DR_OPTS.timing, dr.timing || 'none'))}
+          ${field('Doming or coning on effort', sel('inj.diastasis.doming', DR_OPTS.doming, dr.doming || 'some'))}${field('Pelvic floor symptoms', sel('inj.diastasis.pf', DR_OPTS.pf, dr.pf || 'no'))}</div>
+          <p class="note">Your selections put you in <b>phase ${drPhase(dr)}: ${INJURY.diastasis.phases[drPhase(dr) - 1][0]}</b>. ${drPhase(dr) < 3 ? 'Planks, rollouts and hollow holds are swapped out of your sessions.' : 'Rollouts and hollow holds stay out until last.'} ${dr.pf === 'yes' || dr.timing === 'pp0' ? 'Impact work is swapped for low-impact.' : ''} <button class="btn sm" data-go="recover:rehab">See the full path</button></p>` : ''}</div>`;
+  } else if (sub === 'schedule') {
+    h = `<div class="cols two"><div class="card"><span class="small muted">Training days</span>
+        <div class="days" style="margin:3px 0 10px">${DAYS.map((d, i) => `<label><input type="checkbox" data-k="day.${i}"${P.days.includes(i) ? ' checked' : ''}>${d}</label>`).join('')}</div>
+        ${P.days.length < 2 ? '<p class="note warn">Pick at least 2 training days.</p>' : ''}
+        ${field(`Session length: <b>${P.minutes} min</b>`, `<input type="range" min="20" max="150" step="5" data-k="minutes" value="${P.minutes}">`)}
+        <label class="row small" style="margin-bottom:10px"><input type="checkbox" data-k="doubles"${P.doubles ? ' checked' : ''}> Two sessions a day are possible</label>
+        <div class="grid2">${field('Equipment', sel('equip', [[0, 'Bodyweight and a band'], [1, 'Home: dumbbells or kettlebells'], [2, 'Full gym']], P.equip))}${field('Pull-up bar', sel('bar', [['1', 'Yes'], ['0', 'No']], P.bar ? '1' : '0'))}</div></div>
+      <div class="card"><div class="grid2">${field('Usual session start', `<input type="time" data-k="sessionTime" value="${P.sessionTime}">`)}${field('Wake time', `<input type="time" data-k="wake" value="${P.wake}">`)}
+        ${field('Sleep target (h)', num('sleep', P.sleep, 'step="0.25" min="6" max="11"'))}${field('Meals a day', sel('meals', [3, 4, 5, 6].map(n => [n, n]), P.meals))}</div>
+        ${field('Eating style', sel('diet', Object.values(STYLES).map(s => [s.id, s.name]), P.diet))}
+        ${field('Plan started (week 1 begins)', `<input type="date" data-k="planStart" value="${P.planStart}">`)}</div></div>`;
+  } else {
+    h = `<div class="card"><h3>Your data</h3><p class="small muted">Everything is saved in this browser only. Back it up to move it to another device.</p>
+      <div class="row"><button class="btn sm" data-act="saveProfile">Back up profile</button><button class="btn sm" data-act="loadProfile">Restore…</button><button class="btn sm" data-act="resetProfile">Start over</button><button class="btn sm" data-act="about">About and changes</button></div>
+      <p class="disclaimer" style="margin-top:10px">An educational planner, not medical advice. Get a professional assessment for pain, recent injuries, heart or health conditions before hard training.</p></div>`;
+  }
+  $('setupPane').innerHTML = h;
+}
+function renderLive() {
+  const m = M, plan = todayPlan(), d = plan.days[m.todayIdx], L = PLAN.days.map(dayLoad);
+  $('setupLive').innerHTML = `<span>Your plan now:</span>${['E', 'S', 'P', 'R'].map(q => `<span class="chip ${q}">${Q[q]} ${m.stage[q]}</span>`).join('')}
+    <span>${Math.round(L.reduce((a, x) => a + x.total, 0) / 6) / 10} h a week</span><span>Today: ${d.sessions.length ? esc(d.sessions.map(s => s.title).join(' and ')) : 'rest'}</span><span>${fuelFor(d, m).kcal} kcal</span>`;
 }
 
-// ---------- Export ----------
-function renderExport() {
-  const m = M;
-  if (VIEW.exportWeek == null) VIEW.exportWeek = m.todayWeek;
-  const plan = VIEW.exportWeek === PLAN.wk.no ? PLAN : planWeek(m, VIEW.exportWeek);
-  const list = plan.days.flatMap(d => d.sessions.map(s => ({ s, key: `${plan.wk.no}:${s.day}:${s.slot}` })));
-  $('export').innerHTML = `
-    <div class="card"><h2>Export to IntervalTimer</h2>
-      <p>Each session becomes an IntervalTimer routine: timed steps for warm-ups, intervals and rests, and "tap when done" steps for sets of reps. Strength sets that have an easier version carry it as an IntervalTimer variant.</p>
-      <ol class="small"><li>Pick the sessions and download the file.</li><li>Open <a href="https://sonusario.github.io/IntervalTimer/" target="_blank" rel="noopener">IntervalTimer</a>, go to <b>Settings → Import routines</b>, and choose the file.</li><li>Imports are added next to your routines; nothing is replaced.</li></ol>
-      <div class="row" style="margin:10px 0">
-        <button class="btn sm" data-act="expPrev">◀</button><b>Week ${plan.wk.no}</b><button class="btn sm" data-act="expNext">▶</button>
-        <button class="btn sm" data-act="expAll">Select all</button><button class="btn sm" data-act="expNone">Select none</button>
-      </div>
-      <div class="exp-list">${list.map(({ s, key }) => `<label><input type="checkbox" data-pick="${key}"${VIEW.picked.has(key) ? ' checked' : ''}><span>${DAYS_LONG[s.day]}${s.slot ? ' ' + s.slot : ''}: ${esc(s.title)}<small>${s.minutes} min · ${s.blocks.length} parts</small></span></label>`).join('') || '<p class="muted">No sessions this week.</p>'}</div>
-      <div class="row" style="margin-top:10px"><button class="btn pri" data-act="expGo"${list.some(x => VIEW.picked.has(x.key)) ? '' : ' disabled'}>Download routines file</button></div>
-    </div>`;
+function setPath(k, raw, el) {
+  const parts = k.split('.');
+  const n = v => (v === '' || v == null ? null : Number(v));
+  if (k === 'quick') { const q = QUICK.find(x => x.id === raw); if (q?.set) { Object.assign(P, JSON.parse(JSON.stringify(q.set))); toast(`Applied: ${q.name}`); } return; }
+  if (k === 'athlete') { P.athlete = raw; P.emph = null; P.mode = ''; return; }
+  if (parts[0] === 'emph') { const e = emphasis(), cur = [e.E, e.S, e.P]; cur[+parts[1]] = Number(raw); P.emph = cur; return; }
+  if (parts[0] === 'test') { const t = TESTS[parts[1]], v = t.unit === 'time' ? parseTime(raw) : n(raw); if (v && v > 0) P.tests[parts[1]] = v; else delete P.tests[parts[1]]; return; }
+  if (parts[0] === 'override') { P.override[parts[1]] = Number(raw); return; }
+  if (parts[0] === 'inj') {
+    const id = parts[1], cur = P.inj[id] || { status: 'none', phase: 1 };
+    cur[parts[2]] = parts[2] === 'phase' ? Number(raw) : raw;
+    if (cur.status === 'none') delete P.inj[id]; else P.inj[id] = cur;
+    return;
+  }
+  if (parts[0] === 'day') { const s = new Set(P.days); if (el.checked) s.add(+parts[1]); else s.delete(+parts[1]); P.days = [...s].sort((a, b) => a - b); return; }
+  if (k === 'doubles') { P.doubles = el.checked; return; }
+  if (k === 'bar') { P.bar = raw === '1'; return; }
+  if (k === 'height') { const v = n(raw); if (v) P.height = clamp(imperial() ? v * 2.54 : v, 120, 230); return; }
+  if (k === 'weight') { const v = n(raw); if (v) P.weight = clamp(imperial() ? v / 2.20462 : v, 30, 200); return; }
+  if (['age', 'minutes', 'sleep', 'meals', 'trainAge', 'equip', 'life'].includes(k)) { const v = n(raw); if (v != null && isFinite(v)) P[k] = v; return; }
+  if (['bf', 'rhr', 'hrmax'].includes(k)) { const v = n(raw); P[k] = v && v > 0 ? v : null; return; }
+  P[k] = raw;
 }
 
 // =============================================================================
@@ -2158,100 +2667,120 @@ function renderExport() {
 function renderOutputs() {
   M = buildModel();
   if (VIEW.week == null) VIEW.week = M.todayWeek;
+  if (VIEW.day == null) VIEW.day = M.todayIdx;
   PLAN = planWeek(M, VIEW.week);
-  renderPaths(); renderWeek(); renderToday(); renderFuel(); renderRecover(); renderGates(); renderExport();
+  renderToday(); renderWeek(); renderPaths(); renderFuel(); renderRecover(); renderLive();
 }
-function renderAll() { renderOutputs(); renderYou(); }
-function showTab(t) {
+function renderAll() {
+  renderOutputs();
+  const k = document.activeElement?.dataset?.k;
+  renderSetup();
+  if (k) document.querySelector(`[data-k="${k}"]`)?.focus();
+}
+function showTab(t, sub) {
   VIEW.tab = t;
+  if (sub) VIEW.sub[t] = sub;
   document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === t));
-  try { localStorage.setItem('fpp:tab', t); } catch (e) { /* ignore */ }
+  if (sub) renderAll();
 }
-$('tabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) { showTab(b.dataset.tab); window.scrollTo(0, 0); } });
-
-let outTimer = 0;
-$('you').addEventListener('input', e => {
-  const el = e.target.closest('[data-k]'); if (!el) return;
-  const k = el.dataset.k;
-  if (el.type === 'range' || el.type === 'number') {
-    setPath(k, el.value, el); save();
-    if (k.startsWith('emph.')) { const ee = emphasis(); el.closest('.emph').querySelectorAll('output').forEach((o, i) => o.textContent = [ee.E, ee.S, ee.P][i] + '%'); }
-    if (k === 'minutes') el.closest('label').querySelector('b').textContent = `${P.minutes} min`;
-    clearTimeout(outTimer); outTimer = setTimeout(renderOutputs, 60);
-  }
-});
-$('you').addEventListener('change', e => {
-  const el = e.target.closest('[data-k]'); if (!el) return;
-  setPath(el.dataset.k, el.value, el);
-  P = sanitize(P); save();
-  renderAll();
-});
-document.addEventListener('click', e => {
-  const b = e.target.closest('[data-act]'); if (!b) return;
-  const act = b.dataset.act;
-  if (act === 'resetEmph') { P.emph = null; save(); renderAll(); }
-  else if (act === 'weekPrev') { VIEW.week = Math.max(1, VIEW.week - 1); renderOutputs(); }
-  else if (act === 'weekNext') { VIEW.week += 1; renderOutputs(); }
-  else if (act === 'weekToday') { VIEW.week = M.todayWeek; renderOutputs(); }
-  else if (act === 'print') window.print();
-  else if (act === 'exportOne') {
-    const s = findSession(b.dataset.key, b.dataset.adjusted === '1');
-    if (!s) return;
-    const w = +b.dataset.key.split(':')[0];
-    const r = sessionToRoutine(s, routineName(s, w), IT_PALETTE[s.day % IT_PALETTE.length]);
-    download(`interval-${DAYS[s.day]}-week${w}.json`, routinesFile([r]));
-    toast('Saved. Import it in IntervalTimer: Settings → Import routines');
-  }
-  else if (act === 'checkin') {
-    const ci = { date: isoDate(new Date()) };
-    document.querySelectorAll('[data-ci]').forEach(x => { ci[x.dataset.ci] = x.type === 'checkbox' ? x.checked : Number(x.value); });
-    P.checkin = ci; save(); renderOutputs();
-  }
-  else if (act === 'log') {
-    const id = b.dataset.id, inp = document.querySelector(`[data-log="${id}"]`), t = TESTS[id];
-    const v = t.unit === 'time' ? parseTime(inp.value) : Number(inp.value);
-    if (!v || v <= 0) { toast('Enter a result first'); return; }
-    const before = M.stage[t.q];
-    P.tests[id] = v; P.testLog.push({ id, value: v, date: isoDate(new Date()) }); save();
-    renderAll();
-    const after = M.stage[t.q];
-    toast(after > before ? `${Q[t.q]} moves up to stage ${after}: ${STAGES[after - 1]}` : `Logged ${fmtVal(id, v)}`);
-  }
-  else if (act === 'expPrev') { VIEW.exportWeek = Math.max(1, VIEW.exportWeek - 1); renderExport(); }
-  else if (act === 'expNext') { VIEW.exportWeek += 1; renderExport(); }
-  else if (act === 'expAll') { document.querySelectorAll('[data-pick]').forEach(x => VIEW.picked.add(x.dataset.pick)); renderExport(); }
-  else if (act === 'expNone') { VIEW.picked.clear(); renderExport(); }
-  else if (act === 'expGo') {
-    const list = [...VIEW.picked].filter(k => +k.split(':')[0] === VIEW.exportWeek).map(k => findSession(k)).filter(Boolean);
-    if (!list.length) return;
-    const routines = list.map(s => sessionToRoutine(s, routineName(s, VIEW.exportWeek), IT_PALETTE[s.day % IT_PALETTE.length]));
-    download(`interval-progression-week${VIEW.exportWeek}.json`, routinesFile(routines));
-    toast(`Saved ${plural(routines.length, 'routine')}`);
-  }
-  else if (act === 'saveProfile') download(`fitness-paths-profile-${isoDate(new Date())}.json`, { app: 'fitness-progression-paths', profile: P });
-  else if (act === 'loadProfile') $('filePick').click();
-  else if (act === 'resetProfile') { if (confirm('Clear everything you entered and start over?')) { P = DEFAULTS(); save(); VIEW.week = null; renderAll(); } }
+document.addEventListener('input', e => {
+  const el = e.target.closest('[data-k]');
+  if (!el || el.type !== 'range') return;
+  setPath(el.dataset.k, el.value, el); save();
+  if (el.dataset.k.startsWith('emph.')) { const ee = emphasis(); el.closest('.emph').querySelectorAll('output').forEach((o, i) => o.textContent = [ee.E, ee.S, ee.P][i] + '%'); }
+  if (el.dataset.k === 'minutes') el.closest('label').querySelector('b').textContent = `${P.minutes} min`;
+  renderOutputs();
 });
 document.addEventListener('change', e => {
+  const el = e.target.closest('[data-k]');
+  if (el) { setPath(el.dataset.k, el.value, el); P = sanitize(P); save(); renderAll(); return; }
   const sw = e.target.closest('[data-swap]');
   if (sw && sw.value !== '') {
     const w = PLAN.wk.no; (P.swaps[w] = P.swaps[w] || []).push([+sw.dataset.swap, +sw.value]); save(); renderOutputs();
     toast(`Swapped ${DAYS[+sw.dataset.swap]} and ${DAYS[+sw.value]} for week ${w}`);
+    return;
   }
   const pk = e.target.closest('[data-pick]');
-  if (pk) { if (pk.checked) VIEW.picked.add(pk.dataset.pick); else VIEW.picked.delete(pk.dataset.pick); $('export').querySelector('[data-act="expGo"]').disabled = !VIEW.picked.size; }
+  if (pk) { if (pk.checked) VIEW.picked.add(pk.dataset.pick); else VIEW.picked.delete(pk.dataset.pick); renderWeek(); }
 });
-document.addEventListener('click', e => { const f = e.target.closest('[data-fday]'); if (f) { VIEW.fuelDay = +f.dataset.fday; renderFuel(); } });
+document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest?.('.stn')) { e.preventDefault(); e.target.closest('.stn').dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
+document.addEventListener('click', e => {
+  const t = e.target;
+  const tab = t.closest('[data-tab]'); if (tab) return showTab(tab.dataset.tab);
+  const sb = t.closest('[data-sub]'); if (sb) { const [a, b] = sb.dataset.sub.split(':'); VIEW.sub[a] = b; return renderAll(); }
+  const go = t.closest('[data-go]'); if (go) { const [a, b] = go.dataset.go.split(':'); return showTab(a, b); }
+  const q = t.closest('[data-q]'); if (q) { VIEW.q = q.dataset.q; return renderAll(); }
+  const dy = t.closest('[data-day]'); if (dy) { VIEW.day = +dy.dataset.day; VIEW.sess = 0; return renderOutputs(); }
+  const ss = t.closest('[data-sess]'); if (ss) { VIEW.sess = +ss.dataset.sess; return renderOutputs(); }
+  const rl = t.closest('[data-rail]'); if (rl) { VIEW.rail = rl.dataset.rail; return renderPaths(); }
+  const mc = t.closest('[data-macro]'); if (mc) { VIEW.macro = mc.dataset.macro; return renderFuel(); }
+  const mi = t.closest('[data-micro]'); if (mi) { VIEW.micro = mi.dataset.micro; VIEW.sub.fuel = 'micros'; return renderFuel(); }
+  const ij = t.closest('[data-inj]'); if (ij) { VIEW.inj = ij.dataset.inj; return renderRecover(); }
+  const b = t.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act;
+  if (act === 'theme') { const cur = document.documentElement.dataset.theme; const dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; setTheme(dark ? 'light' : 'dark'); }
+  else if (act === 'about') openAbout();
+  else if (act === 'start') { VIEW.started = true; save(); showTab('today'); renderAll(); }
+  else if (act === 'resetEmph') { P.emph = null; save(); renderAll(); }
+  else if (act === 'weekPrev') { VIEW.week = Math.max(1, VIEW.week - 1); renderOutputs(); }
+  else if (act === 'weekNext') { VIEW.week += 1; renderOutputs(); }
+  else if (act === 'weekToday') { VIEW.week = M.todayWeek; VIEW.day = M.todayIdx; renderOutputs(); }
+  else if (act === 'print') window.print();
+  else if (act === 'shuffle') { P.mealSeed = (P.mealSeed + 1) % 60; save(); renderFuel(); }
+  else if (act === 'exportOne') {
+    const s = findSession(b.dataset.key, b.dataset.adjusted === '1'); if (!s) return;
+    const w = +b.dataset.key.split(':')[0];
+    download(`interval-${DAYS[s.day]}-week${w}.json`, routinesFile([sessionToRoutine(s, routineName(s, w), IT_PALETTE[s.day % IT_PALETTE.length])]));
+    toast('Saved. In IntervalTimer: Settings → Import routines');
+  }
+  else if (act === 'quick') {
+    const cur = todayCheckin();
+    P.checkin = cur?.quick === b.dataset.lv ? null : { date: isoDate(new Date()), quick: b.dataset.lv };
+    save(); renderOutputs();
+  }
+  else if (act === 'ciOpen') openCheckin();
+  else if (act === 'ciClose') $('ciDlg').close();
+  else if (act === 'checkin') {
+    const ci = { date: isoDate(new Date()) };
+    $('ciDlg').querySelectorAll('[data-ci]').forEach(x => { ci[x.dataset.ci] = x.type === 'checkbox' ? x.checked : Number(x.value); });
+    P.checkin = ci; save(); $('ciDlg').close(); renderOutputs();
+    const r = readiness(ci); toast(`Readiness ${r.score}/100: ${r.level === 'good' ? 'train as planned' : r.level === 'warn' ? 'session made lighter' : 'recovery today'}`);
+  }
+  else if (act === 'log') {
+    const id = b.dataset.id, inp = document.querySelector(`[data-log="${id}"]`), tt = TESTS[id];
+    const v = tt.unit === 'time' ? parseTime(inp.value) : Number(inp.value);
+    if (!v || v <= 0) return toast('Enter a result first');
+    const before = M.stage[tt.q];
+    P.tests[id] = v; P.testLog.push({ id, value: v, date: isoDate(new Date()) }); save(); renderAll();
+    const after = M.stage[tt.q];
+    toast(after > before ? `${Q[tt.q]} moves up to stage ${after}: ${STAGES[after - 1]}` : `Logged ${fmtVal(id, v)}`);
+  }
+  else if (act === 'expPrev') { VIEW.exportWeek = Math.max(1, VIEW.exportWeek - 1); renderWeek(); }
+  else if (act === 'expNext') { VIEW.exportWeek += 1; renderWeek(); }
+  else if (act === 'expAll') { document.querySelectorAll('[data-pick]').forEach(x => VIEW.picked.add(x.dataset.pick)); renderWeek(); }
+  else if (act === 'expNone') { VIEW.picked.clear(); renderWeek(); }
+  else if (act === 'expGo') {
+    const list = [...VIEW.picked].filter(k => +k.split(':')[0] === VIEW.exportWeek).map(k => findSession(k)).filter(Boolean);
+    if (!list.length) return;
+    download(`interval-progression-week${VIEW.exportWeek}.json`, routinesFile(list.map(s => sessionToRoutine(s, routineName(s, VIEW.exportWeek), IT_PALETTE[s.day % IT_PALETTE.length]))));
+    toast(`Saved ${plural(list.length, 'routine')}`);
+  }
+  else if (act === 'saveProfile') download(`fitness-paths-profile-${isoDate(new Date())}.json`, { app: 'fitness-progression-paths', profile: P });
+  else if (act === 'loadProfile') $('filePick').click();
+  else if (act === 'resetProfile') { if (confirm('Clear everything you entered and start over?')) { P = DEFAULTS(); save(); VIEW.week = VIEW.day = null; renderAll(); } }
+});
 $('filePick').addEventListener('change', async () => {
   const f = $('filePick').files[0]; $('filePick').value = '';
   if (!f) return;
   try {
     const data = JSON.parse(await f.text());
     if (data?.app !== 'fitness-progression-paths' || !data.profile) throw new Error('not a profile');
-    P = sanitize({ ...DEFAULTS(), ...data.profile }); save(); VIEW.week = null; renderAll(); toast('Profile restored');
+    P = sanitize({ ...DEFAULTS(), ...data.profile }); save(); VIEW.week = VIEW.day = null; renderAll(); toast('Profile restored');
   } catch (err) { toast('That file is not a Fitness Progression Paths profile'); }
 });
+let wasNarrow = matchMedia('(max-width: 859px)').matches;
+window.addEventListener('resize', () => { const n = matchMedia('(max-width: 859px)').matches; if (n !== wasNarrow) { wasNarrow = n; renderPaths(); } });
 
 // ---------- Theme and About ----------
 function setTheme(t) {
@@ -2259,11 +2788,6 @@ function setTheme(t) {
   try { localStorage.setItem('fpp:theme', t || ''); } catch (e) { /* ignore */ }
 }
 try { setTheme(localStorage.getItem('fpp:theme') || null); } catch (e) { /* ignore */ }
-$('themeBtn').addEventListener('click', () => {
-  const cur = document.documentElement.dataset.theme;
-  const dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-  setTheme(dark ? 'light' : 'dark');
-});
 let logLoaded = false;
 function openAbout() {
   $('aboutDlg').showModal();
@@ -2287,17 +2811,13 @@ function openAbout() {
       $('aboutLog').innerHTML = `<li class="muted">Couldn't load the change log. <a href="https://github.com/${REPO}/commits/main" target="_blank" rel="noopener">See the history on GitHub.</a></li>`;
     });
 }
-$('aboutBtn').addEventListener('click', openAbout);
 $('aboutClose').addEventListener('click', () => $('aboutDlg').close());
 document.querySelectorAll('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
 $('buildNo').textContent = APP_BUILD;
 
+// Returning visitors land on Today; a first visit starts with two choices in Setup.
 renderAll();
-let startTab = 'paths';
-try { startTab = localStorage.getItem('fpp:tab') || 'paths'; } catch (e) { /* ignore */ }
-if (!document.getElementById(startTab)) startTab = 'paths';
-if (startTab === 'you' && matchMedia('(min-width: 1000px)').matches) startTab = 'paths';
-showTab(startTab);
+showTab(FIRST_RUN ? 'setup' : 'today');
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.addEventListener('message', e => {

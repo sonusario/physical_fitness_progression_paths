@@ -17,29 +17,39 @@ It is a single-file progressive web app with no build step, and it works offline
 - **Body.** Sex, age, height, weight, optional body fat and heart rates, daily activity, and units (metric or imperial).
 - **Conditioning.** Your training age, plus your latest test results. These include a 5 km run, bike FTP, 400 m swim, 2 km erg, 30-15 IFT, squat and trap-bar 1RM, pull-ups, push-ups, single-leg squats, broad jump, CMJ, 20 m sprint, calf raises, side plank and single-leg bridge. Results set your stage on each path, or you can set a stage yourself.
 - **Injuries and weak areas.** 12 regions, each marked as fine, weak, recovering or painful now, with a rehab phase for recovering areas.
-- **Schedule.** Training days, session length, whether two sessions a day are possible, usual start time, wake time, sleep target, meals a day, equipment and pull-up bar, and the plan start date.
+- **Split abs (diastasis recti).** Gap width, timing (including postpartum), doming on effort and pelvic floor symptoms. These place you in one of three phases (Reconnect, Rebuild, Reload), swap out planks, rollouts and hollow holds until you are ready for them, and switch to low-impact work where needed.
+- **Schedule.** Training days, session length, whether two sessions a day are possible, usual start time, wake time, sleep target, meals a day, equipment and pull-up bar, eating style, and the plan start date.
 - **Quick starts.** Fill several of these at once (new to training, returning, busy, committed, full-time, masters).
+
+## Layout
+
+The app fits on one screen and does not scroll the page. Six tabs sit along the bottom on a phone and along the top on a desktop, and each has a few sub-tabs.
+
+A first visit opens **Setup** with the athlete type and quick start. Every later visit opens **Today**, because that is what you usually want to glance at.
 
 ## What it gives you
 
-- **Paths.** Six stages for each quality (Endurance, Strength, Power, Resilience), from Foundation to Elite. Each stage shows:
-  - the focus of the stage;
-  - the gate test to move up;
-  - how long that usually takes.
-
-  Injuries get a phased rehab path with return criteria. The main loops are drawn as rings: the daily check-in, train, fuel and sleep loop; the hard and easy week; the 4-week block; and stage → gate → stage.
-- **Week.** A full week of sessions, with exercises, sets, reps, effort (RPE and reps in reserve), rests, heart-rate zones and easier or harder versions.
+- **Today.** The session for today as a short outline. Tap a part to open it, and an exercise for how to do it.
+  - One tap says how you feel (Ready, So-so, Rough), and the session stays as planned, gets lighter, or turns into recovery. A fuller check-in (sleep, soreness, energy, stress, resting heart rate, illness, new pain) is one tap away.
+  - Four tiles show today's fuel, tonight's sleep window, your stages and the week. Each opens the matching tab.
+- **Week.** One day at a time, with a day bar to move around.
   - Weeks 1 to 3 of each block build. Week 4 unloads and holds the gate tests.
-  - You can swap days, and the week rebuilds when you change available days.
-  - A coverage table checks that every major muscle group gets work.
-- **Today.** A readiness check-in covering sleep, soreness, energy, stress, resting heart rate, illness and new pain. It keeps today's session as planned, makes it lighter, or turns it into recovery.
-- **Fuel.** Calories, carbohydrate, protein, fat and fluid for each day, scaled to that day's training. You also get a flexible meal schedule around your sessions, fueling during long sessions, a check for low energy availability, and supplements with good evidence.
-- **Recover.** Your sleep window, the recovery built into the plan, recovery methods ranked by evidence, injury remediation with a pain-monitoring rule, and warning signs.
-- **Gates.** Test protocols and adjusted targets that stand in for competitions. Logging a result updates your stage and the whole plan.
-- **Export.** Download sessions as IntervalTimer routine files, then import them in [IntervalTimer](https://sonusario.github.io/IntervalTimer/) under Settings → Import routines.
-  - Timed steps cover warm-ups, intervals and rests.
-  - Sets of reps wait for a tap.
-  - Easier versions of strength exercises come along as IntervalTimer variants.
+  - Overview lists the whole week and lets you swap days.
+  - Muscles checks that every major muscle group gets work.
+  - Export downloads sessions as routine files for [IntervalTimer](https://sonusario.github.io/IntervalTimer/) (Settings → Import routines). Timed steps cover warm-ups, intervals and rests, sets of reps wait for a tap, and easier versions come along as variants.
+- **Paths.**
+  - Railroad: a directed graph of the four lines (Endurance, Strength, Power, Resilience), six stations each, from You to Elite. Diamonds are gate tests. Dashed arrows show that each Power station needs the Strength and Resilience station before it. Rehab paths are sidings that rejoin the Resilience line. Tap a station for its focus and gate.
+  - Stages: the focus, gate and usual time for each stage.
+  - Gates: test protocols and adjusted targets that stand in for competitions. Logging a result updates your stage and the whole plan.
+  - Loops: the daily, weekly, block and stage loops drawn as rings.
+- **Fuel.**
+  - Day: calories, carbohydrate, protein, fat and fluid, scaled to that day's training, with meal times around your sessions.
+  - Meal plan: real meals with portions, built from popular foods to match the day's targets. Pick an eating style (everyday omnivore, Mediterranean, high protein, vegetarian, vegan, budget, quick, dairy-free, gluten-free) and shuffle for other options.
+  - Macros: what carbohydrate, protein, fat, fibre and fluid each do, how much, when, and which foods.
+  - Micros: twelve vitamins and minerals athletes run short on, with your target, best foods, absorption tips, and a flag where your sport, sex or diet raises the risk.
+  - Supplements: the few with good evidence.
+- **Recover.** Your sleep window, the recovery built into the plan, recovery methods ranked by evidence, injury and split abs remediation with a pain-monitoring rule, and warning signs.
+- **Setup.** Athlete, body, conditioning, injuries, split abs, schedule and data, with a one-line summary of the plan that updates as you change things.
 
 ## How the plan is built
 
