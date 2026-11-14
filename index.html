@@ -261,7 +261,21 @@ details.meal .mb { padding: 0 10px 8px; font-size: 13px; }
 .tpgrid button.on, .seg button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .seg { display: inline-flex; gap: 4px; }
 .seg button { padding: 5px 14px; }
-.tpbig { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; margin: 0 0 6px; }
+.tphead { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0 0 6px; }
+.tpbig { display: flex; align-items: center; font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tpbig button { font: inherit; color: var(--muted); background: none; border: 0; border-radius: 8px; padding: 0 6px; cursor: pointer; min-width: 1.6em; }
+.tpbig button.on { color: var(--accent-ink); background: var(--accent); }
+.tphead .seg { display: inline-flex; flex-direction: column; gap: 3px; } .tphead .seg button { padding: 4px 10px; font-size: 13px; }
+.tpdial { display: block; width: min(240px, 72vw); height: auto; margin: 2px auto 10px; touch-action: none; cursor: pointer; user-select: none; }
+.tpdial .face { fill: var(--panel-2); stroke: var(--line); }
+.tpdial .ticks line { stroke: var(--muted); stroke-width: 1; opacity: .5; }
+.tpdial .hand { stroke: var(--accent); stroke-width: 2; }
+.tpdial .hub, .tpdial .knob { fill: var(--accent); }
+.tpdial text { font-size: 15px; font-weight: 600; fill: var(--text); pointer-events: none; }
+.tpdial text.on { fill: var(--accent-ink); }
+.tpdial:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 50%; }
+.tp .tpv { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.tpic { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; opacity: .75; }
 .tpquick { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-bottom: 8px; }
 
 /* ---------- Day timeline ---------- */
@@ -376,7 +390,7 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
 <input type="file" id="filePick" accept="application/json,.json" hidden>
 <script>
 'use strict';
-const APP_BUILD = '2.3 (2026.11.11)';
+const APP_BUILD = '2.4 (2026.11.14)';
 const REPO = 'sonusario/physical_fitness_progression_paths';
 
 // =============================================================================
@@ -687,7 +701,12 @@ const ATHLETES = [
 const ATHLETE = Object.fromEntries(ATHLETES.map(a => [a.id, a]));
 
 const MODES = { run: 'Running', bike: 'Cycling', swim: 'Swimming', row: 'Rowing or erg', mixed: 'Mixed modes' };
-const MODE_VERB = { run: 'Run', bike: 'Ride', swim: 'Swim', row: 'Row' };
+// Not offered as a choice: with only bodyweight and a band there is no bike or erg, so
+// incline walking (stairs, hills or a steep street) stands in when running has to stop.
+const ALT_MODES = { walk: 'Incline walking' };
+const MODE_VERB = { run: 'Run', bike: 'Ride', swim: 'Swim', row: 'Row', walk: 'Incline walk' };
+// Modes that need a machine: a bike or trainer, or a rowing erg.
+const MACHINE_MODES = new Set(['bike', 'row']);
 
 // Quick-start profiles fill several sections at once.
 const QUICK = [
@@ -1528,14 +1547,27 @@ const BAND_IDX = { high: 1, mid: 0.8, low: 0.6 };
 const BAND_F = { high: 1, mid: 0.8, low: 0.6 };
 
 function modesOf(a) {
-  if (P.mode && P.mode !== 'mixed') return [P.mode];
-  if (P.mode === 'mixed' || a.mode === 'mixed') return a.modes || ['run', 'bike'];
-  return [a.mode];
+  let list;
+  if (P.mode && P.mode !== 'mixed') list = [P.mode];
+  else if (P.mode === 'mixed' || a.mode === 'mixed') list = a.modes || ['run', 'bike'];
+  else list = [a.mode];
+  // Bodyweight and a band means no bike and no erg.
+  if (P.equip === 0) { list = list.filter(x => !MACHINE_MODES.has(x)); if (!list.length) list = ['run']; }
+  return list;
 }
+// Endurance modes the athlete or the chosen mode wanted but the equipment rules out.
+function modesDropped(a) {
+  if (P.equip !== 0) return [];
+  const want = P.mode && P.mode !== 'mixed' ? [P.mode] : (P.mode === 'mixed' || a.mode === 'mixed') ? (a.modes || ['run', 'bike']) : [a.mode];
+  return want.filter(x => MACHINE_MODES.has(x));
+}
+const modeName = x => MODES[x] || ALT_MODES[x] || x;
 const MODE_TEST = { run: 'run5k', bike: 'ftp', swim: 'swim400', row: 'row2k' };
 function testsFor(q, m) {
   if (q === 'E') {
-    const list = P.mode && P.mode !== 'mixed' ? [MODE_TEST[P.mode]] : m.athlete.eTests.slice();
+    let list = P.mode && P.mode !== 'mixed' ? [MODE_TEST[P.mode]] : m.athlete.eTests.slice();
+    // No bike or erg with bodyweight and a band: their tests become the 5 km run.
+    if (P.equip === 0) list = list.map(id => id === 'ftp' || id === 'row2k' ? 'run5k' : id);
     return [...new Set([...list, 'easy'])];
   }
   if (q === 'S') return P.equip >= 2 ? ['squat', 'trapdl', ...(P.bar ? ['pullups'] : [])] : ['pushups', 'slsquat', ...(P.bar ? ['pullups'] : [])];
@@ -1602,7 +1634,7 @@ function buildModel() {
   m.modes = modesOf(a);
   m.inj = injuryState();
   // Swap running out while an impact injury is painful.
-  m.altMode = m.modes.find(x => x !== 'run') || 'bike';
+  m.altMode = m.modes.find(x => x !== 'run') || (P.equip === 0 ? 'walk' : 'bike');
   m.hrmax = P.hrmax || Math.round(208 - 0.7 * P.age);
   m.rhr = P.rhr || null;
   m.stage = {}; m.info = {};
@@ -1626,9 +1658,18 @@ function buildModel() {
 // =============================================================================
 // Exercise selection
 // =============================================================================
+// Exercises outside the strength ladders that need kit: the lowest equipment
+// setting that has it, and what to do instead below that (null: leave it out).
+const GEAR = {
+  bike_sprint: [1, null], row_sprint: [1, null], mb_chest: [1, null], mb_rot: [1, null], mb_slam: [1, null], mb_ohthrow: [1, null],
+  kb_swing: [1, null], jump_shrug: [2, null], hang_clean: [2, null], trapbar_jump: [2, null],
+  hsr_calf: [1, 'sl_calf_step'], ab_roll: [1, 'll_plank'], thoracic_ext: [1, 'tspine'], wrist_ext: [1, 'wrist_iso'],
+};
+const gearOk = id => !GEAR[id] || P.equip >= GEAR[id][0];
+function gearSwap(id) { return gearOk(id) ? id : GEAR[id][1]; }
 function okEx(id, m) {
   const ex = EX[id];
-  return ex && !ex.tags.some(t => m.inj.avoid.has(t));
+  return ex && gearOk(id) && !ex.tags.some(t => m.inj.avoid.has(t));
 }
 function barSafe(id) { return P.bar ? id : (NO_BAR[id] || id); }
 function pickStrength(pattern, stage, m) {
@@ -1700,8 +1741,8 @@ function zoneText(z, m) {
   else hr = `${Math.round(m.hrmax * Z.lo)}–${Math.round(m.hrmax * Z.hi)}`;
   return `Z${z} ${Z.name}, ${hr} bpm, RPE ${Z.rpe}`;
 }
-const MODE_FACTOR = { run: 1, bike: 1.5, swim: 1, row: 1 };
-const LONG_CAP = { run: 150, bike: 240, swim: 80, row: 100 };
+const MODE_FACTOR = { run: 1, bike: 1.5, swim: 1, row: 1, walk: 1.2 };
+const LONG_CAP = { run: 150, bike: 240, swim: 80, row: 100, walk: 150 };
 
 // One endurance session: steps for the timer and a summary.
 function enduranceBlock(type, mode, m, wk, budget) {
@@ -1844,8 +1885,8 @@ function powerBlock(m, wk, n, budget) {
     let id = null;
     if (kind === 'sprint') {
       const mode = m.inj.impactPain ? m.altMode : m.modes[n % m.modes.length];
-      const lad = POW.sprint[mode === 'run' && m.inj.avoid.has('ham') ? 'hill' : mode] || POW.sprint.run;
-      id = lad[i];
+      const lad = mode === 'walk' ? null : POW.sprint[mode === 'run' && m.inj.avoid.has('ham') ? 'hill' : mode] || POW.sprint.run;
+      id = lad ? lad[i] : null;
     } else if (kind === 'upper' || kind === 'throw') id = POW[kind][P.equip >= 1 ? 1 : 0][i];
     else if (kind === 'lift') id = POW.lift[P.equip] ? POW.lift[P.equip][i] : null;
     else id = POW[kind][i];
@@ -1924,8 +1965,9 @@ function rehabBlock(m) {
   const per = list.length >= 3 ? 1 : 2;
   for (const inj of list) {
     const phase = injPhase(inj);
-    for (const [id, dose] of inj.phases[phase - 1][1].slice(0, inj.custom ? 3 : per)) {
-      if (items.some(x => x.ex === id) || items.length >= 4) continue;
+    for (const [raw, dose] of inj.phases[phase - 1][1].slice(0, inj.custom ? 3 : per)) {
+      const id = gearSwap(raw);
+      if (!id || items.some(x => x.ex === id) || items.length >= 4) continue;
       items.push({ ex: id, dose, region: inj.name, status: inj.status, phase, d: { sets: 3, reps: dose, rest: 45, work: HOLDS.has(id) ? 45 : 40, hold: HOLDS.has(id) ? 45 : 0 }, mins: 2.5 });
     }
   }
@@ -2269,7 +2311,7 @@ function bmr() {
   if (P.bf > 3 && P.bf < 60) return 370 + 21.6 * P.weight * (1 - P.bf / 100);
   return 10 * P.weight + 6.25 * P.height - 5 * P.age + (P.sex === 'm' ? 5 : -161);
 }
-const MET = { easy: { run: 8, bike: 6.8, swim: 7, row: 7 }, hard: 11, S: 5, P: 6, R: 2.5, X: 2.5, W: 4, C: 3, T: 7 };
+const MET = { easy: { run: 8, bike: 6.8, swim: 7, row: 7, walk: 5.5 }, hard: 11, S: 5, P: 6, R: 2.5, X: 2.5, W: 4, C: 3, T: 7 };
 function dayLoad(d) {
   let kcal = 0, easy = 0, hard = 0, other = 0, longest = 0;
   for (const s of d.sessions) for (const b of s.blocks) {
@@ -2633,38 +2675,90 @@ function nowInTimeline(tl, nowMin) {
 }
 function dateOf(weekNo, idx) { const x = new Date(M.planStart); x.setDate(x.getDate() + (weekNo - 1) * 7 + idx); return x; }
 
-// The whole day as one IntervalTimer routine. The training session runs as a
-// subroutine, so it keeps its own steps and can also be run on its own.
-function dayRoutines(d, weekNo, tl) {
-  const out = [], subs = [];
-  const list = tl.ev.filter(x => x.kind !== 'sleep');
-  const push = (title, mins, icon, extra) => { if (mins >= 0.5) out.push(iv(title, mins * 60, icon, extra)); };
+// IntervalTimer files. Titles stay short (the timer already shows what comes next);
+// what an interval is and how to do it goes in its description text, which the
+// timer shows on its own panel. Routines start with the water-drop sound.
+const IT_START = { start: { kind: 'builtin', id: 'drop' } };
+const shortName = n => String(n).replace(/ \(.*\)$/, '');
+// One stretch of a day's timeline as intervals, from its first item to `until`.
+function dayIntervals(list, until, d, weekNo, subs) {
+  const out = [];
+  const push = (title, mins, icon, text, extra) => { if (mins >= 0.5) out.push(iv(title, mins * 60, icon, { ...(text ? { text } : {}), ...(extra || {}) })); };
   list.forEach((x, i) => {
-    const nextS = list[i + 1] ? list[i + 1].s : tl.bed;
+    const nextS = list[i + 1] ? list[i + 1].s : until;
     const len = Math.max(x.e - x.s, 0);
-    if (x.kind === 'wake') push('Wake up: water and daylight', Math.max(1, Math.min(nextS - x.s, 15)), 'drop');
-    else if (x.kind === 'med') push(`Medicine: ${x.sub}`, 1, 'bell');
+    if (x.kind === 'wake') push('Wake up', Math.max(1, Math.min(nextS - x.s, 15)), 'drop', 'A glass of water, then some daylight. Same wake time every day, even after a short night.');
+    else if (x.kind === 'med') push('Medicine', 1, 'bell', `${x.title}: ${x.sub}`);
     else if (x.kind === 'train') {
       const r = sessionToRoutine(x.sess, routineName(x.sess, weekNo), IT_PALETTE[d.idx % IT_PALETTE.length]);
       subs.push(r);
-      out.push({ ...iv(`Training: ${x.sess.title}`, len * 60, 'heart'), sub: { id: r.id, name: r.name, color: r.color } });
+      out.push({ ...iv('Training', len * 60, 'heart', { text: `${x.sess.title}. ${x.sub}.\n\n${x.sess.blocks.map(b => b.title).join(' → ')}` }), sub: { id: r.id, name: r.name, color: r.color } });
     } else if (x.kind === 'prep') {
+      const meal = x.meal.name.replace(/ \(.*/, '');
       const cooks = x.meal.prep.filter(p => p.id && p.mins >= 3);
-      cooks.forEach((p, k) => push(`Prep ${x.meal.name.replace(/ \(.*/, '').toLowerCase()} ${k + 1}/${cooks.length + 1}: ${FOOD[p.id].name} (${p.mins} min)`, 1, 'repeat'));
-      push(`Prep ${x.meal.name.replace(/ \(.*/, '').toLowerCase()} ${cooks.length + 1}/${cooks.length + 1}: cook, then plate ${x.meal.dish}`, Math.max(1, len - cooks.length), 'repeat');
-    } else if (x.kind === 'meal') push(`${x.meal.name.replace(/ \(.*/, '')}: ${x.meal.dish}`, len, 'bell');
-    else if (x.kind === 'work') push(x.title, len, 'star');
+      cooks.forEach(p => push(`Prep: ${shortName(FOOD[p.id].name)}`, 1, 'repeat', `${p.text}\n\nStart it now; it runs in the background while you get the rest of ${meal.toLowerCase()} ready.`));
+      push(`Prep: ${meal.toLowerCase()}`, Math.max(1, len - cooks.length), 'repeat', `${x.meal.dish}.\n\n${x.meal.prep.map((p, k) => `${k + 1}. ${p.text}`).join('\n')}`);
+    } else if (x.kind === 'meal') push(x.meal.name.replace(/ \(.*/, ''), len, 'bell', `${x.meal.dish}: ${x.meal.items.map(foodText).join(', ')}.\n\n${x.meal.kcal} kcal · carbs ${x.meal.c} g · protein ${x.meal.p} g · fat ${x.meal.f} g. ${x.meal.tip || ''}`.trim());
+    else if (x.kind === 'work') push(x.title, len, 'star', `${x.sub}. One task, notifications off, water within reach.`);
     else if (x.kind === 'break') {
       let used = 0;
-      for (const it of x.items) { const mm = Math.min(it.mins, len - used); if (mm <= 0) break; push(`Break: ${it.name}`, mm, it.kind === 'walk' || it.kind === 'snack' ? 'heart' : it.kind === 'micro' ? 'drop' : 'wave'); used += mm; }
-      if (len - used >= 1) push('Break: water, then back to it', len - used, 'drop');
-    } else if (x.kind === 'wind') push('Wind down: screens off, lights low', len, 'moon');
+      for (const it of x.items) { const mm = Math.min(it.mins, len - used); if (mm <= 0) break; push(it.name.length > 28 ? shortName(it.name).split(':')[0] : it.name, mm, it.kind === 'walk' || it.kind === 'snack' ? 'heart' : it.kind === 'micro' ? 'drop' : 'wave', it.cue); used += mm; }
+      if (len - used >= 1) push('Water', len - used, 'drop', 'Drink some water, then back to it.');
+    } else if (x.kind === 'wind') push('Wind down', len, 'moon', 'Screens off, lights low, room cool. No caffeine within 8 hours of bed.');
     // Fill the space before the next item.
     const end = Math.max(x.e, x.kind === 'wake' ? x.s + Math.min(nextS - x.s, 15) : x.e);
-    if (nextS - end >= 1 && x.kind !== 'wind') push(nextS - end >= 45 ? 'Free time: move at least once an hour' : 'Free time', nextS - end, 'wave');
+    if (nextS - end >= 1 && x.kind !== 'wind') push('Free time', nextS - end, 'wave', nextS - end >= 45 ? 'Move at least once an hour.' : '');
   });
-  const day = { id: uid(), name: `Day plan · ${DAYS_LONG[d.idx]} W${weekNo}`.slice(0, 60), color: IT_PALETTE[(d.idx + 3) % IT_PALETTE.length], created: Date.now(), cues: { start: { kind: 'builtin', id: 'whistle' } }, intervals: out };
+  return out;
+}
+// The whole day as one IntervalTimer routine. The training session runs as a
+// subroutine, so it keeps its own steps and can also be run on its own.
+function dayRoutines(d, weekNo, tl) {
+  const subs = [];
+  const out = dayIntervals(tl.ev.filter(x => x.kind !== 'sleep'), tl.bed, d, weekNo, subs);
+  const day = { id: uid(), name: `Day plan · ${DAYS_LONG[d.idx]} W${weekNo}`.slice(0, 60), color: IT_PALETTE[(d.idx + 3) % IT_PALETTE.length], created: Date.now(), cues: IT_START, intervals: out };
   return { app: 'interval', kind: 'routines', version: 1, exported: new Date().toISOString(), picked: [day.id], routines: [day, ...subs] };
+}
+// Where a day splits: around work hours on a work day, and at the same times as
+// morning, daytime and evening on any other day, so routines line up all week.
+function dayParts(d, tl) {
+  const work = P.desk && P.workDays.includes(d.idx);
+  let a = toMin(P.workStart), b = toMin(P.workEnd);
+  if (a < tl.wake) a = tl.wake + 60; if (b <= a) b = Math.min(tl.bed - 60, a + 480);
+  return { work, cuts: [a, b], names: work ? ['Before work', 'Work', 'After work'] : ['Morning', 'Daytime', 'Evening'] };
+}
+// One day as a folder: three routines (before work, work, after work; or morning,
+// daytime, evening), with each training session as a subroutine beside them.
+function dayFolder(d, weekNo, tl, parent, out) {
+  const f = { id: uid(), name: `${DAYS_LONG[d.idx]} ${shortDate(dateOf(weekNo, d.idx))}`, color: IT_PALETTE[d.idx % IT_PALETTE.length], parent: parent || null };
+  out.folders.push(f);
+  const { cuts, names } = dayParts(d, tl);
+  const list = tl.ev.filter(x => x.kind !== 'sleep');
+  const part = x => x.s < cuts[0] ? 0 : x.s < cuts[1] ? 1 : 2;
+  const subs = [];
+  names.forEach((name, k) => {
+    const mine = list.filter(x => part(x) === k);
+    if (!mine.length) return;
+    const until = k < 2 ? Math.max(cuts[k], ...mine.map(x => x.e)) : tl.bed;
+    const intervals = dayIntervals(mine, until, d, weekNo, subs);
+    if (!intervals.length) return;
+    out.routines.push({ id: uid(), name: `${k + 1}. ${name} · ${DAYS[d.idx]} W${weekNo}`, color: IT_PALETTE[(d.idx + k + 3) % IT_PALETTE.length], created: Date.now() + out.routines.length, cues: IT_START, folder: f.id, intervals });
+  });
+  for (const r of subs) out.routines.push({ ...r, folder: f.id, created: Date.now() + out.routines.length });
+  return f;
+}
+function weekFolder(weekNo, parent, out) {
+  const plan = weekNo === PLAN.wk.no ? PLAN : planWeek(M, weekNo);
+  const f = { id: uid(), name: `Week ${weekNo} · ${weekRange(weekNo)}`, color: plan.wk.deload ? '#FF7A59' : '#4DD9A6', parent: parent || null };
+  out.folders.push(f);
+  for (const d of plan.days) dayFolder(d, weekNo, dayTimeline(d, M, d.sessions), f.id, out);
+  return f;
+}
+// A version 2 routines file: folders, each routine naming the folder it sits in.
+function folderFile(build) {
+  const out = { folders: [], routines: [] };
+  const top = build(out);
+  return { app: 'interval', kind: 'routines', version: 2, exported: new Date().toISOString(), picked: [], pickedFolders: [top.id], folders: out.folders, routines: out.routines };
 }
 // The whole day as plain text: times, the session, meals with prep steps, and breaks.
 function dayText(d, weekNo, tl) {
@@ -2711,9 +2805,17 @@ function dayICS(d, weekNo, tl) {
 const ICON_OF = { W: 'flame', C: 'wave', S: 'dumbbell', P: 'up', R: 'wave', X: 'target', T: 'star' };
 function iv(title, secs, icon, extra = {}) {
   const duration = Math.max(1, Math.round(secs));
-  return { id: uid(), title: title.slice(0, 80), icon, iconImg: null, duration, mode: duration >= 60 ? 'm' : 's', media: null, audio: null, cues: {}, hold: false, ...extra };
+  return { id: uid(), title: title.slice(0, 40), icon, iconImg: null, duration, mode: duration >= 60 ? 'm' : 's', media: null, audio: null, cues: {}, hold: false, ...extra };
 }
-function itemName(it) { return it.test ? TESTS[it.test].name : EX[it.ex]?.name || it.ex; }
+function itemName(it) { return it.test ? TESTS[it.test].name : it.ex === 'easy_walk' && P.equip === 0 ? 'Easy walking' : EX[it.ex]?.name || it.ex; }
+// A step label like "Warm up: easy run, building to Z2" becomes a short title and
+// the rest as text. Long titles lose their tail to the text too.
+function splitLabel(label) {
+  let [title, ...rest] = String(label).split(': ');
+  let text = rest.join(': ');
+  if (title.length > 30) { const k = title.search(/ \(|, /); if (k > 0) { text = `${title.slice(k).replace(/^, /, '').replace(/^ \(|\)$/g, '')}${text ? '. ' + text : ''}`; title = title.slice(0, k); } }
+  return { title, text: text ? text.charAt(0).toUpperCase() + text.slice(1) + (/[.!?]$/.test(text) ? '' : '.') : '' };
+}
 function sessionToRoutine(sess, label, color) {
   const intervals = [];
   for (const b of sess.blocks) {
@@ -2721,33 +2823,36 @@ function sessionToRoutine(sess, label, color) {
       for (const st of b.steps) {
         if (!st.secs) continue;
         const icon = b.kind === 'W' ? 'flame' : b.kind === 'C' ? 'wave' : st.kind === 'rest' ? 'moon' : st.kind === 'warm' ? 'flame' : st.kind === 'cool' ? 'wave' : st.z >= 4 ? 'bolt' : 'heart';
-        intervals.push(iv(st.label, st.secs, icon));
+        const { title, text } = splitLabel(st.label);
+        const how = [text, st.z ? zoneText(st.z, M) : '', b.kind === 'E' && b.summary && st.kind === 'work' ? b.summary : ''].filter(Boolean);
+        intervals.push(iv(title, st.secs, icon, how.length ? { text: [...new Set(how)].join('\n\n') } : {}));
       }
       continue;
     }
     if (b.kind === 'T') {
-      for (const it of b.items) intervals.push(iv(`Test: ${TESTS[it.test].name} (target ${fmtVal(it.test, it.tgt)})`, 60, 'star', { open: true }));
+      for (const it of b.items) intervals.push(iv(`Test: ${shortName(TESTS[it.test].name)}`, 60, 'star', { open: true, text: `Target: ${fmtVal(it.test, it.tgt)}.\n\n${TESTS[it.test].how}` }));
       continue;
     }
     if (!b.items) continue;
     b.items.forEach((it, n) => {
       const ex = EX[it.ex]; const d = it.d || { sets: 2, reps: 10, rest: 30, work: 40 };
       const lastItem = n === b.items.length - 1;
+      const name = shortName(itemName(it)), reps = it.dose && b.kind === 'X' ? it.dose : d.reps;
+      const how = (nm, cue, s) => `${typeof reps === 'number' ? reps + ' reps' : reps}${d.rpe ? ` at RPE ${d.rpe}` : ''}. Set ${s} of ${d.sets}.\n\n${nm}: ${cue}${d.note ? `\n\n${d.note}` : ''}`;
       for (let s = 1; s <= d.sets; s++) {
-        const what = `${ex.name}: ${it.dose && b.kind === 'X' ? it.dose : d.reps}${d.rpe ? ` @ RPE ${d.rpe}` : ''} (set ${s}/${d.sets})`;
         const extra = d.hold ? {} : { open: true };
-        const one = iv(what, d.hold ? d.work : Math.max(20, d.work), d.hold ? 'target' : ICON_OF[b.kind], extra);
+        const one = iv(`${name} ${s}/${d.sets}`, d.hold ? d.work : Math.max(20, d.work), d.hold ? 'target' : ICON_OF[b.kind], { ...extra, text: how(itemName(it), ex.cue, s) });
         if (it.easier && EX[it.easier]) {
-          one.vars = [null, { ...iv(`${EX[it.easier].name} (easier): ${d.reps} (set ${s}/${d.sets})`, one.duration, ICON_OF[b.kind]), open: true }];
+          one.vars = [null, { ...iv(`${shortName(EX[it.easier].name)} ${s}/${d.sets}`, one.duration, ICON_OF[b.kind], { text: `Easier version. ${how(EX[it.easier].name, EX[it.easier].cue, s)}` }), open: true }];
           delete one.vars[1].id; delete one.vars[1].hold;
           one.vi = 0;
         }
         intervals.push(one);
-        if (!(lastItem && s === d.sets) && d.rest) intervals.push(iv(s === d.sets ? `Rest, next: ${EX[b.items[n + 1]?.ex]?.name || 'next block'}` : 'Rest', d.rest, 'moon'));
+        if (!(lastItem && s === d.sets) && d.rest) intervals.push(iv('Rest', d.rest, 'moon'));
       }
     });
   }
-  return { id: uid(), name: label.slice(0, 60), color, created: Date.now(), cues: { start: { kind: 'builtin', id: 'whistle' } }, intervals };
+  return { id: uid(), name: label.slice(0, 60), color, created: Date.now(), cues: IT_START, intervals };
 }
 function routinesFile(list) {
   return { app: 'interval', kind: 'routines', version: 1, exported: new Date().toISOString(), picked: list.map(r => r.id), routines: list };
@@ -2769,7 +2874,7 @@ function fmtVal(id, v) {
 // =============================================================================
 const $ = id => document.getElementById(id);
 const FIRST_RUN = (() => { try { return !localStorage.getItem(STORE_KEY); } catch (e) { return false; } })();
-const VIEW = { tab: 'today', sub: { day: 'line', week: 'day', paths: 'rail', fuel: 'today', recover: 'sleep', stats: 'checkins', setup: 'athlete' }, range: 30, tp: null, scrollNow: true, week: null, day: null, q: 'E', rail: null, macro: 'c', micro: 'iron', inj: null, reg: 'foot', sess: 0, exportWeek: null, picked: new Set() };
+const VIEW = { tab: 'today', sub: { day: 'line', week: 'day', paths: 'rail', fuel: 'today', recover: 'sleep', stats: 'checkins', setup: 'athlete' }, range: 30, tp: null, scrollNow: true, week: null, day: null, q: 'E', rail: null, macro: 'c', micro: 'iron', inj: null, reg: 'foot', sess: 0, exportWeek: null, picked: new Set(), progWeeks: 12 };
 let M = null, PLAN = null;
 
 function toast(msg) {
@@ -2787,25 +2892,71 @@ const shownW = kg => imperial() ? Math.round(kg * 2.20462 * 10) / 10 : Math.roun
 const shownH = cm => imperial() ? Math.round(cm / 2.54 * 10) / 10 : Math.round(cm * 10) / 10;
 function sel(k, opts, val) { return `<select data-k="${k}">${opts.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(val) ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>`; }
 function num(k, val, attrs = '') { return `<input type="number" inputmode="decimal" data-k="${k}" value="${val ?? ''}" ${attrs}>`; }
-// A time control: step 15 minutes either way, or tap the time for a picker.
+// A time control: step 15 minutes either way, or tap the time for a clock-face picker.
 function clockText(v) { const [h, m] = v.split(':').map(Number); return new Date(2000, 0, 1, h, m).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
-function timeField(k, v, label) { return `<span class="tp" data-tp="${k}"><button type="button" class="tps" data-tpstep="-15" aria-label="${esc(label)} 15 minutes earlier">−</button><button type="button" class="tpv" data-tpopen="${k}" aria-label="${esc(label)}: ${clockText(v)}, tap to pick a time">${clockText(v)}</button><button type="button" class="tps" data-tpstep="15" aria-label="${esc(label)} 15 minutes later">+</button></span>`; }
+// A small clock face showing the time, drawn into the field's button.
+function miniClock(v) {
+  const [h, m] = v.split(':').map(Number), ha = ((h % 12) + m / 60) * 30 * Math.PI / 180, ma = m * 6 * Math.PI / 180;
+  return `<svg class="tpic" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5"/><line x1="10" y1="10" x2="${(10 + 4.6 * Math.sin(ha)).toFixed(2)}" y2="${(10 - 4.6 * Math.cos(ha)).toFixed(2)}"/><line x1="10" y1="10" x2="${(10 + 6.6 * Math.sin(ma)).toFixed(2)}" y2="${(10 - 6.6 * Math.cos(ma)).toFixed(2)}"/></svg>`;
+}
+function timeField(k, v, label) { return `<span class="tp" data-tp="${k}"><button type="button" class="tps" data-tpstep="-15" aria-label="${esc(label)} 15 minutes earlier">−</button><button type="button" class="tpv" data-tpopen="${k}" aria-label="${esc(label)}: ${clockText(v)}, tap to pick a time">${miniClock(v)}${clockText(v)}</button><button type="button" class="tps" data-tpstep="15" aria-label="${esc(label)} 15 minutes later">+</button></span>`; }
 function openTimePicker(k) {
   const [h, mi] = P[k].split(':').map(Number);
-  VIEW.tp = { k, h, mi };
+  VIEW.tp = { k, h, mi, mode: 'h' };
   drawTimePicker();
   $('tpDlg').showModal();
 }
+// The picker is a clock face, the way phone alarms work: drag or tap the hour,
+// and it moves on to the minutes. Tap the hour or minutes above to go back.
+const TP_R = 92, TP_C = 120;
 function drawTimePicker() {
-  const t = VIEW.tp, pm = t.h >= 12, h12 = t.h % 12 || 12, v = `${String(t.h).padStart(2, '0')}:${String(t.mi).padStart(2, '0')}`;
+  const t = VIEW.tp, pm = t.h >= 12;
   const label = { sessionTime: 'Usual session start', wake: 'Wake time', workStart: 'Work starts', workEnd: 'Work ends' }[t.k] || 'Time';
   $('tpTitle').textContent = label;
-  $('tpBody').innerHTML = `<div class="tpbig" aria-live="polite">${clockText(v)}</div>
-    <div class="row" style="justify-content:space-between;margin-bottom:2px"><span class="small muted">Hour</span><span class="seg">${[['am', 'AM'], ['pm', 'PM']].map(([x, n]) => `<button data-tpampm="${x}" class="${(x === 'pm') === pm ? 'on' : ''}">${n}</button>`).join('')}</span></div>
-    <div class="tpgrid h">${[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(n => `<button data-tph="${n}" class="${n === h12 ? 'on' : ''}">${n}</button>`).join('')}</div>
-    <span class="small muted">Minutes</span>
-    <div class="tpgrid m">${Array.from({ length: 12 }, (_, i) => i * 5).map(n => `<button data-tpm="${n}" class="${n === t.mi ? 'on' : ''}">:${String(n).padStart(2, '0')}</button>`).join('')}</div>
-    <div class="tpquick">${[-60, -30, -15, 15, 30, 60].map(n => `<button class="btn sm" data-tpadd="${n}">${n > 0 ? '+' : '−'}${Math.abs(n) >= 60 ? Math.abs(n) / 60 + ' h' : Math.abs(n) + ' min'}</button>`).join('')}</div>`;
+  const nums = t.mode === 'h' ? [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] : Array.from({ length: 12 }, (_, i) => i * 5);
+  const ticks = Array.from({ length: 60 }, (_, i) => { const a = i * 6 * Math.PI / 180, r1 = 112, r2 = i % 5 ? 108 : 104; return `<line x1="${(TP_C + r1 * Math.sin(a)).toFixed(1)}" y1="${(TP_C - r1 * Math.cos(a)).toFixed(1)}" x2="${(TP_C + r2 * Math.sin(a)).toFixed(1)}" y2="${(TP_C - r2 * Math.cos(a)).toFixed(1)}"/>`; }).join('');
+  $('tpBody').innerHTML = `<div class="tphead"><div class="tpbig" aria-live="polite"><button type="button" data-tpmode="h" class="${t.mode === 'h' ? 'on' : ''}" aria-label="Hour"></button><span>:</span><button type="button" data-tpmode="m" class="${t.mode === 'm' ? 'on' : ''}" aria-label="Minutes"></button></div>
+      <span class="seg">${[['am', 'AM'], ['pm', 'PM']].map(([x, n]) => `<button type="button" data-tpampm="${x}" class="${(x === 'pm') === pm ? 'on' : ''}">${n}</button>`).join('')}</span></div>
+    <svg id="tpDial" class="tpdial" viewBox="0 0 240 240" role="slider" tabindex="0" aria-label="${t.mode === 'h' ? 'Hour' : 'Minutes'}">
+      <circle class="face" cx="${TP_C}" cy="${TP_C}" r="116"/><g class="ticks">${ticks}</g>
+      <line id="tpHand" class="hand" x1="${TP_C}" y1="${TP_C}" x2="${TP_C}" y2="${TP_C - TP_R}"/><circle class="hub" cx="${TP_C}" cy="${TP_C}" r="4"/><circle id="tpKnob" class="knob" r="17" cx="${TP_C}" cy="${TP_C - TP_R}"/>
+      ${nums.map((n, i) => { const a = i * 30 * Math.PI / 180; return `<text data-n="${n}" x="${(TP_C + TP_R * Math.sin(a)).toFixed(1)}" y="${(TP_C - TP_R * Math.cos(a) + 5).toFixed(1)}" text-anchor="middle">${t.mode === 'h' ? n : String(n).padStart(2, '0')}</text>`; }).join('')}
+    </svg>
+    <div class="tpquick">${[-60, -15, -5, 5, 15, 60].map(n => `<button type="button" class="btn sm" data-tpadd="${n}">${n > 0 ? '+' : '−'}${Math.abs(n) >= 60 ? Math.abs(n) / 60 + ' h' : Math.abs(n) + ' min'}</button>`).join('')}</div>`;
+  updateDial();
+  const dial = $('tpDial');
+  const pick = (e, done) => {
+    const r = dial.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 240 - TP_C, y = (e.clientY - r.top) / r.height * 240 - TP_C;
+    if (Math.hypot(x, y) < 14) return;
+    const deg = (Math.atan2(x, -y) * 180 / Math.PI + 360) % 360;
+    if (t.mode === 'h') t.h = (Math.round(deg / 30) % 12) + (t.h >= 12 ? 12 : 0);
+    else t.mi = (Math.round(deg / 6) % 60);
+    if (done && t.mode === 'm') t.mi = Math.round(t.mi / 5) * 5 % 60;
+    updateDial();
+  };
+  dial.addEventListener('pointerdown', e => { t.drag = true; dial.setPointerCapture(e.pointerId); pick(e); e.preventDefault(); });
+  dial.addEventListener('pointermove', e => { if (t.drag) pick(e); });
+  const end = e => { if (!t.drag) return; t.drag = false; pick(e, true); if (t.mode === 'h') { t.mode = 'm'; drawTimePicker(); } };
+  dial.addEventListener('pointerup', end); dial.addEventListener('pointercancel', () => { t.drag = false; });
+  dial.addEventListener('keydown', e => {
+    const step = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[e.key]; if (!step) return;
+    e.preventDefault();
+    const v = ((t.h * 60 + t.mi + step * (t.mode === 'h' ? 60 : 5)) % 1440 + 1440) % 1440; t.h = Math.floor(v / 60); t.mi = v % 60; updateDial();
+  });
+}
+function updateDial() {
+  const t = VIEW.tp, dial = $('tpDial'); if (!t || !dial) return;
+  const val = t.mode === 'h' ? (t.h % 12) * 30 : t.mi * 6, a = val * Math.PI / 180;
+  const x = TP_C + TP_R * Math.sin(a), y = TP_C - TP_R * Math.cos(a);
+  $('tpHand').setAttribute('x2', x.toFixed(1)); $('tpHand').setAttribute('y2', y.toFixed(1));
+  $('tpKnob').setAttribute('cx', x.toFixed(1)); $('tpKnob').setAttribute('cy', y.toFixed(1));
+  const on = t.mode === 'h' ? (t.h % 12 || 12) : t.mi;
+  dial.querySelectorAll('text').forEach(n => n.classList.toggle('on', +n.dataset.n === on));
+  const h12 = t.h % 12 || 12, mm = String(t.mi).padStart(2, '0');
+  const [hb, mb] = $('tpBody').querySelectorAll('[data-tpmode]');
+  hb.textContent = h12; mb.textContent = mm;
+  $('tpBody').querySelectorAll('[data-tpampm]').forEach(b => b.classList.toggle('on', (b.dataset.tpampm === 'pm') === (t.h >= 12)));
+  dial.setAttribute('aria-valuetext', `${h12}:${mm} ${t.h >= 12 ? 'PM' : 'AM'}`);
 }
 function field(label, control, hint) { return `<label class="f"><span class="l">${label}</span>${control}${hint ? `<span class="small muted">${hint}</span>` : ''}</label>`; }
 function subtabs(tab, list) { $(tab + 'Tabs').innerHTML = list.map(([id, t]) => `<button data-sub="${tab}:${id}" class="${VIEW.sub[tab] === id ? 'on' : ''}">${t}</button>`).join(''); }
@@ -2839,12 +2990,12 @@ function itemHTML(it, b) {
   if (it.fill) extra.push(`Added so ${esc(it.fill.toLowerCase())} get work this week`);
   if (it.region) extra.push(`${esc(it.region)}, ${it.status === 'weak' ? 'prehab' : 'phase ' + it.phase}`);
   if (it.d?.note) extra.push(esc(it.d.note));
-  return `<li><details><summary><b>${esc(ex.name)}</b> <span class="dose">${dose}</span></summary><div>${esc(ex.cue)}${extra.length ? '<br>' + extra.join(' · ') : ''}</div></details></li>`;
+  return `<li><details><summary><b>${esc(itemName(it))}</b> <span class="dose">${dose}</span></summary><div>${esc(ex.cue)}${extra.length ? '<br>' + extra.join(' · ') : ''}</div></details></li>`;
 }
 function blockHTML(b, group, open) {
   const cls = { E: 'E', S: 'S', P: 'P', R: 'R', X: 'X', T: 'X' }[b.kind] || '';
   let body = '', sub = '';
-  if (b.items) { body = `${b.summary ? `<div class="muted">${esc(b.summary)}</div>` : ''}<ul>${b.items.map(it => itemHTML(it, b)).join('')}</ul>`; sub = b.items.map(it => it.test ? TESTS[it.test].name : EX[it.ex].name.replace(/ \(.*/, '')).join(', '); }
+  if (b.items) { body = `${b.summary ? `<div class="muted">${esc(b.summary)}</div>` : ''}<ul>${b.items.map(it => itemHTML(it, b)).join('')}</ul>`; sub = b.items.map(it => itemName(it).replace(/ \(.*/, '')).join(', '); }
   else if (b.kind === 'E') { body = `<div>${esc(b.summary)}</div>`; sub = b.summary; }
   else if (b.steps) { body = `<div class="muted">${b.steps.map(s => esc(s.label)).join(' · ')}</div>`; sub = b.steps.map(s => s.label.split(':')[0]).join(', '); }
   return `<details class="blk ${cls}"${open ? ' open' : ''}><summary><span>${esc(b.title)}</span><span class="sub">${esc(sub)}</span><span class="mins">${b.minutes ? b.minutes + ' min' : ''}</span></summary><div class="bb">${body}</div></details>`;
@@ -2950,7 +3101,8 @@ function evBody(x) {
 }
 function renderDay() {
   const sub = VIEW.sub.day;
-  subtabs('day', [['line', 'Timeline'], ['desk', 'Desk routine'], ['export', 'Export']]);
+  if (VIEW.sub.day === 'desk') VIEW.sub.day = 'line';
+  subtabs('day', [['line', 'Timeline'], ['export', 'Export']]);
   const { m, plan, d, isToday, tl } = dayCtx();
   const date = dateOf(plan.wk.no, d.idx);
   const head = `<div class="row" style="margin-bottom:6px"><b>${DAYS_LONG[d.idx]} ${shortDate(date)}</b><span class="small muted">week ${plan.wk.no}${P.desk && P.workDays.includes(d.idx) ? ' · work day' : ''}</span></div>${dayBar(plan)}`;
@@ -2966,27 +3118,14 @@ function renderDay() {
         const dur = x.e - x.s > 1 ? `${x.e - x.s >= 90 ? Math.round((x.e - x.s) / 6) / 10 + ' h' : x.e - x.s + ' min'}` : '';
         return `<details class="ev ${cls}"${cls === 'now' ? ' open' : ''}><summary><time>${hm(x.s)}</time><i class="kb k-${x.kind}"></i><span class="tt">${esc(x.kind === 'meal' ? `${x.meal.name.replace(/ \(.*/, '')}: ${x.title}` : x.title)}<small>${esc(x.kind === 'meal' ? `${x.meal.kcal} kcal` : x.sub || '')}</small></span><span class="du">${dur}</span></summary><div class="eb">${evBody(x)}</div></details>`;
       }).join('')}</div>
-      <p class="small muted" style="margin:8px 0 0">Built from your wake time, sleep target, session time, meal plan${P.desk ? ', work hours and break rhythm' : ''}. Change them under Setup → Schedule and <button class="btn sm" data-sub="day:desk">Desk routine</button>.</p></div>`;
-  } else if (sub === 'desk') {
-    const R = RHYTHMS[P.rhythm], avoid = m.inj.avoid;
-    h = `<div class="cols two"><div class="card"><h3>Desk routine</h3>
-        <label class="row small" style="margin-bottom:8px"><input type="checkbox" data-k="desk"${P.desk ? ' checked' : ''}> Plan focus blocks and moving breaks on work days</label>
-        <span class="small muted">Work days</span>
-        <div class="days" style="margin:3px 0 10px">${DAYS.map((x, i) => `<label><input type="checkbox" data-k="wday.${i}"${P.workDays.includes(i) ? ' checked' : ''}>${x}</label>`).join('')}</div>
-        <div class="grid2">${field('Work starts', timeField('workStart', P.workStart, 'Work starts'))}${field('Work ends', timeField('workEnd', P.workEnd, 'Work ends'))}</div>
-        ${field('Rhythm', sel('rhythm', Object.entries(RHYTHMS).map(([k, v]) => [k, v.name]), P.rhythm))}
-        <label class="row small" style="margin-bottom:8px"><input type="checkbox" data-k="standDesk"${P.standDesk ? ' checked' : ''}> I have a standing desk (alternate sitting and standing)</label>
-        <p class="small muted">Each ${R.f}-minute block ends with a ${R.b}-minute break${R.long ? `, and every ${R.long}th break is ${R.lb} minutes` : ''}. Breaks rotate through eyes, neck, upper back, wrists, hips and legs, and 8 minutes or more includes a walk. Meals and training take priority and work flows around them. On hard training days the breaks skip the exercise snacks.</p>
-        <p class="small muted">Breaking up long sitting with a few minutes of light activity every 30–60 minutes improves blood sugar and comfort (Dempsey 2016), and regular breaks help focus.</p></div>
-      <div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Break exercises</h3>${xallBtn()}</div>
-        <p class="small muted">Tap one for how to do it.${avoid.size ? ' Greyed ones strain an area you marked under Injuries and are left out.' : ''}</p>
-        <ul style="list-style:none;padding:0">${DESK.map(x => { const out = x.tags.some(t => avoid.has(t)); return `<li${out ? ' style="opacity:.5"' : ''}><details><summary><b>${esc(x.name)}</b> <span class="muted small">${x.mins} min${out ? ' · left out for your injury' : ''}</span></summary><div class="small muted" style="padding:0 0 6px 14px">${esc(x.cue)}</div></details></li>`; }).join('')}</ul></div></div>`;
+      <p class="small muted" style="margin:8px 0 0">Built from your wake time, sleep target, session time, meal plan${P.desk ? ', work hours and break rhythm' : ''}. Change them under Setup → <button class="btn sm" data-go="setup:schedule">Schedule</button> and <button class="btn sm" data-go="setup:desk">Desk routine</button>.</p></div>`;
   } else {
     const n = tl.ev.filter(x => x.kind !== 'sleep').length;
     h = `<div class="card">${head}<h3>Take the whole day with you</h3>
       <p class="small">Everything for ${DAYS_LONG[d.idx]}: wake-up, training, meal prep and meals, focus blocks and breaks, and wind-down (${plural(n, 'item')}).</p>
       <div class="exp-list">
-        <div class="xrow"><button class="btn sm pri" data-act="dayIT">Send to IntervalTimer</button><small>One long routine that runs from waking to bedtime, with each break's exercises and each prep step as its own interval. The training session comes along as a subroutine. In <a href="https://sonusario.github.io/IntervalTimer/" target="_blank" rel="noopener">IntervalTimer</a>: Settings → Import routines.</small></div>
+        <div class="xrow"><button class="btn sm pri" data-act="dayFolderIT">Send to IntervalTimer as a folder</button><small>A folder for ${DAYS_LONG[d.idx]} with three routines, ${dayParts(d, tl).work ? 'before work, work and after work' : 'morning, daytime and evening'}, so you can start whichever part you are in. Training sessions sit beside them as their own routines and run inside the part they fall in.</small></div>
+        <div class="xrow"><button class="btn sm" data-act="dayIT">Send as one routine</button><small>One long routine that runs from waking to bedtime, with each break's exercises and each prep step as its own interval. The training session comes along as a subroutine. In <a href="https://sonusario.github.io/IntervalTimer/" target="_blank" rel="noopener">IntervalTimer</a>: Settings → Import routines.</small></div>
         <div class="xrow"><button class="btn sm" data-act="dayTxt">Download as text</button><small>A plain-text plan with exercise doses, ingredients, prep steps and break cues, to read on any device or print.</small></div>
         <div class="xrow"><button class="btn sm" data-act="dayIcs">Add to calendar (.ics)</button><small>Training, meal prep, meals, breaks and wind-down as calendar events with the details inside.</small></div>
         <div class="xrow"><button class="btn sm" data-act="dayPrint">Print</button><small>Prints the timeline with everything expanded.</small></div></div></div>`;
@@ -3000,6 +3139,8 @@ function dayBar(plan) {
   return `<div class="daybar">${plan.days.map(d => `<button data-day="${d.idx}" class="${d.idx === VIEW.day ? 'on' : ''} ${plan.wk.no === M.todayWeek && d.idx === M.todayIdx ? 'now' : ''}"><b>${DAYS[d.idx]}</b><i style="background:${dayColor(d)}"></i><span class="muted">${d.sessions.reduce((a, s) => a + s.minutes, 0) || 'rest'}</span></button>`).join('')}</div>`;
 }
 const shortDate = x => x.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+// The progression export starts at the first week of the block you are in.
+function progStart() { return Math.floor((Math.max(1, M.todayWeek) - 1) / 4) * 4 + 1; }
 function weekRange(no) { return `${shortDate(dateOf(no, 0))} – ${shortDate(dateOf(no, 6))}`; }
 function weekNav(wk) {
   return `<div class="weeknav"><button class="btn sm" data-act="weekPrev" aria-label="Previous week">◀</button><h2>Week ${wk.no}</h2><span class="small muted">${weekRange(wk.no)}</span><button class="btn sm" data-act="weekNext" aria-label="Next week">▶</button>
@@ -3042,7 +3183,12 @@ function renderWeek() {
       <p class="small">Each session becomes a routine: timed steps for warm-ups, intervals and rests, and "tap when done" steps for sets of reps. Download the file, then in <a href="https://sonusario.github.io/IntervalTimer/" target="_blank" rel="noopener">IntervalTimer</a> choose <b>Settings → Import routines</b>. Nothing there is replaced.</p>
       <div class="row" style="margin:6px 0"><button class="btn sm" data-act="expPrev">◀</button><b>Week ${ep.wk.no}</b><button class="btn sm" data-act="expNext">▶</button><button class="btn sm" data-act="expAll">All</button><button class="btn sm" data-act="expNone">None</button>
         <button class="btn sm pri" data-act="expGo"${list.some(x => VIEW.picked.has(x.key)) ? '' : ' disabled'}>Download routines file</button></div>
-      <div class="exp-list">${list.map(({ s, key }) => `<label><input type="checkbox" data-pick="${key}"${VIEW.picked.has(key) ? ' checked' : ''}><span>${DAYS_LONG[s.day]}${s.slot ? ' ' + s.slot : ''}: ${esc(s.title)}<small>${s.minutes} min</small></span></label>`).join('') || '<p class="muted">No sessions this week.</p>'}</div></div>`;
+      <div class="exp-list">${list.map(({ s, key }) => `<label><input type="checkbox" data-pick="${key}"${VIEW.picked.has(key) ? ' checked' : ''}><span>${DAYS_LONG[s.day]}${s.slot ? ' ' + s.slot : ''}: ${esc(s.title)}<small>${s.minutes} min</small></span></label>`).join('') || '<p class="muted">No sessions this week.</p>'}</div></div>
+      <div class="card"><h3>Whole days, weeks or the progression</h3>
+      <p class="small">Each day goes in as a folder of three routines (before work, work and after work on work days; morning, daytime and evening otherwise), with its training sessions beside them. Needs IntervalTimer build 5.15 or later, which imports folders.</p>
+      <div class="exp-list">
+        <div class="xrow"><button class="btn sm pri" data-act="weekFolderIT">Week ${ep.wk.no} as a folder</button><small>Seven day folders inside a folder for the week (${weekRange(ep.wk.no)}).</small></div>
+        <div class="xrow"><button class="btn sm" data-act="progFolderIT">Progression as a folder</button><small>A folder of week folders from week ${progStart()} for <select data-progweeks style="width:auto">${[4, 8, 12, 16, 24].map(n => `<option value="${n}"${n === VIEW.progWeeks ? ' selected' : ''}>${n} weeks</option>`).join('')}</select>, block by block. Stages move up as you pass gate tests, so export again after each test week.</small></div></div></div>`;
   }
   $('weekPane').innerHTML = h;
 }
@@ -3154,7 +3300,7 @@ function renderPaths() {
   } else if (sub === 'stages') {
     const q = VIEW.q, info = m.info[q], st = info.stage, blocks = [1, 1, 2, 2, 3, 3][st - 1];
     const a = m.athlete, e = m.emph;
-    h = `<div class="card"><div class="row"><b>${esc(a.name)}</b><span class="small muted">${m.modes.map(x => MODES[x]).join(', ')}${m.inj.impactPain ? `, running swapped for ${MODES[m.altMode].toLowerCase()} for now` : ''}</span></div>
+    h = `<div class="card"><div class="row"><b>${esc(a.name)}</b><span class="small muted">${m.modes.map(x => MODES[x]).join(', ')}${m.inj.impactPain ? `, running swapped for ${modeName(m.altMode).toLowerCase()} for now` : ''}</span></div>
         <div class="bar" style="margin:6px 0 4px"><i style="width:${e.E}%;background:var(--E)"></i><i style="width:${e.S}%;background:var(--S)"></i><i style="width:${e.P}%;background:var(--P)"></i></div>
         <div class="small muted"><span class="q-E">Endurance ${e.E}%</span> · <span class="q-S">Strength ${e.S}%</span> · <span class="q-P">Power ${e.P}%</span></div></div>
       <div class="card">${qPills()}
@@ -3455,6 +3601,17 @@ function ganttChart(rows, t0, t1, now) {
 }
 // A front and back body figure, each muscle group shaded by this week's sets.
 const INJ_REGION = Object.fromEntries(REGIONS.flatMap(([rid, , ids]) => ids.map(id => [id, rid])));
+// Where each condition sits on the body chart: 'f' front or 'b' back, then x, y.
+// A condition shows only on the side where it is felt, so front and back differ.
+const INJ_SPOT = {
+  achilles: ['b', 49, 232], plantar: ['b', 49, 242], ankle: ['f', 44, 236], ankle_stiff: ['f', 52, 234], peroneal: ['b', 42, 236],
+  forefoot: ['f', 49, 243], flatfoot: ['f', 55, 241], shin: ['f', 50, 207], calf: ['b', 49, 198], stressfx: ['f', 46, 218],
+  knee: ['f', 49, 178], itb: ['f', 41, 174], acl: ['f', 54, 184], meniscus: ['f', 57, 177],
+  hamstring: ['b', 49, 160], groin: ['f', 57, 136], hipflexor: ['f', 50, 120], quad: ['f', 48, 150], glutetend: ['b', 40, 126],
+  fai: ['f', 43, 117], hamtend: ['b', 53, 140], back: ['b', 60, 108], sciatica: ['b', 47, 118], thoracic: ['b', 60, 62],
+  oblique: ['f', 43, 96], diastasis: ['f', 60, 92], shoulder: ['f', 34, 52], instab: ['b', 34, 52], elbow: ['b', 27, 94],
+  biceps: ['f', 28, 70], wrist: ['f', 27, 122], fingers: ['f', 92, 126], neck: ['b', 60, 36], concussion: ['f', 60, 16],
+};
 const REGION_SPOT = { foot: [[36, 236], null], leg: [[49, 205], [49, 205]], knee: [[49, 178], null], hip: [[50, 122], [50, 128]], core: [[60, 95], [60, 108]], arm: [[36, 52], [36, 52]], head: [[60, 36], [60, 36]] };
 function bodySVG(back, cov, inj) {
   const v = g => cov[g] || 0;
@@ -3484,14 +3641,20 @@ function bodySVG(back, cov, inj) {
     s += pair('ham', E(49, 163, 9, 23));
     s += pair('calf', E(49, 206, 7, 20));
   }
-  // Injuries and weak areas, by region.
-  const by = {};
-  for (const i of inj) { const r = INJ_REGION[i.id]; if (r) (by[r] = by[r] || []).push(i); }
-  for (const [r, list] of Object.entries(by)) {
-    const p = REGION_SPOT[r]?.[back ? 1 : 0];
-    if (!p) continue;
+  // Injuries and weak areas, each where it is felt and only on that side. Marks
+  // that would overlap share one marker.
+  const marks = [];
+  for (const i of inj) {
+    const sp = INJ_SPOT[i.id];
+    let p;
+    if (sp) { if ((sp[0] === 'b') !== back) continue; p = [sp[1], sp[2]]; }
+    else { const r = INJ_REGION[i.id] || 'core'; p = REGION_SPOT[r]?.[back ? 1 : 0]; if (!p || (back && REGION_SPOT[r][0])) continue; }
+    const near = marks.find(k => Math.hypot(k.p[0] - p[0], k.p[1] - p[1]) < 11);
+    if (near) near.list.push(i); else marks.push({ p, list: [i] });
+  }
+  for (const { p, list } of marks) {
     const bad = list.some(i => i.status === 'pain');
-    s += `<g data-tip="${esc(list.map(i => `${i.name}: ${INJ_STATUS[i.status] || 'recovering'}`).join('; '))}"><circle cx="${p[0]}" cy="${p[1]}" r="12" class="hit"/> <circle cx="${p[0]}" cy="${p[1]}" r="6" fill="var(--panel)" stroke="${bad ? 'var(--bad)' : 'var(--warn)'}" stroke-width="2"/><text x="${p[0]}" y="${p[1] + 3.5}" text-anchor="middle" style="font-size:9px;font-weight:800;fill:${bad ? 'var(--bad)' : 'var(--warn)'}">!</text></g>`;
+    s += `<g data-tip="${esc(list.map(i => `${i.name}: ${INJ_STATUS[i.status] || 'recovering'}`).join('; '))}"><circle cx="${p[0]}" cy="${p[1]}" r="12" class="hit" fill="transparent"/> <circle cx="${p[0]}" cy="${p[1]}" r="6" fill="var(--panel)" stroke="${bad ? 'var(--bad)' : 'var(--warn)'}" stroke-width="2"/><text x="${p[0]}" y="${p[1] + 3.5}" text-anchor="middle" style="font-size:9px;font-weight:800;fill:${bad ? 'var(--bad)' : 'var(--warn)'}">!</text></g>`;
   }
   return `<svg viewBox="0 0 120 252" role="img" aria-label="${back ? 'Back' : 'Front'} of the body, shaded by weekly sets"><text x="60" y="251" text-anchor="middle" style="font-size:8px;fill:var(--muted)">${back ? 'Back' : 'Front'}</text>${s}</svg>`;
 }
@@ -3593,7 +3756,7 @@ function renderStats() {
 function renderSetup() {
   const m = M, a = ATHLETE[P.athlete], e = emphasis(), sub = VIEW.sub.setup;
   const nInj = Object.keys(P.inj).length;
-  subtabs('setup', [['athlete', 'Athlete'], ['body', 'Body'], ['tests', 'Conditioning'], ['injuries', `Injuries${nInj ? ' · ' + nInj : ''}`], ['schedule', 'Schedule'], ['health', `Health${P.meds.length ? ' · ' + P.meds.length : ''}`], ['data', 'Data']]);
+  subtabs('setup', [['athlete', 'Athlete'], ['body', 'Body'], ['tests', 'Conditioning'], ['injuries', `Injuries${nInj ? ' · ' + nInj : ''}`], ['schedule', 'Schedule'], ['desk', 'Desk routine'], ['health', `Health${P.meds.length ? ' · ' + P.meds.length : ''}`], ['data', 'Data']]);
   let h = '';
   if (sub === 'athlete') {
     h = `${FIRST_RUN && !VIEW.started ? `<div class="card note good" style="margin:0 0 10px"><b>Welcome.</b> Pick your athlete type and a quick start. Everything else has sensible defaults you can refine later. <button class="btn sm pri" data-act="start">Show my plan</button></div>` : ''}
@@ -3645,13 +3808,29 @@ function renderSetup() {
         ${P.days.length < 2 ? '<p class="note warn">Pick at least 2 training days.</p>' : ''}
         ${field(`Session length: <b>${P.minutes} min</b>`, `<input type="range" min="20" max="150" step="5" data-k="minutes" value="${P.minutes}">`)}
         <label class="row small" style="margin-bottom:10px"><input type="checkbox" data-k="doubles"${P.doubles ? ' checked' : ''}> Two sessions a day are possible</label>
-        <div class="grid2">${field('Equipment', sel('equip', [[0, 'Bodyweight and a band'], [1, 'Home: dumbbells or kettlebells'], [2, 'Full gym']], P.equip))}${field('Pull-up bar', sel('bar', [['1', 'Yes'], ['0', 'No']], P.bar ? '1' : '0'))}</div></div>
+        <div class="grid2">${field('Equipment', sel('equip', [[0, 'Bodyweight and a band'], [1, 'Home: dumbbells or kettlebells'], [2, 'Full gym']], P.equip))}${field('Pull-up bar', sel('bar', [['1', 'Yes'], ['0', 'No']], P.bar ? '1' : '0'))}</div>
+        ${P.equip === 0 ? `<p class="small muted" style="margin:-4px 0 0">Bodyweight and a band: no bike, rower or weights in any session${modesDropped(ATHLETE[P.athlete]).length ? `. ${modesDropped(ATHLETE[P.athlete]).map(x => MODES[x]).join(' and ')} becomes running` : ''}, and when running hurts, incline walking (stairs or hills) takes its place.</p>` : ''}</div>
       <div class="card"><div class="grid2">${field('Wake time', timeField('wake', P.wake, 'Wake time'))}${field('Usual session start', timeField('sessionTime', P.sessionTime, 'Usual session start'))}
         ${field('Sleep target (h)', num('sleep', P.sleep, 'step="0.25" min="6" max="11"'))}${field('Meals a day', sel('meals', [3, 4, 5, 6].map(n => [n, n]), P.meals))}</div>
         ${field('Eating style', sel('diet', Object.values(STYLES).map(s => [s.id, s.name]), P.diet))}
         ${field('Plan start (week 1)', `<input type="date" data-k="planStart" value="${P.planStart}">`)}
         <p class="small" style="margin:-4px 0 8px">${planStartText(m)} <button class="btn sm" data-act="startNow">Restart from this week</button></p>
-        <p class="small muted" style="margin:0">Desk hours and breaks are on the <button class="btn sm" data-go="day:desk">Day tab</button>.</p></div></div>`;
+        <p class="small muted" style="margin:0">Work hours and breaks: <button class="btn sm" data-sub="setup:desk">Desk routine</button>.</p></div></div>`;
+  } else if (sub === 'desk') {
+    const m = M;
+    const R = RHYTHMS[P.rhythm], avoid = m.inj.avoid;
+    h = `<div class="cols two"><div class="card"><h3>Desk routine</h3>
+        <label class="row small" style="margin-bottom:8px"><input type="checkbox" data-k="desk"${P.desk ? ' checked' : ''}> Plan focus blocks and moving breaks on work days</label>
+        <span class="small muted">Work days</span>
+        <div class="days" style="margin:3px 0 10px">${DAYS.map((x, i) => `<label><input type="checkbox" data-k="wday.${i}"${P.workDays.includes(i) ? ' checked' : ''}>${x}</label>`).join('')}</div>
+        <div class="grid2">${field('Work starts', timeField('workStart', P.workStart, 'Work starts'))}${field('Work ends', timeField('workEnd', P.workEnd, 'Work ends'))}</div>
+        ${field('Rhythm', sel('rhythm', Object.entries(RHYTHMS).map(([k, v]) => [k, v.name]), P.rhythm))}
+        <label class="row small" style="margin-bottom:8px"><input type="checkbox" data-k="standDesk"${P.standDesk ? ' checked' : ''}> I have a standing desk (alternate sitting and standing)</label>
+        <p class="small muted">Each ${R.f}-minute block ends with a ${R.b}-minute break${R.long ? `, and every ${R.long}th break is ${R.lb} minutes` : ''}. Breaks rotate through eyes, neck, upper back, wrists, hips and legs, and 8 minutes or more includes a walk. Meals and training take priority and work flows around them. On hard training days the breaks skip the exercise snacks.</p>
+        <p class="small muted">Breaking up long sitting with a few minutes of light activity every 30–60 minutes improves blood sugar and comfort (Dempsey 2016), and regular breaks help focus.</p></div>
+      <div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Break exercises</h3>${xallBtn()}</div>
+        <p class="small muted">Tap one for how to do it.${avoid.size ? ' Greyed ones strain an area you marked under Injuries and are left out.' : ''}</p>
+        <ul style="list-style:none;padding:0">${DESK.map(x => { const out = x.tags.some(t => avoid.has(t)); return `<li${out ? ' style="opacity:.5"' : ''}><details><summary><b>${esc(x.name)}</b> <span class="muted small">${x.mins} min${out ? ' · left out for your injury' : ''}</span></summary><div class="small muted" style="padding:0 0 6px 14px">${esc(x.cue)}</div></details></li>`; }).join('')}</ul></div></div>`;
   } else if (sub === 'health') {
     h = `<div class="card"><h3>Regular medicines</h3><p class="small">Tick any you take, and the app adds general cautions where a medicine meets caffeine, food or training: on Today's session, the meal plan, supplements and the Day plan. Nothing is changed in your plan automatically.</p>
       <div class="medlist">${MEDS.map(x => `<label><input type="checkbox" data-med="${x.id}"${P.meds.includes(x.id) ? ' checked' : ''}><span><b>${esc(x.name)}</b><small>${esc(x.ex)}</small></span></label>`).join('')}</div>
@@ -3752,6 +3931,8 @@ document.addEventListener('change', e => {
     if (VIEW.planMoved) { VIEW.planMoved = false; toast(M.notStarted ? `Week 1 starts ${shortDate(M.planStart)}; Today shows a preview until then` : `Week 1 now starts ${shortDate(M.planStart)}. Today is week ${M.todayWeek}.`); }
     return;
   }
+  const pw = e.target.closest('[data-progweeks]');
+  if (pw) { VIEW.progWeeks = +pw.value || 12; return renderWeek(); }
   const md = e.target.closest('[data-med]');
   if (md) { const set = new Set(P.meds); if (md.checked) set.add(md.dataset.med); else set.delete(md.dataset.med); P.meds = MEDS.map(x => x.id).filter(id => set.has(id)); save(); renderAll(); return; }
   const sw = e.target.closest('[data-swap]');
@@ -3784,13 +3965,12 @@ document.addEventListener('click', e => {
   const ts = t.closest('[data-tpstep]'); if (ts) { const k = ts.closest('[data-tp]').dataset.tp; setTime(k, toMin(P[k]) + +ts.dataset.tpstep); return; }
   const to = t.closest('[data-tpopen]'); if (to) return openTimePicker(to.dataset.tpopen);
   if (VIEW.tp) {
-    const tp = VIEW.tp, x = t.closest('[data-tph],[data-tpm],[data-tpampm],[data-tpadd]');
+    const tp = VIEW.tp, x = t.closest('[data-tpmode],[data-tpampm],[data-tpadd]');
     if (x) {
-      if (x.dataset.tph) tp.h = (+x.dataset.tph % 12) + (tp.h >= 12 ? 12 : 0);
-      else if (x.dataset.tpm) tp.mi = +x.dataset.tpm;
-      else if (x.dataset.tpampm) tp.h = tp.h % 12 + (x.dataset.tpampm === 'pm' ? 12 : 0);
+      if (x.dataset.tpmode) { tp.mode = x.dataset.tpmode; return drawTimePicker(); }
+      if (x.dataset.tpampm) tp.h = tp.h % 12 + (x.dataset.tpampm === 'pm' ? 12 : 0);
       else { const v = (((tp.h * 60 + tp.mi + +x.dataset.tpadd) % 1440) + 1440) % 1440; tp.h = Math.floor(v / 60); tp.mi = v % 60; }
-      return drawTimePicker();
+      return updateDial();
     }
   }
   const b = t.closest('[data-act]'); if (!b) return;
@@ -3824,6 +4004,22 @@ document.addEventListener('click', e => {
   }
   else if (act === 'startNow') { P.planStart = isoDate(mondayOf(new Date())); VIEW.week = VIEW.exportWeek = null; save(); renderAll(); toast(`Week 1 starts ${shortDate(mondayOf(new Date()))}: today is week 1`); }
   else if (act === 'avoidClear') { P.avoidCats = []; P.avoidFoods = []; save(); renderAll(); }
+  else if (act === 'dayFolderIT') {
+    const { plan, d, tl } = dayCtx(), w = plan.wk.no;
+    const file = folderFile(out => dayFolder(d, w, tl, null, out));
+    download(`interval-${DAYS[d.idx]}-week${w}-folder.json`, file); toast(`Saved a folder of ${plural(file.routines.length, 'routine')}. In IntervalTimer: Settings → Import`);
+  }
+  else if (act === 'weekFolderIT' || act === 'progFolderIT') {
+    const wn = VIEW.exportWeek || PLAN.wk.no;
+    let file;
+    if (act === 'weekFolderIT') file = folderFile(out => weekFolder(wn, null, out));
+    else {
+      const a = progStart(), n = VIEW.progWeeks;
+      file = folderFile(out => { const f = { id: uid(), name: `${M.athlete.name.replace(/ \(.*/, '')} · weeks ${a}–${a + n - 1}`.slice(0, 40), color: '#5AA9FF', parent: null }; out.folders.push(f); for (let k = 0; k < n; k++) weekFolder(a + k, f.id, out); return f; });
+    }
+    download(act === 'weekFolderIT' ? `interval-week${wn}-folder.json` : `interval-progression-weeks${progStart()}-${progStart() + VIEW.progWeeks - 1}.json`, file);
+    toast(`Saved ${plural(file.folders.length, 'folder')} and ${plural(file.routines.length, 'routine')}`);
+  }
   else if (act === 'dayIT' || act === 'dayTxt' || act === 'dayIcs') {
     const { plan, d, tl } = dayCtx(), w = plan.wk.no, tag = `${DAYS[d.idx]}-week${w}`;
     if (act === 'dayIT') { download(`interval-day-${tag}.json`, dayRoutines(d, w, tl)); toast('Saved. In IntervalTimer: Settings → Import routines'); }
@@ -3932,6 +4128,29 @@ $('buildNo').textContent = APP_BUILD;
 // Returning visitors land on Today; a first visit starts with two choices in Setup.
 renderAll();
 showTab(FIRST_RUN ? 'setup' : 'today');
+
+// The timeline and Today's now-bar follow the clock: redraw on each new minute,
+// keeping whatever was opened and where the list was scrolled. A new day
+// rebuilds everything. Nothing redraws under an open dialog or a focused field.
+let tickDate = isoDate(new Date());
+function minuteTick() {
+  clearTimeout(minuteTick.t);
+  minuteTick.t = setTimeout(minuteTick, 60000 - Date.now() % 60000 + 30);
+  if (document.hidden || document.querySelector('dialog[open]') || document.activeElement?.matches?.('input, select, textarea')) return;
+  const today = isoDate(new Date());
+  if (today !== tickDate) { tickDate = today; VIEW.week = VIEW.day = null; return renderAll(); }
+  if (VIEW.tab === 'day' && VIEW.sub.day === 'line') {
+    const pane = $('dayPane'), evs = [...pane.querySelectorAll('.ev')];
+    const open = new Set(evs.filter(x => x.open && !x.classList.contains('now')).map(x => x.querySelector('time')?.textContent + '|' + x.querySelector('.tt')?.textContent));
+    const shut = new Set(evs.filter(x => !x.open && x.classList.contains('now')).map(x => x.querySelector('time')?.textContent + '|' + x.querySelector('.tt')?.textContent));
+    const scrolls = [pane, ...pane.querySelectorAll('.tl')].map(x => x.scrollTop);
+    renderDay();
+    for (const x of pane.querySelectorAll('.ev')) { const key = x.querySelector('time')?.textContent + '|' + x.querySelector('.tt')?.textContent; if (open.has(key)) x.open = true; if (shut.has(key)) x.open = false; }
+    [pane, ...pane.querySelectorAll('.tl')].forEach((x, i) => { if (scrolls[i] != null) x.scrollTop = scrolls[i]; });
+  } else if (VIEW.tab === 'today') renderToday();
+}
+minuteTick();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) minuteTick(); });
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.addEventListener('message', e => {
