@@ -1,6 +1,6 @@
 // Offline support: serve the cached copy first, refresh it in the background,
 // and tell open pages when a newer build of the app has arrived.
-const CACHE = 'fpp-v5';
+const CACHE = 'fpp-v6';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png'];
 const buildOf = text => { const m = /APP_BUILD = ['"]([^'"]*)['"]/.exec(text || ''); return m ? m[1] : ''; };
 const ONE = { ignoreSearch: true, ignoreVary: true };
@@ -19,6 +19,8 @@ self.addEventListener('activate', e => e.waitUntil((async () => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
+  // The About panel's Check for update and Reload ask for the live copy.
+  if (e.request.cache === 'reload' && e.request.mode !== 'navigate') return;
   const isPage = e.request.mode === 'navigate';
   const key = isPage ? new Request(new URL('./', self.location.href)) : e.request;
   e.respondWith(caches.open(CACHE).then(async c => {
